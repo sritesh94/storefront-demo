@@ -5,3 +5,5 @@ export default function decorate(block) {
     card.classList.add('card-item');
   });
 }
+
+console.log('cards-slider block loaded');
