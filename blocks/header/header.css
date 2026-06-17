@@ -37,6 +37,23 @@ header nav[aria-expanded='true'] {
   min-height: 100dvh;
 }
 
+header nav p {
+  margin: 0;
+  line-height: 1;
+}
+
+.nav-top {
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+}
+
+.nav-top p {
+  margin: 0 auto;
+  max-width: 1264px;
+  padding: 10px 32px;
+}
+
 @media (min-width: 900px) {
   header .nav-wrapper {
     position: relative;
@@ -54,11 +71,6 @@ header nav[aria-expanded='true'] {
     min-height: 0;
     overflow: visible;
   }
-}
-
-header nav p {
-  margin: 0;
-  line-height: 1;
 }
 
 /* hamburger */
