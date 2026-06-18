@@ -2,9 +2,15 @@
 import { events } from '@dropins/tools/event-bus.js';
 
 import { tryRenderAemAssetsImage } from '@dropins/tools/lib/aem/assets.js';
+import { getConfigValue } from '@dropins/tools/lib/aem/configs.js';
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
-import { fetchPlaceholders, getProductLink, rootLink } from '../../scripts/commerce.js';
+import {
+  CS_FETCH_GRAPHQL,
+  fetchPlaceholders,
+  getProductLink,
+  rootLink,
+} from '../../scripts/commerce.js';
 
 import renderAuthCombine from './renderAuthCombine.js';
 import { renderAuthDropdown } from './renderAuthDropdown.js';
@@ -18,6 +24,85 @@ const labels = await fetchPlaceholders();
 const overlay = document.createElement('div');
 overlay.classList.add('overlay');
 document.querySelector('header').insertAdjacentElement('afterbegin', overlay);
+
+const CATEGORY_NAVIGATION_QUERY = `
+  query CategoryNavigation($rootCategoryIds: [String!]!) {
+    categories(
+      ids: $rootCategoryIds,
+      roles: ["show_in_menu", "active"],
+      subtree: { startLevel: 2, depth: 3 }
+    ) {
+      name
+      position
+      id
+      urlPath
+      parentId
+    }
+  }
+`;
+
+function shouldShowCategory(category) {
+  return category?.name && category?.urlPath;
+}
+
+function getSortedCategories(categories) {
+  return [...categories].sort((a, b) => {
+    if (Number.isFinite(a.position) && Number.isFinite(b.position)) return a.position - b.position;
+    return a.name.localeCompare(b.name);
+  });
+}
+
+function buildCategoryTree(categories, parentId) {
+  return getSortedCategories(categories)
+    .filter((category) => category.parentId === parentId && shouldShowCategory(category))
+    .map((category) => ({
+      ...category,
+      children: buildCategoryTree(categories, category.id),
+    }));
+}
+
+function buildCategoryList(categories) {
+  if (!categories.length) return null;
+  const list = document.createElement('ul');
+  categories.forEach((category) => {
+    const item = document.createElement('li');
+    const link = document.createElement('a');
+    link.href = rootLink(`/${category.urlPath}`);
+    link.textContent = category.name;
+    item.append(link);
+
+    const childList = buildCategoryList(category.children || []);
+    if (childList) item.append(childList);
+
+    list.append(item);
+  });
+  return list;
+}
+async function decorateCategoryNavigation(navSections) {
+  const navWrapper = navSections?.querySelector('.default-content-wrapper');
+  const authoredList = navWrapper?.querySelector(':scope > ul');
+  if (!authoredList) return;
+  try {
+    const rootCategoryId = await getConfigValue('plugins.picker.rootCategory') || '2';
+    const { data, errors } = await CS_FETCH_GRAPHQL.fetchGraphQl(CATEGORY_NAVIGATION_QUERY, {
+      variables: { rootCategoryIds: [rootCategoryId] },
+    });
+    if (errors?.length) throw new Error('Category navigation query returned errors');
+    const categoryTree = buildCategoryTree(data?.categories || [], rootCategoryId);
+    const categoryList = buildCategoryList(categoryTree);
+    if (!categoryList) return;
+    const catalogItem = [...authoredList.children]
+      .find((item) => item.firstElementChild?.textContent.trim().toLowerCase() === 'catalog');
+    const categoryItems = [...categoryList.children];
+    if (catalogItem) {
+      catalogItem.replaceWith(...categoryItems);
+    } else {
+      authoredList.prepend(...categoryItems);
+    }
+  } catch (error) {
+    console.warn('Could not load Commerce category navigation. Falling back to authored nav.', error);
+  }
+}
 
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
@@ -195,6 +280,8 @@ export default async function decorate(block) {
 
   const navSections = nav.querySelector('.nav-sections');
   if (navSections) {
+    await decorateCategoryNavigation(navSections);
+
     navSections
       .querySelectorAll(':scope .default-content-wrapper > ul > li')
       .forEach((navSection) => {
@@ -239,6 +326,20 @@ export default async function decorate(block) {
 
   wishlistButton.addEventListener('click', () => {
     window.location.href = rootLink(wishlistPath);
+  });
+
+  events.on('wishlist/data', (data) => {
+    const count = data?.items_count ?? data?.items?.length;
+
+    if (count) {
+      wishlistButton.setAttribute('data-count', count);
+    } else {
+      wishlistButton.removeAttribute('data-count');
+    }
+  }, { eager: true });
+
+  import('../../scripts/initializers/wishlist.js').catch((error) => {
+    console.warn('Could not initialize wishlist counter.', error);
   });
 
   /** Mini Cart */

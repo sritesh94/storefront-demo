@@ -223,6 +223,10 @@ header nav .nav-sections ul>li:empty {
   display: none;
 }
 
+.nav-sections .default-content-wrapper > ul > li:first-of-type {
+  display: none;
+}
+
 @media (min-width: 900px) {
   header nav .nav-sections {
     display: block;
@@ -250,7 +254,7 @@ header nav .nav-sections ul>li:empty {
 
   header nav .nav-sections ul {
     display: flex;
-    gap: 24px;
+    gap: 5px;
     margin: 0;
   }
 
@@ -262,11 +266,11 @@ header nav .nav-sections ul>li:empty {
   header nav .nav-sections .nav-drop[aria-expanded='true'] ul {
     flex-flow: column wrap;
     max-height: calc(var(--desktop-panel-max-height) - 2 * var(--spacing-xbig));
-    min-height: calc(var(--desktop-panel-min-height) - 2 * var(--spacing-xbig));
   }
 
   header nav .nav-sections .default-content-wrapper>ul>li {
     flex: 0 1 auto;
+    position: relative;
   }
 
   header nav .nav-sections .default-content-wrapper>ul>li[aria-expanded='true'] .submenu-wrapper {
@@ -274,11 +278,11 @@ header nav .nav-sections ul>li:empty {
     box-sizing: border-box;
     left: 0;
     max-height: var(--desktop-panel-max-height);
-    min-height: var(--desktop-panel-min-height);
-    padding: var(--spacing-xbig);
+    padding: var(--spacing-small);
     position: absolute;
-    top: var(--spacing-large);
-    width: 100%;
+    top: calc(100% + var(--spacing-xsmall));
+    width: 280px;
+    box-shadow: var(--shape-shadow-2);
   }
 
   header nav .nav-sections .default-content-wrapper>ul>li .submenu-header {
@@ -294,20 +298,6 @@ header nav .nav-sections ul>li:empty {
   header nav .nav-sections .default-content-wrapper>ul>li[aria-expanded='true'] ul {
     display: flex;
     margin: 0 auto;
-    overflow-x: auto;
-    width: var(--desktop-large-panel-width);
-  }
-
-  header nav .nav-sections .default-content-wrapper>ul>li ul::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: 16px;
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 8px solid var(--color-neutral-500);
   }
 
   header nav .nav-sections .default-content-wrapper>ul>li ul>li {
@@ -365,7 +355,8 @@ header nav .nav-tools button.nav-cart-button {
   position: relative;
 }
 
-header nav .nav-tools button.nav-cart-button[data-count]::after {
+header nav .nav-tools button.nav-cart-button[data-count]::after,
+header nav .nav-tools button.nav-wishlist-button[data-count]::after {
   content: attr(data-count);
   position: absolute;
   top: 0;
@@ -868,4 +859,3 @@ body:has(.seller-assisted-buying-banner) {
     display: inline-block;
   }
 }
-
