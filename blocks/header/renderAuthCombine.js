@@ -8,14 +8,20 @@ import { Button, provider as UI } from '@dropins/tools/components.js';
 import {
   CUSTOMER_LOGIN_PATH,
   CUSTOMER_ACCOUNT_PATH,
+  CUSTOMER_CREATE_PATH,
   CUSTOMER_FORGOTPASSWORD_PATH,
   rootLink,
   getProductLink,
 } from '../../scripts/commerce.js';
+import { moveSignUpLinkBelowSubmit } from './authHelpers.js';
 
 const signInFormConfig = {
   renderSignUpLink: true,
   routeForgotPassword: () => rootLink(CUSTOMER_FORGOTPASSWORD_PATH),
+  routeSignUp: () => rootLink(CUSTOMER_CREATE_PATH),
+  onSignUpLinkClick: () => {
+    window.location.href = rootLink(CUSTOMER_CREATE_PATH);
+  },
   slots: {
     SuccessNotification: (ctx) => {
       const userName = ctx?.isSuccessful?.userName || '';
@@ -204,6 +210,7 @@ const onHeaderLinkClick = (element) => {
     signUpFormConfig,
     resetPasswordFormConfig,
   })(signInForm);
+  moveSignUpLinkBelowSubmit(signInForm);
 };
 
 const renderAuthCombine = (navSections, toggleMenu) => {

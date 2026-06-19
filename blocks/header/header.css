@@ -355,6 +355,15 @@ header nav .nav-tools button.nav-cart-button {
   position: relative;
 }
 
+header nav .nav-tools button.nav-compare-button {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  background-image: url('../../icons/compare.svg');
+  width: 30px;
+  height: 30px;
+}
+
 header nav .nav-tools button.nav-cart-button[data-count]::after,
 header nav .nav-tools button.nav-wishlist-button[data-count]::after {
   content: attr(data-count);
@@ -495,6 +504,31 @@ header .nav-search-input .search_autocomplete .popover-container {
   @supports (height: 90svh) {
     max-height: 90svh;
   }
+}
+
+:is(#auth-combine-wrapper, .dropdown-wrapper.nav-tools-wrapper) .auth-sign-in-form__signup-prompt {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xxsmall);
+  justify-content: center;
+  align-items: baseline;
+  margin: var(--spacing-medium) 0 0;
+  color: var(--color-neutral-700);
+  font: var(--type-body-1-default-font);
+  letter-spacing: 0;
+}
+
+:is(#auth-combine-wrapper, .dropdown-wrapper.nav-tools-wrapper) .auth-sign-in-form__signup-prompt .auth-sign-in-form__button--signup {
+  margin: 0;
+  flex-basis: auto;
+}
+
+:is(#auth-combine-wrapper, .dropdown-wrapper.nav-tools-wrapper) .auth-sign-in-form__button--signup-hidden {
+  display: none;
+}
+
+.auth-sign-in-form__signup-prompt .auth-sign-in-form__signup-link {
+  font-weight: 600;
 }
 
 /* CSS for auth dropdown */

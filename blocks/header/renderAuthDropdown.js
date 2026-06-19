@@ -3,9 +3,11 @@ import * as authApi from '@dropins/storefront-auth/api.js';
 import { render as authRenderer } from '@dropins/storefront-auth/render.js';
 import { SignIn } from '@dropins/storefront-auth/containers/SignIn.js';
 import {
+  CUSTOMER_CREATE_PATH,
   CUSTOMER_FORGOTPASSWORD_PATH,
   rootLink,
 } from '../../scripts/commerce.js';
+import { moveSignUpLinkBelowSubmit } from './authHelpers.js';
 
 function handleLogout(redirections) {
   const shouldRedirect = Object.entries(redirections).some(([currentPath, redirectPath]) => {
@@ -29,8 +31,11 @@ function renderSignIn(element) {
       window.location.reload();
     },
     formSize: 'small',
+    renderSignUpLink: true,
     routeForgotPassword: () => rootLink(CUSTOMER_FORGOTPASSWORD_PATH),
+    routeSignUp: () => rootLink(CUSTOMER_CREATE_PATH),
   })(element);
+  moveSignUpLinkBelowSubmit(element);
 }
 
 export function renderAuthDropdown(navTools) {
@@ -41,7 +46,10 @@ export function renderAuthDropdown(navTools) {
       <div id="auth-dropin-container"></div>
       <ul class="authenticated-user-menu">
          <li><a href="${rootLink('/customer/account')}">My Account</a></li>
-          <li><button>Logout</button></li>
+         <li><a href="${rootLink('/customer/orders')}">My Orders</a></li>
+         <li><a href="${rootLink('/order-status')}">Order Status</a></li>
+         <li><a href="${rootLink('/customer/address')}">Address</a></li>
+         <li><button>Logout</button></li>
       </ul>
     </div>
  </div>`);

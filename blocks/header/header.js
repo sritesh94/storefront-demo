@@ -70,37 +70,49 @@ function buildCategoryList(categories) {
     link.href = rootLink(`/${category.urlPath}`);
     link.textContent = category.name;
     item.append(link);
-
     const childList = buildCategoryList(category.children || []);
     if (childList) item.append(childList);
-
     list.append(item);
   });
   return list;
 }
 async function decorateCategoryNavigation(navSections) {
-  const navWrapper = navSections?.querySelector('.default-content-wrapper');
-  const authoredList = navWrapper?.querySelector(':scope > ul');
-  if (!authoredList) return;
   try {
     const rootCategoryId = await getConfigValue('plugins.picker.rootCategory') || '2';
-    const { data, errors } = await CS_FETCH_GRAPHQL.fetchGraphQl(CATEGORY_NAVIGATION_QUERY, {
-      variables: { rootCategoryIds: [rootCategoryId] },
-    });
-    if (errors?.length) throw new Error('Category navigation query returned errors');
-    const categoryTree = buildCategoryTree(data?.categories || [], rootCategoryId);
-    const categoryList = buildCategoryList(categoryTree);
-    if (!categoryList) return;
-    const catalogItem = [...authoredList.children]
-      .find((item) => item.firstElementChild?.textContent.trim().toLowerCase() === 'catalog');
-    const categoryItems = [...categoryList.children];
-    if (catalogItem) {
-      catalogItem.replaceWith(...categoryItems);
-    } else {
-      authoredList.prepend(...categoryItems);
+    const { data, errors } = await CS_FETCH_GRAPHQL.fetchGraphQl(
+      CATEGORY_NAVIGATION_QUERY,
+      {
+        variables: {
+          rootCategoryIds: [rootCategoryId],
+        },
+      },
+    );
+
+    if (errors?.length) {
+      throw new Error('Category navigation query returned errors');
     }
+
+    const categoryTree = buildCategoryTree(
+      data?.categories || [],
+      rootCategoryId,
+    );
+
+    const categoryList = buildCategoryList(categoryTree);
+
+    if (!categoryList) return;
+
+    navSections.innerHTML = '';
+
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('default-content-wrapper');
+
+    wrapper.append(categoryList);
+    navSections.append(wrapper);
   } catch (error) {
-    console.warn('Could not load Commerce category navigation. Falling back to authored nav.', error);
+    console.warn(
+      'Could not load Commerce category navigation.',
+      error,
+    );
   }
 }
 
@@ -271,6 +283,19 @@ export default async function decorate(block) {
     if (section) section.classList.add(`nav-${c}`);
   });
 
+  let navSections = nav.querySelector('.nav-sections');
+  if (!navSections) {
+    navSections = document.createElement('div');
+    navSections.classList.add('nav-sections');
+    nav.append(navSections);
+  }
+  let navTools = nav.querySelector('.nav-tools');
+  if (!navTools) {
+    navTools = document.createElement('div');
+    navTools.classList.add('nav-tools');
+    nav.append(navTools);
+  }
+
   const navBrand = nav.querySelector('.nav-brand');
   const brandLink = navBrand.querySelector('.button');
   if (brandLink) {
@@ -278,7 +303,7 @@ export default async function decorate(block) {
     brandLink.closest('.button-container').className = '';
   }
 
-  const navSections = nav.querySelector('.nav-sections');
+  navSections = nav.querySelector('.nav-sections');
   if (navSections) {
     await decorateCategoryNavigation(navSections);
 
@@ -307,7 +332,7 @@ export default async function decorate(block) {
       });
   }
 
-  const navTools = nav.querySelector('.nav-tools');
+  navTools = nav.querySelector('.nav-tools');
 
   /** Wishlist */
   const wishlist = document.createRange().createContextualFragment(`
@@ -361,6 +386,24 @@ export default async function decorate(block) {
   if (excludeMiniCartFromPaths.includes(window.location.pathname)) {
     cartButton.style.display = 'none';
   }
+
+  // Compare Icon
+
+  const compare = document.createRange().createContextualFragment(`
+    <div class="compare-wrapper nav-tools-wrapper">
+      <button type="button" class="nav-compare-button" aria-label="Compare"></button>
+      <div class="compare-panel nav-tools-panel"></div>
+    </div>
+  `);
+
+  navTools.append(compare);
+
+  const compareButton = navTools.querySelector('.nav-compare-button');
+  const compareMeta = getMetadata('compare');
+  const comparePath = compareMeta ? new URL(compareMeta, window.location).pathname : '/compare';
+  compareButton.addEventListener('click', () => {
+    window.location.href = rootLink(comparePath);
+  });
 
   /**
    * Handles loading states for navigation panels with state management
