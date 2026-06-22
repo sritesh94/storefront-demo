@@ -81,6 +81,15 @@
     gap: var(--spacing-xxsmall);
 }
 
+.product-discovery-product-actions__compare-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+}
+
 /* Empty State */
 
 .block.product-list-page.product-list-page--empty .search__wrapper {

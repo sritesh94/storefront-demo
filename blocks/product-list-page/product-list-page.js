@@ -176,8 +176,44 @@ export default async function decorate(block) {
             product: ctx.product,
             variant: 'tertiary',
           })($wishlistToggle);
+          // Compare Button
+          const compareBtn = document.createElement('button');
+          compareBtn.className = 'product-discovery-product-actions__compare-toggle';
+          compareBtn.type = 'button';
+          compareBtn.innerHTML = `
+            <img
+              src="../../icons/compare.svg"
+              alt="Compare"
+              width="24"
+              height="24"
+            />
+          `;
+          const compareProducts = JSON.parse(
+            localStorage.getItem('compare-products') || '[]',
+          );
+          if (compareProducts.includes(ctx.product.sku)) {
+            compareBtn.classList.add('active');
+          }
+          compareBtn.addEventListener('click', () => {
+            let products = JSON.parse(
+              localStorage.getItem('compare-products') || '[]',
+            );
+            if (products.includes(ctx.product.sku)) {
+              products = products.filter((sku) => sku !== ctx.product.sku);
+              compareBtn.classList.remove('active');
+            } else {
+              products.push(ctx.product.sku);
+              compareBtn.classList.add('active');
+            }
+            localStorage.setItem(
+              'compare-products',
+              JSON.stringify(products),
+            );
+          });
+          ctx.replaceWith(actionsWrapper);
           actionsWrapper.appendChild(addToCartBtn);
           actionsWrapper.appendChild($wishlistToggle);
+          actionsWrapper.appendChild(compareBtn);
           ctx.replaceWith(actionsWrapper);
         },
       },
