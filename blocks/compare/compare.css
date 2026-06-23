@@ -1,3 +1,274 @@
-.test-code {
-    display: block;
+.compare-container {
+  max-width: 1200px;
+  margin: var(--spacing-medium) auto;
+  padding: 0 var(--spacing-small);
+}
+
+.compare-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-medium);
+  border-bottom: 2px solid var(--color-neutral-200);
+  padding-bottom: var(--spacing-small);
+}
+
+.compare-header-container h2 {
+  margin: 0;
+  font: var(--type-headline-1-font);
+  color: var(--color-neutral-900);
+}
+
+.compare-action-btn {
+  padding: var(--spacing-xsmall) var(--spacing-small);
+  font: var(--type-details-overline-font);
+  border: var(--shape-border-width-1) solid var(--color-neutral-400);
+  background-color: var(--color-neutral-50);
+  color: var(--color-neutral-800);
+  border-radius: var(--shape-border-radius-1);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.compare-action-btn:hover {
+  background-color: var(--color-neutral-200);
+  border-color: var(--color-neutral-600);
+}
+
+.compare-table-wrapper {
+  overflow-x: auto;
+  border: var(--shape-border-width-1) solid var(--color-neutral-300);
+  border-radius: var(--shape-border-radius-2);
+  background-color: var(--color-neutral-50);
+  box-shadow: var(--shape-shadow-3);
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font: var(--type-body-2-default-font);
+}
+
+.compare-table th,
+.compare-table td {
+  padding: var(--spacing-small);
+  border: var(--shape-border-width-1) solid var(--color-neutral-200);
+  min-width: 250px;
+}
+
+.compare-table th.compare-feature-col,
+.compare-table td.compare-feature-name {
+  min-width: 180px;
+  width: 180px;
+  font-weight: 700;
+  background-color: var(--color-neutral-100);
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  border-right: 2px solid var(--color-neutral-300);
+}
+
+.compare-table th {
+  background-color: var(--color-neutral-50);
+  vertical-align: top;
+}
+
+.compare-table tbody tr:hover {
+  background-color: var(--color-neutral-100);
+}
+
+.compare-table tbody tr:hover td.compare-feature-name {
+  background-color: var(--color-neutral-200);
+}
+
+/* Card details */
+.compare-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--spacing-small) 0;
+}
+
+.compare-remove-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background-color: var(--color-neutral-200);
+  color: var(--color-neutral-700);
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.compare-remove-btn:hover {
+  background-color: var(--color-brand-700);
+  color: var(--color-neutral-50);
+}
+
+.compare-card-image-link {
+  margin-bottom: var(--spacing-small);
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.compare-card-image {
+  max-height: 150px;
+  max-width: 100%;
+  object-fit: contain;
+  transition: transform 0.2s;
+}
+
+.compare-card-image-link:hover .compare-card-image {
+  transform: scale(1.05);
+}
+
+.compare-card-name-link {
+  text-decoration: none;
+  color: var(--color-neutral-900);
+  margin-bottom: var(--spacing-xsmall);
+  display: block;
+}
+
+.compare-card-name-link:hover {
+  text-decoration: underline;
+}
+
+.compare-card-name {
+  margin: 0;
+  font: var(--type-body-1-strong-font);
+  font-size: 1.5rem;
+  line-height: 1.4;
+  height: 2.8em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.compare-card-price {
+  margin-bottom: var(--spacing-xsmall);
+}
+
+.compare-price {
+  font: var(--type-body-1-strong-font);
+}
+
+.compare-price.regular-price {
+  color: var(--color-neutral-600);
+  margin-right: var(--spacing-xxsmall);
+  font-size: 0.9em;
+}
+
+.compare-price.special-price {
+  color: var(--color-alert-800);
+}
+
+.compare-card-sku {
+  font: var(--type-details-caption-2-font);
+  color: var(--color-neutral-700);
+}
+
+.compare-label {
+  font-weight: 700;
+}
+
+/* Stock statuses */
+.compare-stock {
+  font-weight: 700;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.compare-stock.in-stock {
+  background-color: var(--color-positive-200);
+  color: var(--color-positive-800);
+}
+
+.compare-stock.out-of-stock {
+  background-color: var(--color-alert-200);
+  color: var(--color-alert-800);
+}
+
+.compare-not-applicable {
+  color: var(--color-neutral-500);
+}
+
+.compare-description-cell {
+  line-height: 1.6;
+  max-height: 150px;
+  overflow-y: auto;
+  font-size: 0.9em;
+}
+
+/* Actions styling */
+.compare-add-cart {
+  width: 100%;
+  padding: var(--spacing-small);
+  font: var(--type-button-2-font);
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.compare-add-cart.disabled {
+  background-color: var(--color-neutral-300);
+  color: var(--color-neutral-600);
+  cursor: not-allowed;
+}
+
+/* Empty, Error and Loading states */
+.compare-empty-state,
+.compare-error,
+.compare-loading {
+  text-align: center;
+  padding: var(--spacing-large) var(--spacing-medium);
+  background-color: var(--color-neutral-50);
+  border: var(--shape-border-width-1) solid var(--color-neutral-300);
+  border-radius: var(--shape-border-radius-2);
+  margin: var(--spacing-medium) auto;
+  max-width: 600px;
+  box-shadow: var(--shape-shadow-3);
+}
+
+.compare-empty-state p,
+.compare-error p {
+  font: var(--type-headline-2-default-font);
+  margin-bottom: var(--spacing-medium);
+}
+
+.compare-back-btn,
+.compare-retry-btn {
+  display: inline-block;
+  text-decoration: none;
+}
+
+@media (max-width: 600px) {
+  .compare-table th,
+  .compare-table td {
+    min-width: 200px;
+    padding: var(--spacing-xsmall);
+  }
+
+  .compare-table th.compare-feature-col,
+  .compare-table td.compare-feature-name {
+    min-width: 120px;
+    width: 120px;
+  }
 }

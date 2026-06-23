@@ -362,10 +362,12 @@ header nav .nav-tools button.nav-compare-button {
   background-image: url('../../icons/compare.svg');
   width: 30px;
   height: 30px;
+  position: relative;
 }
 
 header nav .nav-tools button.nav-cart-button[data-count]::after,
-header nav .nav-tools button.nav-wishlist-button[data-count]::after {
+header nav .nav-tools button.nav-wishlist-button[data-count]::after,
+header nav .nav-tools button.nav-compare-button[data-count]::after {
   content: attr(data-count);
   position: absolute;
   top: 0;

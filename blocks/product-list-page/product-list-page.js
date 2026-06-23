@@ -209,6 +209,7 @@ export default async function decorate(block) {
               'compare-products',
               JSON.stringify(products),
             );
+            window.dispatchEvent(new CustomEvent('compare-products-updated'));
           });
           ctx.replaceWith(actionsWrapper);
           actionsWrapper.appendChild(addToCartBtn);
