@@ -1,6 +1,6 @@
 import { getProductsData, setEndpoint } from '@dropins/storefront-pdp/api.js';
-import { CS_FETCH_GRAPHQL, getProductLink, rootLink } from '../../scripts/commerce.js';
 import { events } from '@dropins/tools/event-bus.js';
+import { CS_FETCH_GRAPHQL, getProductLink, rootLink } from '../../scripts/commerce.js';
 import {
   getCompareProducts,
   removeCompareProduct,
