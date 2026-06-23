@@ -188,7 +188,6 @@ export default async function decorate(block) {
               height="24"
             />
           `;
-          ctx.replaceWith(actionsWrapper);
           actionsWrapper.appendChild(addToCartBtn);
           actionsWrapper.appendChild($wishlistToggle);
           actionsWrapper.appendChild(compareBtn);

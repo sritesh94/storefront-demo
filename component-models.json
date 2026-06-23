@@ -381,10 +381,6 @@
     ]
   },
   {
-    "id": "compare",
-    "fields": []
-  },
-  {
     "id": "enrichment",
     "fields": [
       {

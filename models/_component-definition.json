@@ -55,6 +55,9 @@
         },
         {
           "...": "../blocks/cards-slider-*/_*.json#/definitions"
+        },
+        {
+          "...": "../blocks/compare-products-*/_*.json#/definitions"
         }
       ]
     },
