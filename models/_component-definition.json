@@ -57,7 +57,7 @@
           "...": "../blocks/cards-slider-*/_*.json#/definitions"
         },
         {
-          "...": "../blocks/compare/_*.json#/definitions"
+          "...": "../blocks/compare-*/_*.json#/definitions"
         }
       ]
     },
