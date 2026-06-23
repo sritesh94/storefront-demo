@@ -1,26 +1,27 @@
 import { getProductsData, setEndpoint } from '@dropins/storefront-pdp/api.js';
-import { CS_FETCH_GRAPHQL, getProductLink } from '../../scripts/commerce.js';
+import { CS_FETCH_GRAPHQL, getProductLink, rootLink } from '../../scripts/commerce.js';
+import { events } from '@dropins/tools/event-bus.js';
+import {
+  getCompareProducts,
+  removeCompareProduct,
+  clearCompareProducts,
+} from '../../scripts/components/compare/compare.js';
 
 export default async function decorate(block) {
   setEndpoint(CS_FETCH_GRAPHQL);
-
-  const getCompareList = () => JSON.parse(localStorage.getItem('compare-products') || '[]');
-
-  const saveCompareList = (list) => {
-    localStorage.setItem('compare-products', JSON.stringify(list));
-    window.dispatchEvent(new CustomEvent('compare-products-updated'));
-  };
 
   const renderEmptyState = () => {
     block.innerHTML = `
       <div class="compare-empty-state">
         <p>No products selected for comparison.</p>
-        <a href="/" class="compare-back-btn button primary">Browse Products</a>
+        <a href="${rootLink('/')}" class="compare-back-btn button primary">
+          Browse Products
+        </a>
       </div>
     `;
   };
 
-  const skus = getCompareList();
+  const skus = getCompareProducts().filter(Boolean);
 
   if (!skus.length) {
     renderEmptyState();
@@ -32,7 +33,7 @@ export default async function decorate(block) {
   try {
     const products = await getProductsData(skus.map((sku) => ({ sku })));
 
-    if (!products || !products.length) {
+    if (!products?.length) {
       renderEmptyState();
       return;
     }
@@ -143,11 +144,14 @@ export default async function decorate(block) {
     // 2. Custom Attributes Rows
     uniqueAttributes.forEach((label) => {
       const row = document.createElement('tr');
-      row.innerHTML = `<td class="compare-feature-name">${label}</td>`;
+      const nameCell = document.createElement('td');
+      nameCell.className = 'compare-feature-name';
+      nameCell.textContent = label;
+      row.appendChild(nameCell);
       products.forEach((product) => {
         const td = document.createElement('td');
         const attrVal = product.attributes?.find((a) => a.label === label);
-        td.innerHTML = attrVal ? attrVal.value : '<span class="compare-not-applicable">—</span>';
+        td.textContent = attrVal?.value || '—';
         row.appendChild(td);
       });
       tbody.appendChild(row);
@@ -159,7 +163,9 @@ export default async function decorate(block) {
     products.forEach((product) => {
       const td = document.createElement('td');
       td.className = 'compare-description-cell';
-      td.innerHTML = product.shortDescription || product.description || '';
+      const temp = document.createElement('div');
+      temp.innerHTML = product.shortDescription || product.description || '';
+      td.textContent = temp.textContent || '';
       descRow.appendChild(td);
     });
     tbody.appendChild(descRow);
@@ -187,16 +193,26 @@ export default async function decorate(block) {
             cartBtn.disabled = true;
             cartBtn.textContent = 'Adding...';
             const { addProductsToCart } = await import('@dropins/storefront-cart/api.js');
-            const { events } = await import('@dropins/tools/event-bus.js');
-            const response = await addProductsToCart([{ sku: product.sku, quantity: 1 }]);
+            const response = await addProductsToCart([
+              {
+                sku: product.sku,
+                quantity: 1,
+              },
+            ]);
+
             events.emit('cart/updated', response);
+
             cartBtn.textContent = 'Added!';
+
             setTimeout(() => {
               cartBtn.disabled = false;
               cartBtn.textContent = 'Add to Cart';
             }, 2000);
           } catch (err) {
+            console.error(err);
+
             cartBtn.textContent = 'Error';
+
             setTimeout(() => {
               cartBtn.disabled = false;
               cartBtn.textContent = 'Add to Cart';
@@ -216,21 +232,24 @@ export default async function decorate(block) {
 
     // Event listener for Clear All
     headerContainer.querySelector('.compare-clear-all').addEventListener('click', () => {
-      saveCompareList([]);
+      clearCompareProducts();
       renderEmptyState();
     });
 
     // Event listeners for Remove buttons
     block.querySelectorAll('.compare-remove-btn').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        const skuToRemove = e.target.getAttribute('data-sku');
-        const currentList = getCompareList();
-        const updatedList = currentList.filter((s) => s !== skuToRemove);
-        saveCompareList(updatedList);
-        decorate(block);
+      btn.addEventListener('click', async (e) => {
+        const skuToRemove = e.currentTarget.dataset.sku;
+        removeCompareProduct(skuToRemove);
+        if (getCompareProducts().length === 0) {
+          renderEmptyState();
+          return;
+        }
+        await decorate(block);
       });
     });
   } catch (error) {
+    console.error('Compare products error:', error);
     block.innerHTML = `
       <div class="compare-error">
         <p>An error occurred while loading comparison data.</p>

@@ -18,6 +18,11 @@ import { events } from '@dropins/tools/event-bus.js';
 import { readBlockConfig } from '../../scripts/aem.js';
 import { fetchPlaceholders, getProductLink } from '../../scripts/commerce.js';
 import { getSearchStateFromUrl, applySearchStateToUrl } from './search-url.js';
+import {
+  addCompareProduct,
+  removeCompareProduct,
+  isCompared,
+} from '../../scripts/components/compare/compare.js';
 
 // Initializers
 import '../../scripts/initializers/search.js';
@@ -168,7 +173,7 @@ export default async function decorate(block) {
           actionsWrapper.className = 'product-discovery-product-actions';
           // Add to Cart Button
           const addToCartBtn = getAddToCartButton(ctx.product);
-          addToCartBtn.className = 'product-discovery-product-actions__add-to-cart';
+          addToCartBtn.classList.add('product-discovery-product-actions__add-to-cart');
           // Wishlist Button
           const $wishlistToggle = document.createElement('div');
           $wishlistToggle.classList.add('product-discovery-product-actions__wishlist-toggle');
@@ -188,30 +193,22 @@ export default async function decorate(block) {
               height="24"
             />
           `;
-          const compareProducts = JSON.parse(
-            localStorage.getItem('compare-products') || '[]',
-          );
-          if (compareProducts.includes(ctx.product.sku)) {
+          if (isCompared(ctx.product.sku)) {
             compareBtn.classList.add('active');
           }
           compareBtn.addEventListener('click', () => {
-            let products = JSON.parse(
-              localStorage.getItem('compare-products') || '[]',
-            );
-            if (products.includes(ctx.product.sku)) {
-              products = products.filter((sku) => sku !== ctx.product.sku);
+            if (isCompared(ctx.product.sku)) {
+              removeCompareProduct(ctx.product.sku);
               compareBtn.classList.remove('active');
             } else {
-              products.push(ctx.product.sku);
+              const result = addCompareProduct(ctx.product.sku);
+              if (!result.success) {
+                alert(result.message);
+                return;
+              }
               compareBtn.classList.add('active');
             }
-            localStorage.setItem(
-              'compare-products',
-              JSON.stringify(products),
-            );
-            window.dispatchEvent(new CustomEvent('compare-products-updated'));
           });
-          ctx.replaceWith(actionsWrapper);
           actionsWrapper.appendChild(addToCartBtn);
           actionsWrapper.appendChild($wishlistToggle);
           actionsWrapper.appendChild(compareBtn);

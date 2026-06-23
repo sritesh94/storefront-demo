@@ -11,6 +11,9 @@ import {
   getProductLink,
   rootLink,
 } from '../../scripts/commerce.js';
+import {
+  getCompareCount,
+} from '../../scripts/components/compare/compare.js';
 
 import renderAuthCombine from './renderAuthCombine.js';
 import { renderAuthDropdown } from './renderAuthDropdown.js';
@@ -400,29 +403,40 @@ export default async function decorate(block) {
 
   const compareButton = navTools.querySelector('.nav-compare-button');
   const compareMeta = getMetadata('compare');
-  const comparePath = compareMeta ? new URL(compareMeta, window.location).pathname : '/compare';
+  const comparePath = compareMeta
+    ? new URL(compareMeta, window.location).pathname
+    : '/compare';
+
   compareButton.addEventListener('click', () => {
     window.location.href = rootLink(comparePath);
   });
 
-  const updateCompareCount = () => {
-    const compareProducts = JSON.parse(localStorage.getItem('compare-products') || '[]');
-    const count = compareProducts.length;
+  function updateCompareCount() {
+    const count = getCompareCount();
+
     if (count > 0) {
       compareButton.setAttribute('data-count', count);
     } else {
       compareButton.removeAttribute('data-count');
     }
-  };
+  }
 
   updateCompareCount();
 
-  window.addEventListener('compare-products-updated', updateCompareCount);
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'compare-products') {
-      updateCompareCount();
-    }
-  });
+  if (!window.__compareCounterInitialized) {
+    window.addEventListener(
+      'compare-products-updated',
+      updateCompareCount,
+    );
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'compare-products') {
+        updateCompareCount();
+      }
+    });
+
+    window.__compareCounterInitialized = true;
+  }
 
   /**
    * Handles loading states for navigation panels with state management
