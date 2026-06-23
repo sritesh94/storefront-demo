@@ -1,0 +1,21 @@
+{
+  "definitions": [
+    {
+      "title": "Compare",
+      "id": "compare",
+      "model": "compare",
+      "plugins": {
+        "da": {
+          "type": "key-value-block"
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "compare",
+      "fields": []
+    }
+  ],
+  "filters": []
+}
