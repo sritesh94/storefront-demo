@@ -405,25 +405,6 @@ export default async function decorate(block) {
     window.location.href = rootLink(comparePath);
   });
 
-  const updateCompareCount = () => {
-    const compareProducts = JSON.parse(localStorage.getItem('compare-products') || '[]');
-    const count = compareProducts.length;
-    if (count > 0) {
-      compareButton.setAttribute('data-count', count);
-    } else {
-      compareButton.removeAttribute('data-count');
-    }
-  };
-
-  updateCompareCount();
-
-  window.addEventListener('compare-products-updated', updateCompareCount);
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'compare-products') {
-      updateCompareCount();
-    }
-  });
-
   /**
    * Handles loading states for navigation panels with state management
    *

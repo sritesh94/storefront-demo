@@ -188,29 +188,6 @@ export default async function decorate(block) {
               height="24"
             />
           `;
-          const compareProducts = JSON.parse(
-            localStorage.getItem('compare-products') || '[]',
-          );
-          if (compareProducts.includes(ctx.product.sku)) {
-            compareBtn.classList.add('active');
-          }
-          compareBtn.addEventListener('click', () => {
-            let products = JSON.parse(
-              localStorage.getItem('compare-products') || '[]',
-            );
-            if (products.includes(ctx.product.sku)) {
-              products = products.filter((sku) => sku !== ctx.product.sku);
-              compareBtn.classList.remove('active');
-            } else {
-              products.push(ctx.product.sku);
-              compareBtn.classList.add('active');
-            }
-            localStorage.setItem(
-              'compare-products',
-              JSON.stringify(products),
-            );
-            window.dispatchEvent(new CustomEvent('compare-products-updated'));
-          });
           ctx.replaceWith(actionsWrapper);
           actionsWrapper.appendChild(addToCartBtn);
           actionsWrapper.appendChild($wishlistToggle);
