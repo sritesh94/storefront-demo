@@ -88,6 +88,11 @@
     display: inline-flex;
     align-items: center;
     cursor: pointer;
+    &.active {
+        img {
+            filter: brightness(0) saturate(100%) invert(17%) sepia(91%) saturate(3936%) hue-rotate(356deg) brightness(90%) contrast(127%);
+        }
+    }
 }
 
 /* Empty State */
