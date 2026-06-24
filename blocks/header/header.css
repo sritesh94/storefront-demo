@@ -42,16 +42,26 @@ header nav p {
   line-height: 1;
 }
 
-.nav-top {
+.header-top-section {
   background-color: #000;
   color: #fff;
   text-align: center;
 }
 
-.nav-top p {
+.header-top-section picture {
+  display: inline-flex;
+}
+
+.header-top-section p {
   margin: 0 auto;
-  max-width: 1264px;
-  padding: 10px 32px;
+  max-width: var(--container-max-width);
+  padding: 9px var(--container-padding);
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 700;
 }
 
 @media (min-width: 900px) {
@@ -63,8 +73,8 @@ header nav p {
     display: flex;
     justify-content: space-between;
     gap: 0 32px;
-    max-width: 1264px;
-    padding: 0 32px;
+    max-width: var(--container-max-width);;
+    padding: 0 var(--container-padding);
   }
 
   header nav[aria-expanded='true'] {

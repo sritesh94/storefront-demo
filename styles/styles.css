@@ -88,7 +88,7 @@
   --spacing-huge: 120px;
   --spacing-xhuge: 144px;
   --spacing-xxhuge: 192px;
-  --type-base-font-family: adobe-clean, roboto, roboto-fallback, system-ui, sans-serif;
+  --type-base-font-family: manrope, adobe-clean, roboto, roboto-fallback, system-ui, sans-serif;
   --type-display-1-font: normal normal 300 6rem/7.2rem var(--type-base-font-family);
   --type-display-1-letter-spacing: 0.04em;
   --type-display-2-font: normal normal 300 4.8rem/5.6rem var(--type-base-font-family);
@@ -123,16 +123,18 @@
   --type-details-caption-2-letter-spacing: 0.08em;
   --type-details-overline-font: normal normal 400 1.2rem/2rem var(--type-base-font-family);
   --type-details-overline-letter-spacing: 0.16em;
+  --container-max-width: 1920px;
+  --container-padding: 30px;
 
   /* Additional tokens */
-  --type-fixed-font-family: adobe-clean, "Roboto Mono", menlo, consolas, "Liberation Mono", monospace, system-ui, sans-serif;
+  --type-fixed-font-family: manrope, adobe-clean, "Roboto Mono", menlo, consolas, "Liberation Mono", monospace, system-ui, sans-serif;
   --background-color: var(--color-neutral-50);
   --nav-height: 6.4rem;
 }
 
 /* fallback font */
 @font-face {
-  font-family: adobe-clean;
+  font-family: manrope;
   size-adjust: 100%;
   src: local("Helvetica");
 }
@@ -464,9 +466,9 @@ main > .section {
 }
 
 main > .section > div {
-  max-width: 1200px;
+  max-width: var(--container-max-width);
   margin: auto;
-  padding: 0 var(--spacing-medium);
+  padding: 0 var(--container-padding);
 }
 
 main > .section:first-of-type {
@@ -475,7 +477,7 @@ main > .section:first-of-type {
 
 @media (min-width: 900px) {
   main > .section > div {
-    padding: 0 var(--spacing-big);
+    padding: 0 var(--container-padding);
   }
 }
 
@@ -580,9 +582,9 @@ body.columns main {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 1264px;
+  max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: var(--spacing-large) var(--spacing-small);
+  padding: var(--spacing-large) var(--container-padding);
   box-sizing: border-box;
 }
 

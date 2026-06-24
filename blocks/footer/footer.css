@@ -6,8 +6,8 @@ footer {
 
 footer .footer > div {
     margin: auto;
-    max-width: 1200px;
-    padding: 40px 24px 24px;
+    max-width: var(--container-max-width);
+    padding: 40px var(--container-padding) 24px;
 }
 
 footer .footer p {
