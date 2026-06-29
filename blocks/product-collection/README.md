@@ -1,1 +1,0 @@
-# product-collection block code

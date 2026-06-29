@@ -63,7 +63,7 @@
           "...": "../blocks/tabs-*/_*.json#/definitions"
         },
         {
-          "...": "../blocks/product-collection-*/_*.json#/definitions"
+          "...": "../blocks/product-*/_*.json#/definitions"
         }
       ]
     },
