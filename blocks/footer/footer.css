@@ -2,39 +2,42 @@
   padding: 0 31px;
   border-top: 1px solid #E5E5E5;
 }
+
 .footer-wrapper .footer-main-section .columns-wrapper:nth-child(2) {
   padding: 24px 31px;
 }
+
+.footer-instagram-section .columns-6-cols > div {
+  column-gap: 2px;
+}
+
+.footer-shipping-section img {
+  width: 48px;
+}
+
 .footer-wrapper .footer-main-section .columns-wrapper:nth-child(2) img {
   max-width: 392px;
   margin-left: auto;
   object-fit: contain;
 }
-.footer-wrapper .footer-main-section .columns-wrapper:nth-child(2) p {
+
+.footer-shipping-section p {
   font-size: 14px;
+  line-height: 22px;
   font-weight: 400;
-  line-height: 26px;
-  color: #616161;
   margin: 0;
 }
-.footer-wrapper .footer-main-section .columns-wrapper:nth-child(1) {
-  padding-top: 55px;
-  padding-bottom: 34px;
+
+.footer-shipping-section h4,
+.footer-shipping-section p {
+  width: calc(100% - 68px);
+  float: right;
 }
-.footer-wrapper .footer-main-section h2 {
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 24px;
-  color: #121212;
-  margin: 0 0 10px;
-}
-.footer-wrapper .footer-main-section ul {
-  padding: 0;
+
+.footer-instagram-section p {
   margin: 0;
 }
-.footer-wrapper .footer-main-section li {
-  list-style: none;
-}
+
 .footer-wrapper .footer-main-section li p,
 .footer-wrapper .footer-main-section li a {
   font-size: 14px;
@@ -42,93 +45,11 @@
   line-height: 26px;
   color: #616161;
 }
+
 .footer-wrapper .footer-main-section li p {
   margin: 0;
 }
-.footer-wrapper .footer-main-section .columns-5-cols > div {
-  align-items: flex-start;
-}
-.footer-wrapper .footer-main-section .columns-5-cols > div div:first-of-type {
-  min-width: 24%;
-}
-.footer-wrapper .footer-main-section .columns-5-cols > div div:first-of-type img {
-  max-width: 90px;
-}
-.footer-wrapper .footer-main-section .columns-5-cols > div div:first-of-type ul {
-  display: flex;
-  align-items: center;
-  gap: 25px;
-}
-.footer-wrapper .footer-main-section .columns-5-cols > div div:first-of-type ul img {
-  width: 24px;
-  height: 24px;
-}
-.footer-wrapper .footer-main-section .columns-5-cols > div div:last-of-type li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.footer-wrapper .footer-main-section .columns-5-cols > div div:last-of-type img {
-  width: 16px;
-  height: 16px;
-}
-.footer-shipping-section {
-  max-width: 1412px;
-  padding: 60px 31px;
-  margin: 0 auto;
-}
-.footer-shipping-section img {
-  width: 48px;
-}
-.footer-shipping-section h4 {
-  font-size: 16px;
-  line-height: 26px;
-  font-weight: 700;
-  margin: 0 0 4px;
-}
-.footer-shipping-section p {
-  font-size: 14px;
-  line-height: 22px;
-  font-weight: 400;
-  margin: 0;
-}
-.footer-shipping-section h4,
-.footer-shipping-section p {
-  width: calc(100% - 68px);
-  float: right;
-}
-.footer-shipping-section h3 {
-  float: left;
-  margin: 0;
-}
-.footer-instagram-section {
-  margin-top: 80px;
-}
-.footer-instagram-section h2 {
-  font-size: 36px;
-  line-height: 44px;
-  font-weight: 500;
-  text-align: center;
-  padding: 0 31px;
-  margin-bottom: 40px;
-}
-.footer-instagram-section p {
-  margin: 0;
-}
-.footer-instagram-section .columns-6-cols > div {
-  column-gap: 2px;
-}
-.footer-instagram-section .columns-6-cols > div > div {
-  position: relative;
-}
-.footer-instagram-section .columns-6-cols > div > div:hover p:nth-child(2) {
-  opacity: 1;
-  visibility: visible;
-}
-.footer-instagram-section .columns-6-cols > div > div:hover p:nth-child(1):before {
-  opacity: 1;
-  visibility: visible;
-}
+
 .footer-instagram-section .columns-6-cols > div > div p:nth-child(2) {
   position: absolute;
   left: 50%;
@@ -138,18 +59,131 @@
   opacity: 0;
   visibility: hidden;
 }
-.footer-instagram-section .columns-6-cols > div > div p:nth-child(1):before {
+
+.footer-wrapper .footer-main-section .columns-wrapper:nth-child(2) p {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  color: #616161;
+  margin: 0;
+}
+
+.footer-wrapper .footer-main-section .columns-wrapper:nth-child(1) {
+  padding-top: 55px;
+  padding-bottom: 34px;
+}
+
+.footer-instagram-section h2 {
+  font-size: 36px;
+  line-height: 44px;
+  font-weight: 500;
+  text-align: center;
+  padding: 0 31px;
+  margin-bottom: 40px;
+}
+
+.footer-wrapper .footer-main-section h2 {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: #121212;
+  margin: 0 0 10px;
+}
+
+.footer-instagram-section .columns-6-cols > div > div {
+  position: relative;
+}
+
+.footer-wrapper .footer-main-section ul {
+  padding: 0;
+  margin: 0;
+}
+
+.footer-wrapper .footer-main-section li {
+  list-style: none;
+}
+
+
+.footer-wrapper .footer-main-section .columns-5-cols > div {
+  align-items: flex-start;
+}
+
+.footer-wrapper .footer-main-section .columns-5-cols > div div:first-of-type {
+  min-width: 24%;
+}
+
+.footer-wrapper .footer-main-section .columns-5-cols > div div:first-of-type img {
+  max-width: 90px;
+}
+
+.footer-wrapper .footer-main-section .columns-5-cols > div div:first-of-type ul {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.footer-wrapper .footer-main-section .columns-5-cols > div div:last-of-type img {
+  width: 16px;
+  height: 16px;
+}
+
+.footer-wrapper .footer-main-section .columns-5-cols > div div:first-of-type ul img {
+  width: 24px;
+  height: 24px;
+}
+
+.footer-wrapper .footer-main-section .columns-5-cols > div div:last-of-type li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-shipping-section {
+  max-width: 1412px;
+  padding: 60px 31px;
+  margin: 0 auto;
+}
+
+.footer-shipping-section h4 {
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.footer-shipping-section h3 {
+  float: left;
+  margin: 0;
+}
+
+.footer-instagram-section .columns-6-cols > div > div p:nth-child(1)::before {
   content: '';
   position: absolute;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgb(0 0 0 / 50%);
   transition: all 0.3s ease-in-out;
   opacity: 0;
   visibility: hidden;
 }
+
+.footer-instagram-section {
+  margin-top: 80px;
+}
+
+.footer-instagram-section .columns-6-cols > div > div:hover p:nth-child(2) {
+  opacity: 1;
+  visibility: visible;
+}
+
+.footer-instagram-section .columns-6-cols > div > div:hover p:nth-child(1)::before {
+  opacity: 1;
+  visibility: visible;
+}
+
 .footer-instagram-section .columns-6-cols > div > div p:nth-child(1) picture {
   display: flex;
 }
+
