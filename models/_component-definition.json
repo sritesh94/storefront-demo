@@ -61,9 +61,6 @@
         },
         {
           "...": "../blocks/tabs-*/_*.json#/definitions"
-        },
-        {
-          "...": "../blocks/product-*/_*.json#/definitions"
         }
       ]
     },
