@@ -58,6 +58,9 @@
         },
         {
           "...": "../blocks/compare-products-*/_*.json#/definitions"
+        },
+        {
+          "...": "../blocks/tabs-*/_*.json#/definitions"
         }
       ]
     },

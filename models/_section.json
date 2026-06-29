@@ -166,7 +166,8 @@
         "targeted-block",
         "text",
         "cards-slider",
-        "compare-products"
+        "compare-products",
+        "tabs"
       ]
     }
   ]

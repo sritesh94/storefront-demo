@@ -1,0 +1,22 @@
+.tabs-nav {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    background: white;
+    cursor: pointer;
+}
+
+.tab-button.active {
+    background: black;
+    color: white;
+}
+
+.tab-panel[hidden] {
+    display: none;
+}
