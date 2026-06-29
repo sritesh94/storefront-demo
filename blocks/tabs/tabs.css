@@ -1,22 +1,24 @@
 .tabs-nav {
     display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 24px;
+    align-items: center;
+    gap: 8px;
 }
 
-.tab-button {
-    padding: 10px 20px;
-    border: 1px solid #ccc;
-    background: white;
+.tabs-nav button {
+    border: 1px solid #121212;
+    background-color: transparent;
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 1.2px;
+    font-weight: 700;
+    opacity: .5;
+    text-transform: uppercase;
+    padding: 6px 20px;
     cursor: pointer;
 }
 
-.tab-button.active {
-    background: black;
-    color: white;
-}
-
-.tab-panel[hidden] {
-    display: none;
+.tabs-nav button.active {
+    opacity: 1;
+    cursor: none;
+    pointer-events: none;
 }
