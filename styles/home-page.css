@@ -1,0 +1,99 @@
+.homepage-banner-section {
+    table {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 60px;
+        z-index: 2;
+        max-width: 271px;
+        h3 {
+            margin: 0;
+            font-size: 12px;
+            line-height: 22px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+        }
+        h1 {
+            margin: 12px 0 32px;
+            font-size: 56px;
+            line-height: 68px;
+            font-weight: 500;
+        }
+        p {
+            text-align: left;
+            font-size: 12px;
+            line-height: 20px;
+            font-weight: 700;
+            padding: 0;
+            a {
+                border: 1px solid #1D1D1B;
+                padding: 8px 30px;
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+    .carousel-slide {
+        position: relative;
+    }
+    .carousel-slides {
+        height: 32vw;
+    }
+}
+
+.homepage-summer-section {
+    .columns-2-cols {
+        padding: 26px 20px 32px 60px;
+        > div {
+            > div:not(.columns-img-col) {
+                z-index: 2;
+                display: flex;
+                flex-wrap: wrap;
+                column-gap: 157px;
+                img {
+                    max-width: 199px;
+                }
+                .button-wrapper + p {
+                    position: absolute;
+                    left: 50%;
+                    top: calc(100% - 80px);
+                    margin-top: 0;
+                    margin-bottom: 0;
+                }
+                h2 {
+                    margin-top: 0;
+                    margin-bottom: 20px;
+                    font-size: 44px;
+                    font-weight: 500;
+                    line-height: 50px;
+                    color: #000;
+                    width: 100%;
+                    + p {
+                        max-width: 443px;
+                        margin: 0;
+                        font-size: 16px;
+                        line-height: 24px;
+                    }
+                }
+                .button-wrapper {
+                    margin: 0;
+                }
+            }
+        }
+    }
+    .columns-wrapper {
+        padding: 0;
+        position: relative;
+    }
+    .columns-img-col {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        img {
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+}
