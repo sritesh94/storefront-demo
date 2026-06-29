@@ -1,6 +1,4 @@
 export default async function decorate(block) {
-  console.log('Product block loaded');
-
   block.innerHTML = `
     <div class="product-test">
       <h2>Product Block Working ✅</h2>
