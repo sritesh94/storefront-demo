@@ -47,8 +47,7 @@
       "text",
       "cards-slider",
       "compare-products",
-      "tabs",
-      "product"
+      "tabs"
     ]
   },
   {
@@ -85,5 +84,9 @@
       "text",
       "image"
     ]
+  },
+  {
+    "id": "product-section",
+    "components": []
   }
 ]
