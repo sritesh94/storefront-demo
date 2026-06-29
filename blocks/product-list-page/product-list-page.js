@@ -203,7 +203,10 @@ export default async function decorate(block) {
             } else {
               const result = addCompareProduct(ctx.product.sku);
               if (!result.success) {
-                console.log(result.message);
+                const error = document.createElement('div');
+                error.className = 'compare-error';
+                error.textContent = result.message;
+                actionsWrapper.append(error);
                 return;
               }
               compareBtn.classList.add('active');
