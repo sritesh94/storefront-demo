@@ -14,20 +14,22 @@ import { render as wishlistRender } from '@dropins/storefront-wishlist/render.js
 // Block-level
 import { readBlockConfig } from '../../scripts/aem.js';
 import { getProductLink, CS_FETCH_GRAPHQL } from '../../scripts/commerce.js';
+import {
+  addCompareProduct,
+  removeCompareProduct,
+  isCompared,
+} from '../../scripts/components/compare/compare.js';
 
 // Initializers
 import '../../scripts/initializers/recommendations.js';
 import '../../scripts/initializers/wishlist.js';
 
-const isMobile = window.matchMedia('only screen and (max-width: 900px)').matches;
-
 /**
  * Fetches products from Adobe Commerce API
  * @param {Array<string>} skus - Product SKUs to fetch
- * @param {number} pageSize - Number of products to fetch
  * @returns {Promise<Array>} Array of product objects
  */
-async function fetchProductsFromCommerce(skus = [], pageSize = 6) {
+async function fetchProductsFromCommerce(skus = []) {
   try {
     const query = skus.length > 0
       ? `
@@ -161,7 +163,7 @@ async function fetchProductsFromCommerce(skus = [], pageSize = 6) {
 
     const variables = skus.length > 0
       ? { skus }
-      : { phrase: '', pageSize, currentPage: 1 };
+      : { phrase: '', pageSize: 6, currentPage: 1 };
 
     const response = await CS_FETCH_GRAPHQL.fetchGraphQl(query, {
       method: 'POST',
@@ -187,12 +189,15 @@ async function fetchProductsFromCommerce(skus = [], pageSize = 6) {
         id: product.id || product.sku,
         sku: product.sku,
         name: product.name,
+        urlKey: product.urlKey,
+        url: product.url,
         price: regularPrice,
         specialPrice: finalPrice !== regularPrice ? finalPrice : '',
         image: imageUrl,
         rating: 0,
         badge: '',
         swatches: [],
+        inStock: true,
       };
     });
   } catch (error) {
@@ -230,12 +235,15 @@ function renderProductCard(product, container) {
     imageWrapper.appendChild(badge);
   }
 
-  // Wishlist toggle
+  // Actions overlay
+  const actionsWrapper = document.createElement('div');
+  actionsWrapper.className = 'product-section-actions product-discovery-product-actions';
+  imageWrapper.appendChild(actionsWrapper);
+
   const wishlistContainer = document.createElement('div');
-  wishlistContainer.className = 'product-section-wishlist';
+  wishlistContainer.className = 'product-section-wishlist product-discovery-product-actions__wishlist-toggle';
 
   card.appendChild(imageWrapper);
-  card.appendChild(wishlistContainer);
 
   // Product info
   const infoWrapper = document.createElement('div');
@@ -243,7 +251,7 @@ function renderProductCard(product, container) {
 
   // Product name (link to product page)
   const nameLink = document.createElement('a');
-  nameLink.href = getProductLink(product.sku) || '#';
+  nameLink.href = getProductLink(product.urlKey || product.sku, product.sku) || '#';
   nameLink.className = 'product-section-name';
   nameLink.textContent = product.name || 'Product';
 
@@ -299,13 +307,16 @@ function renderProductCard(product, container) {
   // Add to Cart Button
   const addToCartBtn = document.createElement('button');
   addToCartBtn.className = 'product-section-add-to-cart';
+  addToCartBtn.type = 'button';
   addToCartBtn.textContent = 'Add to Cart';
+  addToCartBtn.disabled = !product.inStock;
   addToCartBtn.addEventListener('click', async () => {
+    if (!product.inStock || addToCartBtn.disabled) {
+      return;
+    }
+
     try {
-      await cartApi.addProductToCart({
-        sku: product.sku,
-        quantity: 1,
-      });
+      await cartApi.addProductsToCart([{ sku: product.sku, quantity: 1 }]);
       publishRecsItemAddToCartClick(product.sku);
       addToCartBtn.textContent = 'Added!';
       setTimeout(() => {
@@ -322,55 +333,52 @@ function renderProductCard(product, container) {
   const wishlistProduct = {
     sku: product.sku,
     topLevelSku: product.sku,
+    urlKey: product.urlKey,
     name: product.name,
-    url: getProductLink(product.sku),
+    url: getProductLink(product.urlKey || product.sku, product.sku),
     images: [{ url: product.image, label: product.name }],
   };
 
+  const compareBtn = document.createElement('button');
+  compareBtn.className = 'product-section-compare product-discovery-product-actions__compare-toggle';
+  compareBtn.type = 'button';
+  compareBtn.innerHTML = '<img src="../../icons/compare.svg" alt="Compare" width="20" height="20" />';
+  if (isCompared(product.sku)) {
+    compareBtn.classList.add('active');
+  }
+  compareBtn.addEventListener('click', () => {
+    if (isCompared(product.sku)) {
+      removeCompareProduct(product.sku);
+      compareBtn.classList.remove('active');
+    } else {
+      const result = addCompareProduct(product.sku);
+      if (!result.success) {
+        const error = document.createElement('div');
+        error.className = 'product-section-compare-error';
+        error.textContent = result.message;
+        card.appendChild(error);
+        return;
+      }
+      compareBtn.classList.add('active');
+    }
+  });
+
+  actionsWrapper.appendChild(wishlistContainer);
+  actionsWrapper.appendChild(compareBtn);
+
   // Render wishlist toggle after card is in DOM
-  wishlistRender.render(WishlistToggle, { product: wishlistProduct })(wishlistContainer);
+  wishlistRender.render(WishlistToggle, {
+    product: wishlistProduct,
+    variant: 'tertiary',
+  })(wishlistContainer);
 
   container.appendChild(card);
 }
 
 /**
- * Handles carousel/slider navigation for mobile
- * @param {HTMLElement} container - The container with product cards
- * @param {string} displayType - The display type (carousel or grid)
- */
-function setupCarouselControls(container, displayType) {
-  if (displayType !== 'carousel') return;
-
-  const prevBtn = document.createElement('button');
-  prevBtn.className = 'product-section-carousel-control prev';
-  prevBtn.setAttribute('aria-label', 'Previous');
-  prevBtn.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12l4.58-4.59z"/></svg>';
-
-  const nextBtn = document.createElement('button');
-  nextBtn.className = 'product-section-carousel-control next';
-  nextBtn.setAttribute('aria-label', 'Next');
-  nextBtn.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>';
-
-  if (isMobile) {
-    container.parentElement.appendChild(prevBtn);
-    container.parentElement.appendChild(nextBtn);
-
-    prevBtn.addEventListener('click', () => {
-      container.scrollLeft -= 300;
-    });
-
-    nextBtn.addEventListener('click', () => {
-      container.scrollLeft += 300;
-    });
-  }
-}
-
-/**
  * Main block decoration function
  * Configuration options (set in da.live as key-value pairs):
- * - displaytype: 'grid' | 'carousel' (default: 'grid')
- * - pagesize: number of products to display (default: 6)
- * - productskus: comma-separated product SKUs to display
+ * - productskus (or product-skus): comma-separated product SKUs to display
  * - recommendationtype: type of recommendation (e.g., 'viewed', 'bought-together')
  * - categorypath: category path for filtering (alternative to product SKUs)
  * - sortby: sort order (e.g., 'name', 'price', 'relevance')
@@ -378,10 +386,9 @@ function setupCarouselControls(container, displayType) {
 export default async function decorate(block) {
   const config = readBlockConfig(block);
 
-  const displayType = (config.displaytype || 'grid').toLowerCase();
-  const pageSize = parseInt(config.pagesize, 10) || 6;
-  const productSkus = config.productskus
-    ? config.productskus.split(',').map((sku) => sku.trim())
+  const skuConfig = config.productskus || config['product-skus'] || config.productSkus || config.productSKUs;
+  const productSkus = skuConfig
+    ? String(skuConfig).split(',').map((sku) => sku.trim()).filter(Boolean)
     : [];
 
   // Create container
@@ -392,7 +399,7 @@ export default async function decorate(block) {
   `);
 
   const container = fragment.querySelector('.product-section-container');
-  container.className = `product-section-container product-section-${displayType}`;
+  container.className = 'product-section-container';
 
   block.innerHTML = '';
   block.appendChild(fragment);
@@ -404,12 +411,12 @@ export default async function decorate(block) {
   container.appendChild(loadingDiv);
 
   // Fetch products from Commerce API
-  const productsToDisplay = await fetchProductsFromCommerce(productSkus, pageSize);
+  const productsToDisplay = await fetchProductsFromCommerce(productSkus);
 
   // If no products found and no SKUs specified, show message
   if (productsToDisplay.length === 0) {
     loadingDiv.textContent = 'No products available';
-    console.warn('No products found for config:', { productSkus, pageSize });
+    console.warn('No products found for config:', { productSkus });
   } else {
     // Clear loading state
     container.innerHTML = '';
@@ -418,11 +425,8 @@ export default async function decorate(block) {
     productsToDisplay.forEach((product) => {
       renderProductCard(product, container);
     });
-
-    // Setup carousel controls if needed
-    setupCarouselControls(container, displayType);
   }
 
   // Emit event that block has loaded
-  events.emit('aem/product-section-loaded', { displayType, pageSize, productCount: productsToDisplay.length });
+  events.emit('aem/product-section-loaded', { productCount: productsToDisplay.length });
 }
