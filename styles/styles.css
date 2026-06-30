@@ -274,6 +274,12 @@ button {
   font: inherit;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 /* links */
 a:not(.dropin-design a) {
   color: var(--color-brand-500);

@@ -53,6 +53,16 @@
   color: #000;
 }
 
+.homepage-product-section h3 {
+  font-size: 14px;
+  line-height: 20px;
+  text-transform: uppercase;
+  color: #EF6031;
+  letter-spacing: 2.8px;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
 .homepage-banner-section table h3 {
   margin: 0;
   font-size: 12px;
@@ -190,6 +200,13 @@
   margin: 0 0 50px;
 }
 
+main > .homepage-product-section {
+  background-color: #F9F9F9;
+  display: flex;
+  padding: 80px 0;
+  justify-content: space-between;
+}
+
 .homepage-promo-section table p {
   font-size: 14px;
   line-height: 20px;
@@ -197,6 +214,14 @@
   letter-spacing: 1px;
   text-transform: uppercase;
   margin: 0 0 12px;
+}
+
+.homepage-product-section h2 + p {
+  font-size: 16px;
+  line-height: 24px;
+  color: #616161;
+  font-weight: 400;
+  margin: 0 0 45px;
 }
 
 .homepage-spotlight-section h5 + p + p {
@@ -260,6 +285,13 @@
 
 .homepage-original-sec .button-wrapper {
   margin: 30px 0 0;
+}
+
+.homepage-product-section h2 {
+  font-size: 44px;
+  line-height: 50px;
+  font-weight: 500;
+  margin: 0 0 40px;
 }
 
 .homepage-promo-section h2 {
@@ -434,3 +466,19 @@ main > .homepage-promo-section {
   font-weight: 700;
   line-height: 41px;
 }
+
+ .homepage-product-section > .product-section-wrapper {
+    padding: 0 60px;
+    width: 63%;
+    overflow: hidden;
+    margin: 0;
+  }
+
+main {
+    .homepage-product-section > .columns-wrapper {
+      max-width: 100%;
+      width: 27%;
+      padding: 0 0 0 60px;
+      margin: 0;
+    }
+  }

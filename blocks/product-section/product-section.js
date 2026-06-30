@@ -375,6 +375,30 @@ function renderProductCard(product, container) {
   container.appendChild(card);
 }
 
+function setupProductSlider(container, prevBtn, nextBtn) {
+  const getMaxScroll = () => Math.max(0, container.scrollWidth - container.clientWidth);
+
+  const updateButtons = () => {
+    const maxScroll = getMaxScroll();
+    prevBtn.disabled = container.scrollLeft <= 0;
+    nextBtn.disabled = container.scrollLeft >= maxScroll - 1;
+  };
+
+  const scrollStep = () => Math.max(container.clientWidth * 0.8, 320);
+
+  prevBtn.addEventListener('click', () => {
+    container.scrollBy({ left: -scrollStep(), behavior: 'smooth' });
+  });
+
+  nextBtn.addEventListener('click', () => {
+    container.scrollBy({ left: scrollStep(), behavior: 'smooth' });
+  });
+
+  container.addEventListener('scroll', updateButtons, { passive: true });
+  window.addEventListener('resize', () => requestAnimationFrame(updateButtons));
+  requestAnimationFrame(updateButtons);
+}
+
 /**
  * Main block decoration function
  * Configuration options (set in da.live as key-value pairs):
@@ -391,15 +415,23 @@ export default async function decorate(block) {
     ? String(skuConfig).split(',').map((sku) => sku.trim()).filter(Boolean)
     : [];
 
-  // Create container
+  // Create container and slider controls
   const fragment = document.createRange().createContextualFragment(`
     <div class="product-section-wrapper">
-      <div class="product-section-container"></div>
+      <button type="button" class="product-section-arrow product-section-prev" aria-label="Previous products">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </button>
+      <div class="product-section-slider"></div>
+      <button type="button" class="product-section-arrow product-section-next" aria-label="Next products">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M9 6 7.59 7.41 12.17 12l-4.58 4.59L9 18l6-6z"/></svg>
+      </button>
     </div>
   `);
 
-  const container = fragment.querySelector('.product-section-container');
-  container.className = 'product-section-container';
+  const container = fragment.querySelector('.product-section-slider');
+  container.className = 'product-section-slider';
+  const prevBtn = fragment.querySelector('.product-section-prev');
+  const nextBtn = fragment.querySelector('.product-section-next');
 
   block.innerHTML = '';
   block.appendChild(fragment);
@@ -425,6 +457,8 @@ export default async function decorate(block) {
     productsToDisplay.forEach((product) => {
       renderProductCard(product, container);
     });
+
+    setupProductSlider(container, prevBtn, nextBtn);
   }
 
   // Emit event that block has loaded
