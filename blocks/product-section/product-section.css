@@ -11,6 +11,14 @@
   width: 100%;
 }
 
+/* Loading State */
+.product-section-loading {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-secondary, #666);
+  font-size: var(--font-size-body, 1rem);
+}
+
 /* Product Card - Base Styles */
 .product-section-card {
   background: var(--color-background-white, #fff);

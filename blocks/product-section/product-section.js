@@ -13,13 +13,148 @@ import { render as wishlistRender } from '@dropins/storefront-wishlist/render.js
 
 // Block-level
 import { readBlockConfig } from '../../scripts/aem.js';
-import { getProductLink } from '../../scripts/commerce.js';
+import { getProductLink, CORE_FETCH_GRAPHQL } from '../../scripts/commerce.js';
 
 // Initializers
 import '../../scripts/initializers/recommendations.js';
 import '../../scripts/initializers/wishlist.js';
 
 const isMobile = window.matchMedia('only screen and (max-width: 900px)').matches;
+
+/**
+ * Fetches products from Adobe Commerce API
+ * @param {Array<string>} skus - Product SKUs to fetch
+ * @param {number} pageSize - Number of products to fetch
+ * @returns {Promise<Array>} Array of product objects
+ */
+async function fetchProductsFromCommerce(skus = [], pageSize = 6) {
+  try {
+    const query = skus.length > 0
+      ? `
+        query GetProductsBySku {
+          products(filter: { sku: { in: [${skus.map((sku) => `"${sku}"`).join(', ')}] } }, pageSize: ${pageSize}) {
+            items {
+              id
+              sku
+              name
+              url_key
+              image {
+                url
+                label
+              }
+              price_range {
+                minimum_price {
+                  regular_price {
+                    value
+                  }
+                  final_price {
+                    value
+                  }
+                }
+                maximum_price {
+                  regular_price {
+                    value
+                  }
+                  final_price {
+                    value
+                  }
+                }
+              }
+              review_count
+              rating_summary
+              configurable_options {
+                id
+                label
+                values {
+                  label
+                  swatch_data {
+                    color
+                  }
+                }
+              }
+            }
+          }
+        }
+      `
+      : `
+        query GetProducts {
+          products(pageSize: ${pageSize}, currentPage: 1) {
+            items {
+              id
+              sku
+              name
+              url_key
+              image {
+                url
+                label
+              }
+              price_range {
+                minimum_price {
+                  regular_price {
+                    value
+                  }
+                  final_price {
+                    value
+                  }
+                }
+                maximum_price {
+                  regular_price {
+                    value
+                  }
+                  final_price {
+                    value
+                  }
+                }
+              }
+              review_count
+              rating_summary
+              configurable_options {
+                id
+                label
+                values {
+                  label
+                  swatch_data {
+                    color
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+
+    const response = await CORE_FETCH_GRAPHQL.query({ query });
+
+    if (response.errors) {
+      console.error('GraphQL Errors:', response.errors);
+      return [];
+    }
+
+    const products = response.data?.products?.items || [];
+
+    return products.map((product) => ({
+      id: product.id,
+      sku: product.sku,
+      name: product.name,
+      price: product.price_range?.minimum_price?.regular_price?.value || 0,
+      specialPrice: product.price_range?.minimum_price?.final_price?.value,
+      image: product.image?.url || 'https://placehold.co/300x400',
+      rating: product.rating_summary ? Math.round(product.rating_summary / 20) : 0,
+      badge: '',
+      swatches: (product.configurable_options || [])
+        .flatMap((option) => option.values || [])
+        .filter((value) => value.swatch_data?.color)
+        .map((value) => ({
+          color: value.swatch_data.color,
+          label: value.label,
+        }))
+        .slice(0, 5),
+    }));
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return [];
+  }
+}
 
 /**
  * Renders a product card with image, name, rating, price, and color swatches
@@ -209,107 +344,32 @@ export default async function decorate(block) {
   block.innerHTML = '';
   block.appendChild(fragment);
 
-  // Mock product data for demonstration
-  // In production, this would fetch from the storefront API via the dropins
-  const mockProducts = [
-    {
-      name: 'Becky Platform Sandal',
-      sku: 'becky-sandal',
-      price: '68.00',
-      specialPrice: '',
-      image: 'https://placehold.co/300x400/f5f5f5/000?text=Becky',
-      rating: 4,
-      badge: 'NEW',
-      swatches: [
-        { color: '#d9d9d9', label: 'Gray' },
-        { color: '#ff6b81', label: 'Pink' },
-        { color: '#0f9d58', label: 'Green' },
-      ],
-    },
-    {
-      name: 'Mini Melissa Cloud Sandal + Mickey And Friends Baby',
-      sku: 'mini-melissa-cloud',
-      price: '98.00',
-      specialPrice: '68.00',
-      image: 'https://placehold.co/300x400/f5f5f5/000?text=Mini+Melissa',
-      rating: 4,
-      badge: 'SALE',
-      swatches: [
-        { color: '#d9d9d9', label: 'Light' },
-        { color: '#ff6b81', label: 'Pink' },
-        { color: '#0f9d58', label: 'Green' },
-      ],
-    },
-    {
-      name: 'Free Platform',
-      sku: 'free-platform',
-      price: '68.00',
-      specialPrice: '',
-      image: 'https://placehold.co/300x400/f5f5f5/000?text=Free+Platform',
-      rating: 4,
-      badge: 'NEW',
-      swatches: [
-        { color: '#d9d9d9', label: 'Blue' },
-        { color: '#ff6b81', label: 'Red' },
-        { color: '#0f9d58', label: 'Green' },
-      ],
-    },
-    {
-      name: 'Classic Loafer',
-      sku: 'classic-loafer',
-      price: '85.00',
-      specialPrice: '',
-      image: 'https://placehold.co/300x400/f5f5f5/000?text=Classic+Loafer',
-      rating: 5,
-      badge: '',
-      swatches: [
-        { color: '#d9d9d9', label: 'White' },
-        { color: '#333333', label: 'Black' },
-      ],
-    },
-    {
-      name: 'Summer Sneaker',
-      sku: 'summer-sneaker',
-      price: '75.00',
-      specialPrice: '55.00',
-      image: 'https://placehold.co/300x400/f5f5f5/000?text=Summer+Sneaker',
-      rating: 4,
-      badge: 'SALE',
-      swatches: [
-        { color: '#ff6b81', label: 'Red' },
-        { color: '#0f9d58', label: 'Green' },
-      ],
-    },
-    {
-      name: 'Elegant Heel',
-      sku: 'elegant-heel',
-      price: '95.00',
-      specialPrice: '',
-      image: 'https://placehold.co/300x400/f5f5f5/000?text=Elegant+Heel',
-      rating: 5,
-      badge: '',
-      swatches: [
-        { color: '#000000', label: 'Black' },
-        { color: '#800080', label: 'Purple' },
-      ],
-    },
-  ];
+  // Show loading state
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'product-section-loading';
+  loadingDiv.textContent = 'Loading products...';
+  container.appendChild(loadingDiv);
 
-  // Filter products based on configuration
-  let productsToDisplay = mockProducts.slice(0, pageSize);
+  // Fetch products from Commerce API
+  const productsToDisplay = await fetchProductsFromCommerce(productSkus, pageSize);
 
-  if (productSkus.length > 0) {
-    productsToDisplay = mockProducts.filter((p) => productSkus.includes(p.sku));
+  // If no products found and no SKUs specified, show message
+  if (productsToDisplay.length === 0) {
+    loadingDiv.textContent = 'No products available';
+    console.warn('No products found for config:', { productSkus, pageSize });
+  } else {
+    // Clear loading state
+    container.innerHTML = '';
+
+    // Render products
+    productsToDisplay.forEach((product) => {
+      renderProductCard(product, container);
+    });
+
+    // Setup carousel controls if needed
+    setupCarouselControls(container, displayType);
   }
 
-  // Render products
-  productsToDisplay.forEach((product) => {
-    renderProductCard(product, container);
-  });
-
-  // Setup carousel controls if needed
-  setupCarouselControls(container, displayType);
-
   // Emit event that block has loaded
-  events.emit('aem/product-section-loaded', { displayType, pageSize });
+  events.emit('aem/product-section-loaded', { displayType, pageSize, productCount: productsToDisplay.length });
 }
