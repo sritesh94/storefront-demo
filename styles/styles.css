@@ -318,18 +318,25 @@ button.button {
   text-transform: uppercase;
 }
 
-a.button[aria-disabled="true"],
-button.button:disabled {
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
 main a.button:hover,
 main a.button:focus,
 button.button:hover,
 button.button:focus {
   background-color: var(--color-brand-600);
   cursor: pointer;
+}
+
+main a.button:any-link:hover,
+main a.button:any-link:focus,
+button.button:hover {
+    background-color: #000;
+    color: #fff;
+  }
+
+a.button[aria-disabled="true"],
+button.button:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 main a.button.disabled,
@@ -376,7 +383,7 @@ main a.button.secondary:hover,
 main a.button.secondary:focus-visible,
 button.button.secondary:hover,
 button.button.secondary:focus-visible {
-  color: var(--color-brand-600);
+  color: #fff;
 }
 
 

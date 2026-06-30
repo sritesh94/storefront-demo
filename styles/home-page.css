@@ -7,6 +7,25 @@
   max-width: 271px;
 }
 
+.homepage-banner-section .carousel-wrapper {
+  position: relative;
+}
+
+.homepage-banner-section .carousel nav {
+  position: absolute;
+  inset: 0;
+}
+
+.homepage-banner-section .carousel .carousel-slide-indicators {
+  flex-direction: column;
+  right: 60px;
+  bottom: 50%;
+  transform: translateY(-50%);
+  width: 62px;
+  align-items: flex-end;
+  gap: 7px;
+}
+
 .homepage-tabs-section h3 {
     margin: 16px 0 0;
     font-size: 14px;
@@ -48,6 +67,14 @@
     margin: 0 0 20px;
 }
 
+.homepage-original-sec p {
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 300;
+  color: #000;
+  margin: 0 0 20px;
+}
+
 .homepage-banner-section table p {
   text-align: left;
   font-size: 12px;
@@ -77,8 +104,8 @@
   position: relative;
 }
 
-.homepage-banner-section .carousel-slides {
-  height: 32vw;
+.homepage-banner-section .carousel .carousel-slides {
+  height: 31.3vw;
 }
 
 .homepage-summer-section .columns-2-cols {
@@ -91,11 +118,29 @@
     gap: 30px;
 }
 
+.homepage-original-sec .columns-2-cols > div {
+  gap: 0;
+  align-items: stretch;
+  min-height: 700px;
+  flex: unset;
+}
+
+.homepage-original-sec .columns > div > div {
+  width: 50%;
+  flex: unset;
+  box-sizing: border-box;
+}
+
 .homepage-summer-section .columns-2-cols > div > div:not(.columns-img-col) {
   z-index: 2;
   display: flex;
   flex-wrap: wrap;
   column-gap: 157px;
+}
+
+.homepage-original-sec img {
+  height: 100%;
+  object-fit: cover;
 }
 
 .homepage-tabs-section img {
@@ -112,6 +157,10 @@
     line-height: 28px;
     font-weight: 400;
     margin: 20px 0;
+}
+
+.homepage-original-sec h2 + p {
+  margin: 0 0 50px;
 }
 
 .homepage-spotlight-section h5 + p + p {
@@ -156,6 +205,18 @@
     color: #000;
     margin: 0 0 66px;
     text-align: center;
+}
+
+.homepage-original-sec h2 {
+  font-size: 44px;
+  line-height: 50px;
+  font-weight: 500;
+  margin: 0 0 20px;
+  color: #000;
+}
+
+.homepage-original-sec .button-wrapper {
+  margin: 30px 0 0;
 }
 
 .homepage-summer-section .columns-2-cols > div > div:not(.columns-img-col) h2 {
@@ -251,3 +312,17 @@ main > .homepage-spotlight-section {
     text-transform: uppercase;
     margin: 0;
 }
+
+main > .homepage-original-sec .columns-wrapper {
+  padding: 0;
+}
+
+.homepage-original-sec .columns-2-cols > div > div:not(.columns-img-col) {
+  background: rgb(46 114 210 / 10%);
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+}
+

@@ -93,9 +93,14 @@ main > .section .carousel-wrapper {
 }
 
 .carousel .carousel-slide-indicator {
-    display: inline-block;
     margin: 0 var(--spacing-xsmall) 0 var(--spacing-xxsmall);
-    border-radius: var(--shape-border-radius-2);
+    border: 1px solid transparent;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .carousel .carousel-slide-indicator button {
@@ -103,19 +108,23 @@ main > .section .carousel-wrapper {
     width: 8px;
     height: 8px;
     outline: 0;
-    border: 0 none;
     border-radius: 50%;
     text-decoration: none;
-    background-color: var(--color-neutral-400);
+    background-color: transparent;
     margin: 0;
     padding: 0;
     transition: background-color 0.2s;
+    border: 1px solid #1D1D1D;
 }
 
 .carousel .carousel-slide-indicator button:disabled,
 .carousel .carousel-slide-indicator button:hover,
 .carousel .carousel-slide-indicator button:focus-visible {
-    background-color: var(--color-neutral-700);
+    background-color: #1D1D1D;
+}
+
+.carousel .carousel-slide-indicator:has(button:disabled) {
+    border-color: #1D1D1D;
 }
 
 .carousel .carousel-navigation-buttons {
