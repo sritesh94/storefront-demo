@@ -43,6 +43,16 @@
     margin: 0 0 20px;
 }
 
+.homepage-promo-section h3 {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 2.8px;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin: 0 0 12px;
+  color: #000;
+}
+
 .homepage-banner-section table h3 {
   margin: 0;
   font-size: 12px;
@@ -125,6 +135,17 @@
   flex: unset;
 }
 
+.homepage-promo-section .columns > div {
+  gap: 16px;
+}
+
+.homepage-promo-section .columns > div > div {
+  position: relative;
+  padding: 60px;
+  min-height: 500px;
+  box-sizing: border-box;
+}
+
 .homepage-original-sec .columns > div > div {
   width: 50%;
   flex: unset;
@@ -147,6 +168,12 @@
     transition: all .3s ease-in-out;
 }
 
+.homepage-promo-section img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .homepage-summer-section .columns-img-col img {
   height: 100%;
   object-fit: cover;
@@ -163,6 +190,15 @@
   margin: 0 0 50px;
 }
 
+.homepage-promo-section table p {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+
 .homepage-spotlight-section h5 + p + p {
     margin: 0;
 }
@@ -173,6 +209,13 @@
 
 .homepage-summer-section .columns-2-cols > div > div:not(.columns-img-col) img {
   max-width: 199px;
+}
+
+.homepage-promo-section .columns > div > div > p:first-of-type {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  margin: 0;
 }
 
 .homepage-summer-section .columns-2-cols > div > div:not(.columns-img-col) h2 + p {
@@ -219,6 +262,14 @@
   margin: 30px 0 0;
 }
 
+.homepage-promo-section h2 {
+  font-size: 36px;
+  line-height: 44px;
+  font-weight: 500;
+  margin: 0 0 39px;
+  color: #000;
+}
+
 .homepage-summer-section .columns-2-cols > div > div:not(.columns-img-col) h2 {
   margin-top: 0;
   margin-bottom: 20px;
@@ -227,6 +278,10 @@
   line-height: 50px;
   color: #000;
   width: 100%;
+}
+
+.homepage-promo-section .button-wrapper {
+  margin-top: 0;
 }
 
 .homepage-summer-section .columns-2-cols > div > div:not(.columns-img-col) .button-wrapper {
@@ -313,6 +368,10 @@ main > .homepage-spotlight-section {
     margin: 0;
 }
 
+.homepage-promo-section .columns-wrapper {
+  padding: 0;
+}
+
 main > .homepage-original-sec .columns-wrapper {
   padding: 0;
 }
@@ -326,3 +385,52 @@ main > .homepage-original-sec .columns-wrapper {
   padding: 60px;
 }
 
+main > .homepage-promo-section {
+  margin: 80px 0;
+}
+
+.homepage-promo-section .columns > div > div:nth-child(2) h3,
+.homepage-promo-section .columns > div > div:nth-child(2) h2 {
+  color: #fff;
+  max-width: 372px;
+  width: 100%;
+}
+
+.homepage-promo-section .columns > div > div:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+}
+
+.homepage-promo-section table {
+  color: #fff;
+  display: flex;
+  margin-top: auto;
+}
+
+.homepage-promo-section table ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  gap: 24px;
+}
+
+.homepage-promo-section table ul li {
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 400;
+  display: flex;
+  gap: 4px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.homepage-promo-section table ul br {
+  display: none;
+}
+
+.homepage-promo-section table .countdown-value {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 41px;
+}

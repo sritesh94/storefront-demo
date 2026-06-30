@@ -376,7 +376,7 @@ main a.button.secondary,
 button.button.secondary {
   background-color: unset;
   border: var(--shape-border-width-3) solid currentcolor;
-  color: var(--color-brand-500);
+  color: #1D1D1B;
 }
 
 main a.button.secondary:hover,
