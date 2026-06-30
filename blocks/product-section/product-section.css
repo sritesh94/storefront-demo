@@ -3,6 +3,7 @@
 .product-section-wrapper {
   width: 100%;
   position: relative;
+  box-sizing: border-box;
 }
 
 .product-section-container {

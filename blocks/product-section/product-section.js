@@ -13,7 +13,7 @@ import { render as wishlistRender } from '@dropins/storefront-wishlist/render.js
 
 // Block-level
 import { readBlockConfig } from '../../scripts/aem.js';
-import { getProductLink, CORE_FETCH_GRAPHQL } from '../../scripts/commerce.js';
+import { getProductLink, CS_FETCH_GRAPHQL } from '../../scripts/commerce.js';
 
 // Initializers
 import '../../scripts/initializers/recommendations.js';
@@ -31,44 +31,60 @@ async function fetchProductsFromCommerce(skus = [], pageSize = 6) {
   try {
     const query = skus.length > 0
       ? `
-        query GetProductsBySku {
-          products(filter: { sku: { in: [${skus.map((sku) => `"${sku}"`).join(', ')}] } }, pageSize: ${pageSize}) {
-            items {
-              id
-              sku
-              name
-              url_key
-              image {
-                url
-                label
-              }
-              price_range {
-                minimum_price {
-                  regular_price {
+        query GetProductsBySku($skus: [String!]!) {
+          products(skus: $skus) {
+            sku
+            name
+            url
+            urlKey
+            images(roles: ["image"]) {
+              url
+              label
+            }
+            ... on SimpleProductView {
+              price {
+                regular {
+                  amount {
                     value
-                  }
-                  final_price {
-                    value
+                    currency
                   }
                 }
-                maximum_price {
-                  regular_price {
+                final {
+                  amount {
                     value
-                  }
-                  final_price {
-                    value
+                    currency
                   }
                 }
               }
-              review_count
-              rating_summary
-              configurable_options {
-                id
-                label
-                values {
-                  label
-                  swatch_data {
-                    color
+            }
+            ... on ComplexProductView {
+              priceRange {
+                minimum {
+                  regular {
+                    amount {
+                      value
+                      currency
+                    }
+                  }
+                  final {
+                    amount {
+                      value
+                      currency
+                    }
+                  }
+                }
+                maximum {
+                  regular {
+                    amount {
+                      value
+                      currency
+                    }
+                  }
+                  final {
+                    amount {
+                      value
+                      currency
+                    }
                   }
                 }
               }
@@ -77,44 +93,64 @@ async function fetchProductsFromCommerce(skus = [], pageSize = 6) {
         }
       `
       : `
-        query GetProducts {
-          products(pageSize: ${pageSize}, currentPage: 1) {
+        query GetProducts($phrase: String!, $pageSize: Int!, $currentPage: Int = 1) {
+          productSearch(phrase: $phrase, page_size: $pageSize, current_page: $currentPage) {
             items {
-              id
-              sku
-              name
-              url_key
-              image {
+              productView {
+                sku
+                name
                 url
-                label
-              }
-              price_range {
-                minimum_price {
-                  regular_price {
-                    value
-                  }
-                  final_price {
-                    value
-                  }
-                }
-                maximum_price {
-                  regular_price {
-                    value
-                  }
-                  final_price {
-                    value
-                  }
-                }
-              }
-              review_count
-              rating_summary
-              configurable_options {
-                id
-                label
-                values {
+                urlKey
+                images(roles: ["image"]) {
+                  url
                   label
-                  swatch_data {
-                    color
+                }
+                ... on SimpleProductView {
+                  price {
+                    regular {
+                      amount {
+                        value
+                        currency
+                      }
+                    }
+                    final {
+                      amount {
+                        value
+                        currency
+                      }
+                    }
+                  }
+                }
+                ... on ComplexProductView {
+                  priceRange {
+                    minimum {
+                      regular {
+                        amount {
+                          value
+                          currency
+                        }
+                      }
+                      final {
+                        amount {
+                          value
+                          currency
+                        }
+                      }
+                    }
+                    maximum {
+                      regular {
+                        amount {
+                          value
+                          currency
+                        }
+                      }
+                      final {
+                        amount {
+                          value
+                          currency
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -123,33 +159,42 @@ async function fetchProductsFromCommerce(skus = [], pageSize = 6) {
         }
       `;
 
-    const response = await CORE_FETCH_GRAPHQL.query({ query });
+    const variables = skus.length > 0
+      ? { skus }
+      : { phrase: '', pageSize, currentPage: 1 };
+
+    const response = await CS_FETCH_GRAPHQL.fetchGraphQl(query, {
+      method: 'POST',
+      variables,
+    });
 
     if (response.errors) {
-      console.error('GraphQL Errors:', response.errors);
+      console.error('GraphQL Errors:', JSON.stringify(response.errors, null, 2));
       return [];
     }
 
-    const products = response.data?.products?.items || [];
+    const products = skus.length > 0
+      ? response.data?.products || []
+      : response.data?.productSearch?.items?.map((item) => item.productView) || [];
 
-    return products.map((product) => ({
-      id: product.id,
-      sku: product.sku,
-      name: product.name,
-      price: product.price_range?.minimum_price?.regular_price?.value || 0,
-      specialPrice: product.price_range?.minimum_price?.final_price?.value,
-      image: product.image?.url || 'https://placehold.co/300x400',
-      rating: product.rating_summary ? Math.round(product.rating_summary / 20) : 0,
-      badge: '',
-      swatches: (product.configurable_options || [])
-        .flatMap((option) => option.values || [])
-        .filter((value) => value.swatch_data?.color)
-        .map((value) => ({
-          color: value.swatch_data.color,
-          label: value.label,
-        }))
-        .slice(0, 5),
-    }));
+    return products.map((product) => {
+      const priceData = product.price || product.priceRange?.minimum || {};
+      const regularPrice = priceData?.regular?.amount?.value || 0;
+      const finalPrice = priceData?.final?.amount?.value || regularPrice;
+      const imageUrl = product.images?.[0]?.url || 'https://placehold.co/300x400';
+
+      return {
+        id: product.id || product.sku,
+        sku: product.sku,
+        name: product.name,
+        price: regularPrice,
+        specialPrice: finalPrice !== regularPrice ? finalPrice : '',
+        image: imageUrl,
+        rating: 0,
+        badge: '',
+        swatches: [],
+      };
+    });
   } catch (error) {
     console.error('Error fetching products:', error);
     return [];
@@ -274,8 +319,16 @@ function renderProductCard(product, container) {
   infoWrapper.appendChild(addToCartBtn);
   card.appendChild(infoWrapper);
 
+  const wishlistProduct = {
+    sku: product.sku,
+    topLevelSku: product.sku,
+    name: product.name,
+    url: getProductLink(product.sku),
+    images: [{ url: product.image, label: product.name }],
+  };
+
   // Render wishlist toggle after card is in DOM
-  wishlistRender(WishlistToggle, { sku: product.sku }, wishlistContainer);
+  wishlistRender.render(WishlistToggle, { product: wishlistProduct })(wishlistContainer);
 
   container.appendChild(card);
 }
