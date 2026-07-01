@@ -216,6 +216,14 @@ main > .homepage-product-section {
   margin: 0 0 12px;
 }
 
+.homepage-blog-sec h2 {
+  font-size: 36px;
+  line-height: 44px;
+  font-weight: 500;
+  margin: 0 0 60px;
+  color: #000;
+}
+
 .homepage-product-section h2 + p {
   font-size: 16px;
   line-height: 24px;
@@ -228,12 +236,31 @@ main > .homepage-product-section {
     margin: 0;
 }
 
+.homepage-blog-sec .cards-card-body img {
+  width: 16px;
+}
+
 .homepage-tabs-section tr:hover img {
     transform: scale(1.1);
 }
 
+.homepage-blog-sec .cards .cards-card-image img {
+  aspect-ratio: 1.9608;
+}
+
 .homepage-summer-section .columns-2-cols > div > div:not(.columns-img-col) img {
   max-width: 199px;
+}
+
+.homepage-blog-sec .cards-card-body p {
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 300;
+  color: #787A80;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 0 13px;
 }
 
 .homepage-promo-section .columns > div > div > p:first-of-type {
@@ -488,4 +515,46 @@ main > .homepage-product-slider .tabs-wrapper {
 .homepage-product-slider .tabs-wrapper .tabs-nav {
   justify-content: center;
   margin-bottom: 60px;
+}
+
+main > .homepage-blog-sec {
+  margin: 80px 0 0;
+}
+
+.homepage-blog-sec .cards ul {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.homepage-blog-sec h4 {
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.homepage-blog-sec  .cards .cards-card-body {
+  padding: 24px;
+  margin: 0;
+}
+
+.homepage-blog-sec picture {
+  display: flex;
+}
+
+.homepage-blog-sec h5 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  margin: 0;
+  color: #424551;
+}
+
+.homepage-blog-sec .cards > ul > li {
+  border: 0;
+  box-shadow: 0 4px 4px -4px rgb(30 33 44 / 3%),
+  0 12px 10px -6px rgb(154 156 165 / 4%),
+  0 30px 24px -10px rgb(154 156 165 / 5%),
+  0 80px 80px -20px rgb(154 156 165 / 8%);
+  border-radius: 4px;
 }
