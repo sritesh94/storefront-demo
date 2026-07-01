@@ -251,6 +251,7 @@ const VALID_BLOCK_NAMES = new Set([
   'product-section',
   'tabs',
   'targeted-block',
+  'video',
 ]);
 
 function toCamelCase(name) {

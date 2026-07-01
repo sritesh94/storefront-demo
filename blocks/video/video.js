@@ -1,9 +1,18 @@
 export default function decorate(block) {
+  if (block.querySelector('video')) return;
+
   const link = block.querySelector('a');
+  let url = link ? link.href : '';
 
-  if (!link) return;
+  if (!url) {
+    const text = block.textContent.trim();
+    if (/^https?:\/\//i.test(text)) {
+      url = text;
+    }
+  }
 
-  const url = link.href;
+  if (!url) return;
+
   const video = document.createElement('video');
 
   video.src = url;
