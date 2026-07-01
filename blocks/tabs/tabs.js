@@ -1,4 +1,4 @@
-export default function decorate(block) {
+export default async function decorate(block) {
   const rows = [...block.children];
 
   const headers = document.createElement('div');

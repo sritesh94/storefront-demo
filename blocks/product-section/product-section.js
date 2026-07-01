@@ -379,9 +379,13 @@ function setupProductSlider(container, prevBtn, nextBtn) {
   const getMaxScroll = () => Math.max(0, container.scrollWidth - container.clientWidth);
 
   const updateButtons = () => {
-    const maxScroll = getMaxScroll();
-    prevBtn.disabled = container.scrollLeft <= 0;
-    nextBtn.disabled = container.scrollLeft >= maxScroll - 1;
+    requestAnimationFrame(() => {
+      const maxScroll = getMaxScroll();
+      const atStart = container.scrollLeft <= 0;
+      const atEnd = container.scrollLeft >= Math.max(0, maxScroll - 1);
+      prevBtn.disabled = atStart;
+      nextBtn.disabled = atEnd;
+    });
   };
 
   const scrollStep = () => Math.max(container.clientWidth * 0.8, 320);
@@ -395,8 +399,23 @@ function setupProductSlider(container, prevBtn, nextBtn) {
   });
 
   container.addEventListener('scroll', updateButtons, { passive: true });
-  window.addEventListener('resize', () => requestAnimationFrame(updateButtons));
+  window.addEventListener('resize', updateButtons);
+
+  if ('ResizeObserver' in window) {
+    const resizeObserver = new ResizeObserver(updateButtons);
+    resizeObserver.observe(container);
+  }
+
+  container.querySelectorAll('img').forEach((img) => {
+    if (img.complete) {
+      updateButtons();
+    } else {
+      img.addEventListener('load', updateButtons, { once: true });
+    }
+  });
+
   requestAnimationFrame(updateButtons);
+  window.setTimeout(updateButtons, 100);
 }
 
 /**
@@ -417,7 +436,7 @@ export default async function decorate(block) {
 
   // Create container and slider controls
   const fragment = document.createRange().createContextualFragment(`
-    <div class="product-section-wrapper">
+    <div class="product-section-inner">
       <button type="button" class="product-section-arrow product-section-prev" aria-label="Previous products">
         <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
       </button>

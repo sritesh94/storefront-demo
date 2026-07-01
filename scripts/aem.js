@@ -202,6 +202,57 @@ function toClassName(name) {
  * @param {string} name The unsanitized string
  * @returns {string} The camelCased name
  */
+const VALID_BLOCK_NAMES = new Set([
+  'accordion',
+  'cards',
+  'cards-slider',
+  'carousel',
+  'columns',
+  'commerce-account-header',
+  'commerce-account-sidebar',
+  'commerce-addresses',
+  'commerce-cart',
+  'commerce-checkout',
+  'commerce-checkout-success',
+  'commerce-confirm-account',
+  'commerce-create-account',
+  'commerce-create-password',
+  'commerce-create-return',
+  'commerce-customer-details',
+  'commerce-customer-information',
+  'commerce-forgot-password',
+  'commerce-gift-options',
+  'commerce-login',
+  'commerce-mini-cart',
+  'commerce-order-comments',
+  'commerce-order-cost-summary',
+  'commerce-order-header',
+  'commerce-order-product-list',
+  'commerce-order-returns',
+  'commerce-order-status',
+  'commerce-orders-list',
+  'commerce-return-header',
+  'commerce-returns-list',
+  'commerce-search-order',
+  'commerce-seller-assisted-buying-activity',
+  'commerce-seller-assisted-buying-settings',
+  'commerce-shipping-status',
+  'commerce-wishlist',
+  'compare-products',
+  'enrichment',
+  'footer',
+  'fragment',
+  'header',
+  'hero',
+  'modal',
+  'product-details',
+  'product-list-page',
+  'product-recommendations',
+  'product-section',
+  'tabs',
+  'targeted-block',
+]);
+
 function toCamelCase(name) {
   return toClassName(name).replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
@@ -487,7 +538,10 @@ function buildBlock(blockName, content) {
   const table = Array.isArray(content) ? content : [[content]];
   const blockEl = document.createElement('div');
   // build image block nested div structure
-  blockEl.classList.add(blockName);
+  const safeBlockName = toClassName(String(blockName));
+  if (safeBlockName) {
+    blockEl.classList.add(safeBlockName);
+  }
   table.forEach((row) => {
     const rowEl = document.createElement('div');
     row.forEach((col) => {
@@ -507,6 +561,46 @@ function buildBlock(blockName, content) {
     blockEl.appendChild(rowEl);
   });
   return blockEl;
+}
+
+function isBlockTable(table) {
+  const rows = Array.from(table.querySelectorAll('tr'));
+  if (rows.length < 1) return false;
+  const firstCells = rows[0].querySelectorAll('td, th');
+  if (firstCells.length !== 1) return false;
+  const blockName = toClassName(firstCells[0].textContent.trim());
+  return VALID_BLOCK_NAMES.has(blockName);
+}
+
+function tableToBlock(table) {
+  const rows = Array.from(table.querySelectorAll('tr'));
+  if (rows.length === 0) return null;
+  const firstCell = rows[0].querySelector('td, th');
+  if (!firstCell) return null;
+  const blockName = firstCell.textContent.trim();
+  if (!blockName) return null;
+
+  const content = [];
+  for (let i = 1; i < rows.length; i += 1) {
+    const cols = Array.from(rows[i].querySelectorAll('td, th'));
+    const colHtml = cols.map((c) => c.innerHTML || '');
+    content.push(colHtml);
+  }
+
+  const blockEl = buildBlock(blockName, content);
+  blockEl.dataset.blockPlaceholder = 'true';
+  return blockEl;
+}
+
+function convertTablesToBlocks(root) {
+  Array.from(root.querySelectorAll('table')).forEach((table) => {
+    if (!isBlockTable(table)) return;
+    const blockEl = tableToBlock(table);
+    if (blockEl) {
+      blockEl.dataset.blockPlaceholder = 'true';
+      table.replaceWith(blockEl);
+    }
+  });
 }
 
 /**
@@ -569,7 +663,13 @@ function decorateBlock(block) {
  * @param {Element} main The container element
  */
 function decorateBlocks(main) {
-  main.querySelectorAll('div.section > div > div').forEach(decorateBlock);
+  const blocks = new Set([
+    ...main.querySelectorAll('div.section > div > div'),
+    ...main.querySelectorAll('div.section div[data-block-placeholder="true"]'),
+  ]);
+  blocks.forEach((block) => {
+    decorateBlock(block);
+  });
 }
 
 /**
@@ -674,4 +774,5 @@ export {
   toClassName,
   waitForFirstImage,
   wrapTextNodes,
+  convertTablesToBlocks,
 };

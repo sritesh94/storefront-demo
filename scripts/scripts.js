@@ -9,6 +9,7 @@ import {
   loadSection,
   loadSections,
   loadCSS,
+  convertTablesToBlocks,
 } from './aem.js';
 import {
   loadCommerceEager,
@@ -131,6 +132,7 @@ export function decorateMain(main) {
   decorateLinks(main);
   decorateIcons(main);
   buildAutoBlocks(main);
+  convertTablesToBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
   decorateButtons(main);

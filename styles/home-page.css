@@ -474,11 +474,18 @@ main > .homepage-promo-section {
     margin: 0;
   }
 
-main {
-    .homepage-product-section > .columns-wrapper {
-      max-width: 100%;
-      width: 27%;
-      padding: 0 0 0 60px;
-      margin: 0;
-    }
-  }
+main .homepage-product-section > .columns-wrapper {
+  max-width: 100%;
+  width: 27%;
+  padding: 0 0 0 60px;
+  margin: 0;
+}
+
+main > .homepage-product-slider .tabs-wrapper {
+  padding: 0 95px;
+}
+
+.homepage-product-slider .tabs-wrapper .tabs-nav {
+  justify-content: center;
+  margin-bottom: 60px;
+}
