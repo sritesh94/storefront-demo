@@ -42,7 +42,7 @@ export default function initHomepageVideoCarousel(root = document) {
   const totalEl = controls.querySelector('.total');
 
   let slidesPerView = getSlidesPerView();
-  let currentPage = 0;
+  let currentIndex = 0;
 
   function getSlidesPerView() {
     if (window.innerWidth < 768) return 1;
@@ -50,36 +50,42 @@ export default function initHomepageVideoCarousel(root = document) {
     return 4;
   }
 
-  function totalPages() {
-    return Math.ceil(slides.length / slidesPerView);
+  function maxIndex() {
+    return Math.max(0, slides.length - slidesPerView);
   }
 
   function update() {
     slidesPerView = getSlidesPerView();
 
-    const pageWidth = viewport.clientWidth;
+    slides.forEach((slide) => {
+      slide.style.flex = `0 0 ${100 / slidesPerView}%`;
+    });
 
-    wrapper.style.transform = `translateX(-${currentPage * pageWidth}px)`;
+    const slideWidth = viewport.clientWidth / slidesPerView;
 
-    currentEl.textContent = currentPage + 1;
-    totalEl.textContent = totalPages();
+    wrapper.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
 
-    prevBtn.disabled = currentPage === 0;
-    nextBtn.disabled = currentPage >= totalPages() - 1;
+    currentEl.textContent = currentIndex + 1;
+    totalEl.textContent = maxIndex() + 1;
 
-    section.querySelectorAll('video').forEach((video) => video.pause());
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex >= maxIndex();
+
+    section.querySelectorAll('video').forEach((video) => {
+      video.pause();
+    });
   }
 
   nextBtn.addEventListener('click', () => {
-    if (currentPage < totalPages() - 1) {
-      currentPage += 1;
+    if (currentIndex < maxIndex()) {
+      currentIndex += 1;
       update();
     }
   });
 
   prevBtn.addEventListener('click', () => {
-    if (currentPage > 0) {
-      currentPage -= 1;
+    if (currentIndex > 0) {
+      currentIndex -= 1;
       update();
     }
   });
@@ -89,6 +95,7 @@ export default function initHomepageVideoCarousel(root = document) {
 
   viewport.addEventListener('touchstart', (e) => {
     startX = e.touches[0].clientX;
+    endX = startX;
   });
 
   viewport.addEventListener('touchmove', (e) => {
@@ -100,22 +107,22 @@ export default function initHomepageVideoCarousel(root = document) {
 
     if (Math.abs(diff) < 50) return;
 
-    if (diff > 0 && currentPage < totalPages() - 1) {
-      currentPage += 1;
+    if (diff > 0 && currentIndex < maxIndex()) {
+      currentIndex += 1;
     }
 
-    if (diff < 0 && currentPage > 0) {
-      currentPage -= 1;
+    if (diff < 0 && currentIndex > 0) {
+      currentIndex -= 1;
     }
 
     update();
   });
 
   window.addEventListener('resize', () => {
-    const maxPage = totalPages() - 1;
+    slidesPerView = getSlidesPerView();
 
-    if (currentPage > maxPage) {
-      currentPage = maxPage;
+    if (currentIndex > maxIndex()) {
+      currentIndex = maxIndex();
     }
 
     update();
