@@ -63,6 +63,13 @@
   margin: 0 0 10px;
 }
 
+.homepage-video-sec h3 {
+  font-size: 36px;
+  line-height: 44px;
+  font-weight: 500;
+  margin: 20px 0 10px;
+}
+
 .homepage-banner-section table h3 {
   margin: 0;
   font-size: 12px;
@@ -85,6 +92,13 @@
     color: #000;
     text-align: center;
     margin: 0 0 20px;
+}
+
+.homepage-video-sec p {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  margin: 0;
 }
 
 .homepage-original-sec p {
@@ -329,6 +343,13 @@ main > .homepage-product-section {
   color: #000;
 }
 
+.homepage-video-sec h2 {
+  font-size: 36px;
+  line-height: 44px;
+  font-weight: 500;
+  margin: 0 0 40px;
+}
+
 .homepage-summer-section .columns-2-cols > div > div:not(.columns-img-col) h2 {
   margin-top: 0;
   margin-bottom: 20px;
@@ -416,6 +437,10 @@ main > .homepage-spotlight-section {
 
 .homepage-spotlight-section .columns > div > .columns-img-col {
     order: -1;
+}
+
+.homepage-video-sec .columns-wrapper {
+  padding: 0;
 }
 
 .homepage-spotlight-section h5 {
@@ -557,4 +582,22 @@ main > .homepage-blog-sec {
   0 30px 24px -10px rgb(154 156 165 / 5%),
   0 80px 80px -20px rgb(154 156 165 / 8%);
   border-radius: 4px;
+}
+
+.homepage-video-sec {
+  background-color: #000;
+  color: #fff;
+  padding: 80px 30px;
+  position: relative;
+}
+
+.homepage-video-sec .video-carousel-controls {
+  position: absolute;
+  right: 30px;
+  top: 80px;
+  margin-top: 0;
+}
+
+.homepage-video-sec .default-content-wrapper {
+  padding: 0;
 }

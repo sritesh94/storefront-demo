@@ -23,6 +23,7 @@ import {
   IS_DA,
 } from './commerce.js';
 import { initHomepagePromoCountdown } from './homepage-countdown.js';
+import initHomepageVideoCarousel from './homepage-video-carousel.js';
 
 /**
  * Builds hero block and prepends to main in a new section.
@@ -160,6 +161,7 @@ async function loadEager(doc) {
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
     initHomepagePromoCountdown(main);
+    initHomepageVideoCarousel(main);
   }
 
   try {
