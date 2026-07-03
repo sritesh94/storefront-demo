@@ -45,8 +45,14 @@ const setupAemAssetsImageParams = () => {
   if (isAemAssetsEnabled()) {
     // Convert decimal values to integers for AEM Assets compatibility
     initializers.setImageParamKeys({
-      width: (value) => ['width', Math.floor(value)],
-      height: (value) => ['height', Math.floor(value)],
+      width: (value) => {
+        const num = Number(value);
+        return !Number.isNaN(num) && num > 0 ? ['width', Math.floor(num)] : [];
+      },
+      height: (value) => {
+        const num = Number(value);
+        return !Number.isNaN(num) && num > 0 ? ['height', Math.floor(num)] : [];
+      },
       quality: 'quality',
       auto: 'auto',
       crop: 'crop',

@@ -325,6 +325,35 @@ export async function initializeCommerce() {
   // Initialize Config
   initializeConfig(await getConfigFromSession());
 
+  // Intercept all fetch requests to capture GraphQL search query variables
+  if (!window.hasFetchInterceptor) {
+    window.hasFetchInterceptor = true;
+    const originalFetch = window.fetch;
+    window.fetch = async (input, init) => {
+      if (typeof input === 'string' && input.includes('/graphql')) {
+        try {
+          let variables = null;
+          const url = new URL(input, window.location.origin);
+          const variablesStr = url.searchParams.get('variables');
+          if (variablesStr) {
+            variables = JSON.parse(variablesStr);
+          } else if (init && init.body) {
+            const bodyObj = JSON.parse(init.body);
+            if (bodyObj && bodyObj.variables) {
+              variables = bodyObj.variables;
+            }
+          }
+          if (variables) {
+            window.lastSearchVariables = variables;
+          }
+        } catch (e) {
+          // Ignored
+        }
+      }
+      return originalFetch(input, init);
+    };
+  }
+
   // Set Fetch GraphQL (Core)
   CORE_FETCH_GRAPHQL.setEndpoint(getConfigValue('commerce-core-endpoint') || await getConfigValue('commerce-endpoint'));
   CORE_FETCH_GRAPHQL.setFetchGraphQlHeaders((prev) => ({ ...prev, ...getHeaders('all') }));
@@ -332,6 +361,117 @@ export async function initializeCommerce() {
   // Set Fetch GraphQL (Catalog Service)
   CS_FETCH_GRAPHQL.setEndpoint(await commerceEndpointWithQueryParams());
   CS_FETCH_GRAPHQL.setFetchGraphQlHeaders((prev) => ({ ...prev, ...getHeaders('cs') }));
+
+  CS_FETCH_GRAPHQL.addAfterHook(async (options, response) => {
+    try {
+      if (response && response.data && response.data.productSearch) {
+        const searchResult = response.data.productSearch;
+        const variables = window.lastSearchVariables || {};
+
+        // 1. Get category path from variables or URL
+        let categoryPath = 'default';
+        if (variables.filter) {
+          const catFilter = variables.filter.find((f) => f.attribute === 'categoryPath');
+          if (catFilter && catFilter.eq) {
+            categoryPath = catFilter.eq;
+          }
+        }
+        if (categoryPath === 'default') {
+          categoryPath = window.location.pathname.split('/').pop() || 'default';
+        }
+
+        // 2. Check if a price filter is currently active in the request variables
+        let hasActivePriceFilter = false;
+        if (variables.filter) {
+          hasActivePriceFilter = variables.filter.some((f) => f.attribute === 'price');
+        }
+
+        const priceBuckets = [
+          { from: 0, to: 15 },
+          { from: 15, to: 30 },
+          { from: 30, to: 60 },
+          { from: 60, to: 120 },
+          { from: 120, to: 1000 },
+        ];
+
+        window.categoryPriceBuckets = window.categoryPriceBuckets || {};
+
+        // 3. If no price filter is active, update the active buckets cache from returned items
+        if (!hasActivePriceFilter) {
+          const items = searchResult.items || [];
+          const counts = {};
+          priceBuckets.forEach((b) => {
+            counts[`${b.from}-${b.to}`] = 0;
+          });
+
+          items.forEach((item) => {
+            const product = item.productView;
+            if (!product) return;
+            let price = 0;
+            if (product.price?.final?.amount?.value !== undefined) {
+              price = product.price.final.amount.value;
+            } else if (product.priceRange?.minimum?.final?.amount?.value !== undefined) {
+              price = product.priceRange.minimum.final.amount.value;
+            }
+            const bucket = priceBuckets.find((b) => price >= b.from && price < b.to);
+            if (bucket) {
+              counts[`${bucket.from}-${bucket.to}`] += 1;
+            }
+          });
+
+          // Store only buckets containing items
+          const activeList = priceBuckets.filter((b) => counts[`${b.from}-${b.to}`] > 0);
+          window.categoryPriceBuckets[categoryPath] = activeList;
+        }
+
+        // Use cached buckets or fallback to default list
+        const cached = window.categoryPriceBuckets[categoryPath];
+        const bucketsToShow = cached && cached.length > 0
+          ? cached
+          : priceBuckets;
+
+        // 4. Inject price attribute metadata
+        if (response.data.attributeMetadata) {
+          if (!response.data.attributeMetadata.filterableInSearch) {
+            response.data.attributeMetadata.filterableInSearch = [];
+          }
+          const hasPrice = response.data.attributeMetadata.filterableInSearch.some((a) => a.attribute === 'price');
+          if (!hasPrice) {
+            response.data.attributeMetadata.filterableInSearch.push({
+              __typename: 'SearchAttribute',
+              label: 'Price',
+              attribute: 'price',
+              numeric: true,
+            });
+          }
+        }
+
+        // 5. Inject formatted buckets with proper titles
+        const formattedBuckets = bucketsToShow.map((b) => {
+          const isLast = b.to === 1000;
+          return {
+            __typename: 'RangeBucket',
+            title: `${b.from.toFixed(1)}-${isLast ? '*' : b.to.toFixed(1)}`,
+            from: b.from,
+            to: isLast ? null : b.to,
+            count: 1,
+          };
+        });
+
+        searchResult.facets = [
+          {
+            __typename: 'Aggregation',
+            title: 'Price',
+            attribute: 'price',
+            buckets: formattedBuckets,
+          },
+        ];
+      }
+    } catch (e) {
+      console.error('Error in CS_FETCH_GRAPHQL afterHook:', e);
+    }
+    return response;
+  });
 
   return initializeDropins();
 }
@@ -861,4 +1001,116 @@ export function decorateSections(main) {
     section.dataset.sectionStatus = 'initialized';
     section.style.display = 'none';
   });
+}
+
+const CATEGORY_CHECK_QUERY = `
+  query CategoryNavigation($rootCategoryIds: [String!]!) {
+    categories(
+      ids: $rootCategoryIds,
+      roles: ["show_in_menu", "active"],
+      subtree: { startLevel: 2, depth: 5 }
+    ) {
+      name
+      id
+      urlPath
+    }
+  }
+`;
+
+/**
+ * Intercepts 404 pages and checks if the URL matches a valid Magento category.
+ * If yes, dynamically rebuilds the main container to render the product list page block.
+ * @param {Element} main The main container element
+ * @returns {Promise<boolean>} True if page was decorated as a category page, false otherwise
+ */
+export async function checkAndRenderCategoryPage(main) {
+  if (window.errorCode !== '404') return false;
+
+  const root = getRootPath();
+  let path = window.location.pathname;
+  if (root && path.startsWith(root)) {
+    path = path.substring(root.length);
+  }
+  // Strip leading and trailing slashes
+  path = path.replace(/^\/+|\/+$/g, '');
+
+  try {
+    const rootCategoryId = await getConfigValue('plugins.picker.rootCategory') || '2';
+    const { data, errors } = await CS_FETCH_GRAPHQL.fetchGraphQl(
+      CATEGORY_CHECK_QUERY,
+      {
+        variables: {
+          rootCategoryIds: [rootCategoryId],
+        },
+      },
+    );
+
+    if (errors?.length) {
+      console.warn('Category query returned errors:', errors);
+      return false;
+    }
+
+    const categories = data?.categories || [];
+    const matchedCategory = categories.find((cat) => cat.urlPath === path);
+
+    if (matchedCategory) {
+      // Reconstruct the DOM for the product list page
+      document.title = matchedCategory.name;
+
+      const titleMeta = document.querySelector('meta[property="og:title"]');
+      if (titleMeta) titleMeta.setAttribute('content', matchedCategory.name);
+
+      main.className = '';
+      main.innerHTML = `
+        <div>
+          <div class="product-list-page">
+            <div>
+              <div>urlpath</div>
+              <div>${matchedCategory.urlPath}</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Clear the error page flags
+      window.isErrorPage = false;
+      delete window.errorCode;
+
+      return true;
+    }
+  } catch (error) {
+    console.warn('Error checking for dynamic category page:', error);
+  }
+
+  return false;
+}
+
+/**
+ * Intercepts 404 pages and checks if the URL matches a product detail page (PDP) pattern.
+ * If yes, dynamically rebuilds the main container to render the product details block.
+ * @param {Element} main The main container element
+ * @returns {Promise<boolean>} True if page was decorated as a product page, false otherwise
+ */
+export async function checkAndRenderProductPage(main) {
+  if (window.errorCode !== '404') return false;
+
+  const isPdpPath = /\/?products\/[\w|-]+\/[\w|-]+$/.test(window.location.pathname);
+
+  if (isPdpPath) {
+    // Reconstruct the DOM for the product details page
+    main.className = '';
+    main.innerHTML = `
+      <div>
+        <div class="product-details"></div>
+      </div>
+    `;
+
+    // Clear the error page flags
+    window.isErrorPage = false;
+    delete window.errorCode;
+
+    return true;
+  }
+
+  return false;
 }

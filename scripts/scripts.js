@@ -21,6 +21,8 @@ import {
   decorateSections,
   IS_UE,
   IS_DA,
+  checkAndRenderCategoryPage,
+  checkAndRenderProductPage,
 } from './commerce.js';
 import { initHomepagePromoCountdown } from './homepage-countdown.js';
 import initHomepageVideoCarousel from './homepage-video-carousel.js';
@@ -151,6 +153,8 @@ async function loadEager(doc) {
   if (main) {
     try {
       await initializeCommerce();
+      await checkAndRenderCategoryPage(main);
+      await checkAndRenderProductPage(main);
       decorateMain(main);
       applyTemplates(doc);
       await loadCommerceEager();
