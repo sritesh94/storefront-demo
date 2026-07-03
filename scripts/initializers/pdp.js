@@ -102,6 +102,13 @@ await initializeDropin(async () => {
   const models = {
     ProductDetails: {
       initialData: { ...product },
+      transform: (rawProduct) => ({
+        attributes: rawProduct.attributes?.map(({ label, value, name }) => ({
+          id: name,
+          label,
+          value: Array.isArray(value) ? value.join(', ') : String(value),
+        })) || [],
+      }),
     },
   };
 

@@ -247,4 +247,56 @@ export default async function decorate(block) {
     applySearchStateToUrl(url, payload.request);
     window.history.pushState({}, '', url.toString());
   }, { eager: false });
+
+  // Facet Accordion State Management
+  const openFacets = new Set();
+  let initializedOpen = false;
+
+  const updateAccordionStates = () => {
+    const facets = $facets.querySelectorAll('.product-discovery-facet');
+    facets.forEach((facet) => {
+      const header = facet.querySelector('.product-discovery-facet__header');
+      if (!header) return;
+      const title = header.textContent.trim();
+
+      // Default to open on first load
+      if (!initializedOpen) {
+        openFacets.add(title);
+      }
+
+      if (openFacets.has(title)) {
+        facet.classList.add('is-open');
+      } else {
+        facet.classList.remove('is-open');
+      }
+    });
+
+    if (facets.length > 0) {
+      initializedOpen = true;
+    }
+  };
+
+  // Toggle open/closed state on click
+  $facets.addEventListener('click', (e) => {
+    const header = e.target.closest('.product-discovery-facet__header');
+    if (header) {
+      const facet = header.closest('.product-discovery-facet');
+      if (facet) {
+        const title = header.textContent.trim();
+        if (openFacets.has(title)) {
+          openFacets.delete(title);
+          facet.classList.remove('is-open');
+        } else {
+          openFacets.add(title);
+          facet.classList.add('is-open');
+        }
+      }
+    }
+  });
+
+  // Watch for Preact updates to re-apply the is-open class
+  const facetObserver = new MutationObserver(() => {
+    updateAccordionStates();
+  });
+  facetObserver.observe($facets, { childList: true, subtree: true });
 }

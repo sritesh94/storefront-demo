@@ -1,4 +1,3 @@
-
 .block.product-list-page .search__wrapper {
     display: grid;
     margin-block: var(--spacing-small);
@@ -10,6 +9,15 @@
         "product-list"
         "pagination";
 }
+
+.block.product-list-page .search__facets {
+    grid-area: facets;
+    margin-block-end: var(--spacing-small);
+    display: none;
+    border: 1px solid #A0A0A0;
+    padding: 30px;
+}
+
 
 .block.product-list-page .search__result-info {
     grid-area: result-info;
@@ -50,11 +58,7 @@
     width: 1.75em;
 }
 
-.block.product-list-page .search__facets {
-    grid-area: facets;
-    margin-block-end: var(--spacing-small);
-    display: none;
-}
+
 
 .block.product-list-page .search__facets--visible {
     display: block;
@@ -88,7 +92,7 @@
     display: inline-flex;
     align-items: center;
     cursor: pointer;
-    
+
     &.active {
         img {
             filter: brightness(0) saturate(100%) invert(17%) sepia(91%) saturate(3936%) hue-rotate(356deg) brightness(90%) contrast(127%);
@@ -119,7 +123,7 @@
             "result-info product-sort"
             "facets product-list"
             ". pagination";
-        grid-template-columns: 270px 1fr;
+        grid-template-columns: 373px 1fr;
     }
 
     .block.product-list-page .search__view-facets {
@@ -128,11 +132,135 @@
 
     .block.product-list-page .search__facets {
         display: unset;
-        margin-right: var(--spacing-small);
+        margin-right: 47px;
+        max-height: fit-content;
     }
 
     .block.product-list-page .search__product-sort {
         display: flex;
         justify-content: flex-end;
+        margin-bottom: 40px;
     }
+}
+
+.product-list-page-container h1 {
+    font-size: 24px;
+    line-height: 30px;
+    color: #000;
+    font-weight: 500;
+    margin: 40px 0 0;
+}
+
+.product-discovery-product-list__grid {
+    gap: 40px;
+}
+
+.block.product-list-page .dropin-picker__selected label {
+    display: none;
+}
+
+.block.product-list-page .dropin-picker__medium.dropin-picker__floating.dropin-picker__selected select {
+    border-color: #A0A0A0;
+    font-size: 16px;
+    line-height: 26px;
+    color: #000;
+    font-weight: 700;
+    padding: 13px 40px 11px 16px;
+}
+
+.block.product-list-page select+svg {
+    color: #000;
+}
+
+.product-discovery-facet-list__selected-filters:empty {
+    display: none;
+}
+
+.product-discovery-facet__header {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 26px;
+    color: #000;
+}
+
+.block.product-list-page .product-discovery-facet__bucket .dropin-price-range .dropin-price--small.dropin-price--bold {
+    font-weight: 500;
+    color: #000;
+}
+
+.block.product-list-page .dropin-radio-button__input:checked+.dropin-radio-button__label::after {
+    margin-left: 4px;
+}
+
+/* ============================================================
+   Facet Accordion
+   ============================================================ */
+
+/* Container for all facet groups */
+.block.product-list-page .product-discovery-facet-list__facet-options {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Each individual facet group */
+.block.product-list-page .product-discovery-facet {
+    border-bottom: 1px solid #A0A0A0;
+    padding: 0;
+}
+
+/* Header row — the clickable title bar */
+.block.product-list-page .product-discovery-facet__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0 20px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: #000;
+    position: relative;
+    margin: 0;
+}
+
+/* The + icon — injected via ::after */
+.block.product-list-page .product-discovery-facet__header::after {
+    content: "+";
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 1;
+    color: #000;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+    margin-left: 8px;
+}
+
+/* When accordion is open: show − icon */
+.block.product-list-page .product-discovery-facet.is-open .product-discovery-facet__header::after {
+    content: "\2212";
+}
+
+/* Each individual option row */
+.block.product-list-page .product-discovery-facet__bucket {
+    padding: 4px 0;
+}
+
+/* Bucket list items and show-more buttons — hidden by default */
+.block.product-list-page .product-discovery-facet__bucket,
+.block.product-list-page .product-discovery-facet .dropin-button {
+    display: none;
+}
+
+/* When open — show them and add bottom padding */
+.block.product-list-page .product-discovery-facet.is-open {
+    padding-bottom: 12px;
+}
+
+.block.product-list-page .product-discovery-facet.is-open .product-discovery-facet__bucket {
+    display: block;
+}
+
+.block.product-list-page .product-discovery-facet.is-open .dropin-button {
+    display: inline-flex;
 }
