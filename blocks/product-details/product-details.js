@@ -33,6 +33,13 @@ import {
   getProductLink,
 } from '../../scripts/commerce.js';
 
+// Compare
+import {
+  addCompareProduct,
+  removeCompareProduct,
+  isCompared,
+} from '../../scripts/components/compare/compare.js';
+
 // Initializers
 import { IMAGES_SIZES } from '../../scripts/initializers/pdp.js';
 import '../../scripts/initializers/cart.js';
@@ -114,10 +121,9 @@ export default async function decorate(block) {
         <div class="product-details__configuration">
           <div class="product-details__options"></div>
           <div class="product-details__quantity"></div>
-          <div class="product-details__buttons">
-            <div class="product-details__buttons__add-to-cart"></div>
-            <div class="product-details__buttons__add-to-wishlist"></div>
-          </div>
+          <div class="product-details__buttons__add-to-cart"></div>
+          <div class="product-details__buttons__add-to-wishlist"></div>
+          <div class="product-details__buttons__compare"></div>
         </div>
         <div class="product-details__description"></div>
         <div class="product-details__attributes"></div>
@@ -136,6 +142,7 @@ export default async function decorate(block) {
   const $giftCardOptions = fragment.querySelector('.product-details__gift-card-options');
   const $addToCart = fragment.querySelector('.product-details__buttons__add-to-cart');
   const $wishlistToggleBtn = fragment.querySelector('.product-details__buttons__add-to-wishlist');
+  const $compareBtn = fragment.querySelector('.product-details__buttons__compare');
   const $description = fragment.querySelector('.product-details__description');
   const $attributes = fragment.querySelector('.product-details__attributes');
 
@@ -194,7 +201,7 @@ export default async function decorate(block) {
 
     // Gallery (Desktop)
     pdpRendered.render(ProductGallery, {
-      controls: 'thumbnailsColumn',
+      controls: 'thumbnailsRow',
       arrows: true,
       peak: true,
       gap: 'small',
@@ -248,6 +255,50 @@ export default async function decorate(block) {
       product,
     })($wishlistToggleBtn),
   ]);
+
+  // Compare Button
+  function renderCompareButton(sku) {
+    if (!sku || !$compareBtn) return;
+    $compareBtn.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.className = 'product-details__compare-toggle';
+    btn.type = 'button';
+    btn.innerHTML = `
+      <img
+        src="${window.hlx.codeBasePath}/icons/compare.svg"
+        alt="Compare"
+        width="24"
+        height="24"
+      />
+    `;
+    if (isCompared(sku)) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      if (isCompared(sku)) {
+        removeCompareProduct(sku);
+        btn.classList.remove('active');
+      } else {
+        const result = addCompareProduct(sku);
+        if (!result.success) {
+          const err = document.createElement('span');
+          err.className = 'product-details__compare-error';
+          err.textContent = result.message;
+          $compareBtn.appendChild(err);
+          setTimeout(() => err.remove(), 3000);
+          return;
+        }
+        btn.classList.add('active');
+      }
+    });
+    $compareBtn.appendChild(btn);
+  }
+
+  // Render initially if product is already known
+  if (product?.sku) renderCompareButton(product.sku);
+
+  // Re-render when product data changes (variant switches etc.)
+  events.on('pdp/data', (data) => {
+    if (data?.sku) renderCompareButton(data.sku);
+  }, { eager: true });
 
   // Configuration – Button - Add to Cart
   const addToCart = await UI.render(Button, {

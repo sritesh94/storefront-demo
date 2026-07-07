@@ -47,6 +47,31 @@ function buildHeroBlock(main) {
 }
 
 /**
+ * Builds a breadcrumb block and prepends it to the section containing a product block.
+ * Runs for both authored pages (200) and dynamic pages as a safety net.
+ * @param {Element} main The container element
+ */
+function buildBreadcrumbBlock(main) {
+  // Skip if breadcrumb is already injected (e.g. by checkAndRenderCategoryPage)
+  if (main.querySelector('.breadcrumb')) return;
+
+  // Only add breadcrumb when a product block is present
+  const productBlock = main.querySelector('.product-list-page, .product-details');
+  if (!productBlock) return;
+
+  // Wrap the breadcrumb in a plain section div and prepend to main.
+  // This makes breadcrumb the first section of the page (right below the header),
+  // above any authored title or product content.
+  // decorateSections will add the .section class and wrap the breadcrumb div
+  // giving the correct section > wrapper > block depth for decorateBlocks.
+  const sectionDiv = document.createElement('div');
+  const breadcrumb = document.createElement('div');
+  breadcrumb.className = 'breadcrumb';
+  sectionDiv.append(breadcrumb);
+  main.prepend(sectionDiv);
+}
+
+/**
  * load fonts.css and set a session storage flag
  */
 async function loadFonts() {
@@ -83,6 +108,7 @@ function buildAutoBlocks(main) {
     }
 
     if (!main.querySelector('.hero')) buildHeroBlock(main);
+    buildBreadcrumbBlock(main);
   } catch (error) {
     console.error('Auto Blocking failed', error);
   }

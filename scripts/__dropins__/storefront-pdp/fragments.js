@@ -100,6 +100,16 @@ fragment PRODUCT_FRAGMENT on ProductView {
   url
   urlKey
   externalId
+  categories {
+    name
+    slug
+    level
+    parents {
+      name
+      slug
+      level
+    }
+  }
 
   images(roles: []) {
     url

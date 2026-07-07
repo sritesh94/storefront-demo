@@ -1013,9 +1013,65 @@ const CATEGORY_CHECK_QUERY = `
       name
       id
       urlPath
+      parentId
     }
   }
 `;
+
+// Cache for the flat category list to avoid redundant API calls
+let categoryListCache = null;
+
+/**
+ * Fetches and caches the full flat category list from the API.
+ * @returns {Promise<Array>} Flat array of category objects
+ */
+async function fetchCategoryList() {
+  if (categoryListCache) return categoryListCache;
+  try {
+    const rootCategoryId = await getConfigValue('plugins.picker.rootCategory') || '2';
+    const { data, errors } = await CS_FETCH_GRAPHQL.fetchGraphQl(
+      CATEGORY_CHECK_QUERY,
+      { variables: { rootCategoryIds: [rootCategoryId] } },
+    );
+    if (errors?.length || !data?.categories) return [];
+    categoryListCache = data.categories;
+    return categoryListCache;
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Resolves the full breadcrumb ancestor chain for a given category urlPath.
+ * Returns an ordered array from root to leaf: [{ name, urlPath }, ...]
+ * @param {string} urlPath - The urlPath of the target category (e.g. 'bags/backpacks')
+ * @returns {Promise<Array<{name: string, urlPath: string}>>}
+ */
+export async function getCategoryAncestors(urlPath) {
+  if (!urlPath) return [];
+  const categories = await fetchCategoryList();
+  if (!categories.length) return [];
+
+  // Build a lookup map by id for quick parent traversal
+  const byId = {};
+  const byUrlPath = {};
+  categories.forEach((cat) => {
+    byId[cat.id] = cat;
+    byUrlPath[cat.urlPath] = cat;
+  });
+
+  const target = byUrlPath[urlPath];
+  if (!target) return [];
+
+  // Walk up the parent chain
+  const chain = [];
+  let current = target;
+  while (current) {
+    if (current.urlPath) chain.unshift({ name: current.name, urlPath: current.urlPath });
+    current = current.parentId ? byId[current.parentId] : null;
+  }
+  return chain;
+}
 
 /**
  * Intercepts 404 pages and checks if the URL matches a valid Magento category.
@@ -1035,22 +1091,8 @@ export async function checkAndRenderCategoryPage(main) {
   path = path.replace(/^\/+|\/+$/g, '');
 
   try {
-    const rootCategoryId = await getConfigValue('plugins.picker.rootCategory') || '2';
-    const { data, errors } = await CS_FETCH_GRAPHQL.fetchGraphQl(
-      CATEGORY_CHECK_QUERY,
-      {
-        variables: {
-          rootCategoryIds: [rootCategoryId],
-        },
-      },
-    );
-
-    if (errors?.length) {
-      console.warn('Category query returned errors:', errors);
-      return false;
-    }
-
-    const categories = data?.categories || [];
+    // Use fetchCategoryList() to pre-populate the shared cache used by getCategoryAncestors()
+    const categories = await fetchCategoryList();
     const matchedCategory = categories.find((cat) => cat.urlPath === path);
 
     if (matchedCategory) {
@@ -1063,6 +1105,10 @@ export async function checkAndRenderCategoryPage(main) {
       main.className = '';
       main.innerHTML = `
         <div>
+          <div class="breadcrumb"></div>
+        </div>
+        <div>
+          <h1>${matchedCategory.name}</h1>
           <div class="product-list-page">
             <div>
               <div>urlpath</div>
@@ -1101,7 +1147,19 @@ export async function checkAndRenderProductPage(main) {
     main.className = '';
     main.innerHTML = `
       <div>
+        <div class="breadcrumb"></div>
+      </div>
+      <div>
         <div class="product-details"></div>
+        <a href="/fragments/sustainability">/fragments/sustainability</a>
+      </div>
+      <div>
+        <div class="product-recommendations">
+          <div>
+            <div>recId</div>
+            <div>f94be996-b339-4ba5-9c10-c21cb9be4e4a</div>
+          </div>
+        </div>
       </div>
     `;
 
