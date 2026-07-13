@@ -362,117 +362,6 @@ export async function initializeCommerce() {
   CS_FETCH_GRAPHQL.setEndpoint(await commerceEndpointWithQueryParams());
   CS_FETCH_GRAPHQL.setFetchGraphQlHeaders((prev) => ({ ...prev, ...getHeaders('cs') }));
 
-  CS_FETCH_GRAPHQL.addAfterHook(async (options, response) => {
-    try {
-      if (response && response.data && response.data.productSearch) {
-        const searchResult = response.data.productSearch;
-        const variables = window.lastSearchVariables || {};
-
-        // 1. Get category path from variables or URL
-        let categoryPath = 'default';
-        if (variables.filter) {
-          const catFilter = variables.filter.find((f) => f.attribute === 'categoryPath');
-          if (catFilter && catFilter.eq) {
-            categoryPath = catFilter.eq;
-          }
-        }
-        if (categoryPath === 'default') {
-          categoryPath = window.location.pathname.split('/').pop() || 'default';
-        }
-
-        // 2. Check if a price filter is currently active in the request variables
-        let hasActivePriceFilter = false;
-        if (variables.filter) {
-          hasActivePriceFilter = variables.filter.some((f) => f.attribute === 'price');
-        }
-
-        const priceBuckets = [
-          { from: 0, to: 15 },
-          { from: 15, to: 30 },
-          { from: 30, to: 60 },
-          { from: 60, to: 120 },
-          { from: 120, to: 1000 },
-        ];
-
-        window.categoryPriceBuckets = window.categoryPriceBuckets || {};
-
-        // 3. If no price filter is active, update the active buckets cache from returned items
-        if (!hasActivePriceFilter) {
-          const items = searchResult.items || [];
-          const counts = {};
-          priceBuckets.forEach((b) => {
-            counts[`${b.from}-${b.to}`] = 0;
-          });
-
-          items.forEach((item) => {
-            const product = item.productView;
-            if (!product) return;
-            let price = 0;
-            if (product.price?.final?.amount?.value !== undefined) {
-              price = product.price.final.amount.value;
-            } else if (product.priceRange?.minimum?.final?.amount?.value !== undefined) {
-              price = product.priceRange.minimum.final.amount.value;
-            }
-            const bucket = priceBuckets.find((b) => price >= b.from && price < b.to);
-            if (bucket) {
-              counts[`${bucket.from}-${bucket.to}`] += 1;
-            }
-          });
-
-          // Store only buckets containing items
-          const activeList = priceBuckets.filter((b) => counts[`${b.from}-${b.to}`] > 0);
-          window.categoryPriceBuckets[categoryPath] = activeList;
-        }
-
-        // Use cached buckets or fallback to default list
-        const cached = window.categoryPriceBuckets[categoryPath];
-        const bucketsToShow = cached && cached.length > 0
-          ? cached
-          : priceBuckets;
-
-        // 4. Inject price attribute metadata
-        if (response.data.attributeMetadata) {
-          if (!response.data.attributeMetadata.filterableInSearch) {
-            response.data.attributeMetadata.filterableInSearch = [];
-          }
-          const hasPrice = response.data.attributeMetadata.filterableInSearch.some((a) => a.attribute === 'price');
-          if (!hasPrice) {
-            response.data.attributeMetadata.filterableInSearch.push({
-              __typename: 'SearchAttribute',
-              label: 'Price',
-              attribute: 'price',
-              numeric: true,
-            });
-          }
-        }
-
-        // 5. Inject formatted buckets with proper titles
-        const formattedBuckets = bucketsToShow.map((b) => {
-          const isLast = b.to === 1000;
-          return {
-            __typename: 'RangeBucket',
-            title: `${b.from.toFixed(1)}-${isLast ? '*' : b.to.toFixed(1)}`,
-            from: b.from,
-            to: isLast ? null : b.to,
-            count: 1,
-          };
-        });
-
-        searchResult.facets = [
-          {
-            __typename: 'Aggregation',
-            title: 'Price',
-            attribute: 'price',
-            buckets: formattedBuckets,
-          },
-        ];
-      }
-    } catch (e) {
-      console.error('Error in CS_FETCH_GRAPHQL afterHook:', e);
-    }
-    return response;
-  });
-
   return initializeDropins();
 }
 
@@ -1151,7 +1040,6 @@ export async function checkAndRenderProductPage(main) {
       </div>
       <div>
         <div class="product-details"></div>
-        <a href="/fragments/sustainability">/fragments/sustainability</a>
       </div>
       <div>
         <div class="product-recommendations">
@@ -1160,6 +1048,9 @@ export async function checkAndRenderProductPage(main) {
             <div>f94be996-b339-4ba5-9c10-c21cb9be4e4a</div>
           </div>
         </div>
+      </div>
+      <div class="section-product-sustainability">
+        <a href="/fragments/sustainability">/fragments/sustainability</a>
       </div>
     `;
 

@@ -28,7 +28,64 @@
 }
 
 .product-details__price {
-  margin-top: var(--spacing-medium);
+  margin: var(--spacing-medium) 0;
+  border-bottom: 1px solid #A0A0A0;
+  padding-bottom: 20px;
+}
+
+.pdp-short-description {
+  font-size: 16px;
+  line-height: 24px;
+  color: #000;
+}
+
+.product-details-container .dropin-incrementer__button-container {
+  border-radius: 0;
+}
+
+.product-details-container .dropin-incrementer__button-container:nth-of-type(2) {
+  background-color: #000;
+}
+
+.product-details-container .dropin-incrementer__increase-button {
+  background-color: transparent;
+  color: #fff;
+}
+
+.product-details-container .dropin-incrementer__decrease-button {
+  color: #121212;
+}
+
+.product-details-container .dropin-incrementer__input[type="number"] {
+  border: 1px solid #A0A0A0;
+  border-width: 0 1px;
+}
+
+.pdp-sustainability-sec img {
+  max-width: 100px;
+}
+
+.product-details__buttons__compare button img,
+.product-details__buttons__add-to-wishlist button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.product-details__buttons__compare button img {
+  filter: invert(1);
+}
+
+.product-details__buttons__add-to-cart .dropin-button--with-icon {
+  background-color: #000 !important;
+  font-size: 14px;
+  line-height: 24px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.product-details__buttons__add-to-cart .dropin-button--with-icon svg {
+  display: none;
 }
 
 .product-details__gallery .pdp-overlay__content .pdp-carousel,
@@ -58,9 +115,7 @@
   visibility: visible;
 }
 
-.product-details__attributes {
-  margin-top: var(--spacing-xsmall);
-}
+
 
 .product-details__buttons__compare {
   display: inline-flex;
@@ -95,6 +150,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  column-gap: 0;
   align-items: center;
   margin-top: 30px;
 }
@@ -113,6 +169,7 @@
 
 .product-details__buttons__add-to-cart {
   width: calc(100% - 198px);
+  margin-left: 20px;
 }
 
 .product-details__buttons__add-to-cart button {
@@ -159,7 +216,15 @@
   }
 }
 
-main>.product-details-container .pdp-sustainability-sec {
+.product-recommendations .recommendations-product-list__heading {
+  text-align: center;
+  font-size: 36px;
+  line-height: 44px;
+  font-weight: 500;
+  color: #000;
+}
+
+main>.section-product-sustainability {
   background-color: #FAFAFA;
   text-align: center;
   padding: 80px 0;
@@ -177,10 +242,6 @@ main>.product-details-container .pdp-sustainability-sec {
 .pdp-sustainability-sec>div {
   max-width: 1200px;
   margin: 0 auto;
-}
-
-.pdp-sustainability-sec img {
-  max-width: 100px;
 }
 
 .product-details__compare-toggle.active>img {
@@ -205,5 +266,175 @@ main>.product-details-container .pdp-sustainability-sec {
   line-height: 30px;
   font-weight: 500;
   color: #000;
-  margin: 0 0 16px;
+  margin: 0 0 10px;
+}
+
+/* Accordion Styling */
+.product-details .product-details__accordion-container {
+  margin-top: var(--spacing-medium, 32px);
+  border-top: 1px solid #D9D9D9;
+}
+
+.product-details .product-details__accordion {
+  border-bottom: 1px solid #D9D9D9;
+  padding: 30px 0;
+}
+
+.product-details .product-details__accordion-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: #000;
+  list-style: none;
+}
+
+.pdp-info-sec h4 {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 14px;
+  line-height: 24px;
+  color: #000;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+.pdp-info-sec h3 {
+  background-color: rgb(229 150 157 / 20%);
+  font-size: 14px;
+  line-height: 24px;
+  color: #000;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  text-align: center;
+  padding: 20px;
+  margin: 40px 0;
+}
+
+.product-details .product-details__accordion-summary::-webkit-details-marker {
+  display: none;
+}
+
+.product-details .product-details__accordion-icon {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Horizontal line of the plus sign */
+.product-details .product-details__accordion-icon::before {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 2px;
+  background-color: currentcolor;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Vertical line of the plus sign */
+.product-details .product-details__accordion-icon::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 14px;
+  background-color: currentcolor;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* When the details element is open, rotate/scale the vertical line to form a minus sign */
+.product-details details[open] .product-details__accordion-icon::after {
+  transform: rotate(90deg) scaleX(0);
+}
+
+/* Add padding to the contents when open */
+.product-details .product-details__accordion[open] .product-details__description,
+.product-details .product-details__accordion[open] .product-details__attributes {
+  animation: slide-down 0.3s ease-out;
+}
+
+.product-details__action-buttons {
+  margin-top: var(--spacing-medium, 32px);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-top: 40px;
+  border-top: 1px solid #A0A0A0;
+  margin-bottom: 40px;
+}
+
+.product-details__buttons__compare button,
+.product-details__buttons__add-to-wishlist button {
+  padding: 8px 15px;
+  font-size: 12px;
+  letter-spacing: 1.2px;
+  font-weight: 700;
+  line-height: 20px;
+  border-radius: 0;
+  color: #1D1D1B;
+  border: 1px solid #1D1D1B;
+}
+
+.product-details__buttons__compare button {
+  background-color: #1D1D1B;
+  color: #fff;
+}
+
+/* Custom smooth slide-down animation */
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Style list items within accordion contents */
+.product-details .product-details__description p,
+.product-details .product-details__description li,
+.product-details .product-details__attributes li {
+  font-size: 16px;
+  line-height: 26px;
+  color: var(--color-neutral-700, #4A4A4A);
+}
+
+.product-details .product-details__description li,
+.product-details .product-details__attributes li {
+  margin-bottom: 8px;
+}
+
+.product-details .product-details__description ul,
+.product-details .product-details__attributes ul {
+  padding-left: 20px;
+  margin: 12px 0 0;
+  list-style: disc;
+}
+
+/* Hide the duplicate "Details" text node from the attributes drop-in component */
+.product-details .product-details__attributes .pdp-attributes {
+  font-size: 0;
+  line-height: 0;
+}
+
+/* Restore size for sub-elements in attributes */
+.product-details .product-details__attributes .pdp-attributes>* {
+  font-size: 16px;
+  line-height: 26px;
 }

@@ -13,6 +13,13 @@ await initializeDropin(async () => {
   const langDefinitions = {
     default: {
       ...labels,
+      Cart: {
+        ...labels?.Cart,
+        PriceSummary: {
+          ...labels?.Cart?.PriceSummary,
+          taxToBeDetermined: '',
+        },
+      },
     },
   };
 

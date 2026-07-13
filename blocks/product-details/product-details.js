@@ -68,8 +68,8 @@ function isProductPrerendered() {
 // Function to update the Add to Cart button text
 function updateAddToCartButtonText(addToCartInstance, inCart, labels) {
   const buttonText = inCart
-    ? labels.Global?.UpdateProductInCart
-    : labels.Global?.AddProductToCart;
+    ? 'Update Cart'
+    : (labels.Global?.AddProductToCart || 'Add to Cart');
   if (addToCartInstance) {
     addToCartInstance.setProps((prev) => ({
       ...prev,
@@ -105,6 +105,10 @@ export default async function decorate(block) {
   // State to track if the current product/variant is out of stock
   let isOutOfStock = false;
 
+  // Accordion Titles
+  const descriptionLabel = labels.PDP?.Product?.Description?.label || 'Description';
+  const detailsLabel = labels.PDP?.Product?.Details?.label || 'Details';
+
   // Layout
   const fragment = document.createRange().createContextualFragment(`
     <div class="product-details__alert"></div>
@@ -122,11 +126,28 @@ export default async function decorate(block) {
           <div class="product-details__options"></div>
           <div class="product-details__quantity"></div>
           <div class="product-details__buttons__add-to-cart"></div>
+        </div>
+        <div class="product-details__action-buttons">
           <div class="product-details__buttons__add-to-wishlist"></div>
           <div class="product-details__buttons__compare"></div>
         </div>
-        <div class="product-details__description"></div>
-        <div class="product-details__attributes"></div>
+        <a href="/fragments/pdp-info">/fragments/pdp-info</a>
+        <div class="product-details__accordion-container">
+          <details class="product-details__accordion" open>
+            <summary class="product-details__accordion-summary">
+              ${descriptionLabel}
+              <span class="product-details__accordion-icon"></span>
+            </summary>
+            <div class="product-details__description"></div>
+          </details>
+          <details class="product-details__accordion" open>
+            <summary class="product-details__accordion-summary">
+              ${detailsLabel}
+              <span class="product-details__accordion-icon"></span>
+            </summary>
+            <div class="product-details__attributes"></div>
+          </details>
+        </div>
       </div>
     </div>
   `);
@@ -145,6 +166,18 @@ export default async function decorate(block) {
   const $compareBtn = fragment.querySelector('.product-details__buttons__compare');
   const $description = fragment.querySelector('.product-details__description');
   const $attributes = fragment.querySelector('.product-details__attributes');
+
+  // Load fragments
+  const fragmentElements = [...fragment.querySelectorAll('a[href*="/fragments/"]')];
+  fragmentElements.forEach((link) => {
+    const path = link.getAttribute('href');
+    import('../fragment/fragment.js').then(async ({ loadFragment }) => {
+      const fragmentNode = await loadFragment(path);
+      if (fragmentNode) {
+        link.replaceWith(...fragmentNode.childNodes);
+      }
+    });
+  });
 
   block.replaceChildren(fragment);
 
@@ -253,6 +286,8 @@ export default async function decorate(block) {
     // Wishlist button - WishlistToggle Container
     wishlistRender.render(WishlistToggle, {
       product,
+      labelToWishlist: labels.Wishlist?.AddToWishlist || 'Add to Wishlist',
+      labelWishlisted: labels.Wishlist?.Added || 'Added to Wishlist',
     })($wishlistToggleBtn),
   ]);
 
@@ -263,6 +298,10 @@ export default async function decorate(block) {
     const btn = document.createElement('button');
     btn.className = 'product-details__compare-toggle';
     btn.type = 'button';
+    const isProductCompared = isCompared(sku);
+    const labelText = isProductCompared
+      ? (labels.Compare?.Compared || 'Compared')
+      : (labels.Compare?.AddToCompare || 'Compare');
     btn.innerHTML = `
       <img
         src="${window.hlx.codeBasePath}/icons/compare.svg"
@@ -270,12 +309,14 @@ export default async function decorate(block) {
         width="24"
         height="24"
       />
+      <span>${labelText}</span>
     `;
-    if (isCompared(sku)) btn.classList.add('active');
+    if (isProductCompared) btn.classList.add('active');
     btn.addEventListener('click', () => {
       if (isCompared(sku)) {
         removeCompareProduct(sku);
         btn.classList.remove('active');
+        btn.querySelector('span').textContent = labels.Compare?.AddToCompare || 'Compare';
       } else {
         const result = addCompareProduct(sku);
         if (!result.success) {
@@ -287,6 +328,7 @@ export default async function decorate(block) {
           return;
         }
         btn.classList.add('active');
+        btn.querySelector('span').textContent = labels.Compare?.Compared || 'Compared';
       }
     });
     $compareBtn.appendChild(btn);
@@ -306,8 +348,8 @@ export default async function decorate(block) {
     icon: h(Icon, { source: 'Cart' }),
     onClick: async () => {
       const buttonActionText = isUpdateMode
-        ? labels.Global?.UpdatingInCart
-        : labels.Global?.AddingToCart;
+        ? 'Updating Cart...'
+        : (labels.Global?.AddingToCart || 'Adding to Cart...');
       try {
         addToCart.setProps((prev) => ({
           ...prev,
