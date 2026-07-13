@@ -596,3 +596,72 @@ main .cart__actions-bottom button.cart__btn-clear:hover::before {
 .commerce-cart-container .dropin-input-container.dropin-input-container--primary {
   margin-right: 0;
 }
+
+.commerce-cart-container .cart__coupons .dropin-accordion-section__heading svg,
+.commerce-cart-container .cart__gift-cards .dropin-accordion-section__heading svg {
+  display: none;
+}
+
+.commerce-cart-container .cart__coupons .dropin-accordion-section__title:after,
+.commerce-cart-container .cart__gift-cards .dropin-accordion-section__title:after {
+  content: '';
+  background: url('../../icons/chevron-down.svg') no-repeat center / contain;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}
+
+.commerce-cart-container .cart__coupons .dropin-accordion-section__title,
+.commerce-cart-container .cart__gift-cards .dropin-accordion-section__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.commerce-cart-container .cart__coupons .dropin-accordion-section__title-container,
+.commerce-cart-container .cart__gift-cards .dropin-accordion-section__title-container {
+  width: 100%;
+}
+
+.commerce-cart-container .cart__coupons div[aria-label="Close Apply Discount Code"] .dropin-accordion-section__title:after,
+.commerce-cart-container .cart__gift-cards div[aria-label="Close Gift Card"] .dropin-accordion-section__title:after {
+  transform: rotate(180deg);
+}
+
+.commerce-cart-container .cart-coupons__accordion-section .dropin-accordion-section__content-container {
+  margin: 10px 0 0;
+}
+
+.commerce-cart-container .cart-coupons__accordion-section+.dropin-divider {
+  display: none;
+}
+
+.commerce-cart-container .cart__coupons input#coupon,
+.commerce-cart-container .cart__gift-cards input#giftCardCode {
+  border-color: #000;
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 400;
+  padding: 8px 10px;
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.commerce-cart-container .cart__coupons input#coupon::placeholder,
+.commerce-cart-container .cart__gift-cards input#giftCardCode::placeholder {
+  color: #000;
+}
+
+.commerce-cart-container .cart-coupons .coupon-code-form--button,
+.commerce-cart-container .cart__gift-cards .gift-card-code-form--button {
+  background-color: #000;
+  color: #fff;
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  padding: 7px 20px;
+}
