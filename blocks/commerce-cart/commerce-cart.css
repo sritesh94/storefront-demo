@@ -602,8 +602,8 @@ main .cart__actions-bottom button.cart__btn-clear:hover::before {
   display: none;
 }
 
-.commerce-cart-container .cart__coupons .dropin-accordion-section__title:after,
-.commerce-cart-container .cart__gift-cards .dropin-accordion-section__title:after {
+.commerce-cart-container .cart__coupons .dropin-accordion-section__title::after,
+.commerce-cart-container .cart__gift-cards .dropin-accordion-section__title::after {
   content: '';
   background: url('../../icons/chevron-down.svg') no-repeat center / contain;
   display: inline-block;
@@ -624,8 +624,8 @@ main .cart__actions-bottom button.cart__btn-clear:hover::before {
   width: 100%;
 }
 
-.commerce-cart-container .cart__coupons div[aria-label="Close Apply Discount Code"] .dropin-accordion-section__title:after,
-.commerce-cart-container .cart__gift-cards div[aria-label="Close Gift Card"] .dropin-accordion-section__title:after {
+.commerce-cart-container .cart__coupons div[aria-label="Close Apply Discount Code"] .dropin-accordion-section__title::after,
+.commerce-cart-container .cart__gift-cards div[aria-label="Close Gift Card"] .dropin-accordion-section__title::after {
   transform: rotate(180deg);
 }
 
@@ -638,7 +638,7 @@ main .cart__actions-bottom button.cart__btn-clear:hover::before {
 }
 
 .commerce-cart-container .cart__coupons input#coupon,
-.commerce-cart-container .cart__gift-cards input#giftCardCode {
+.commerce-cart-container .cart__gift-cards input[id="giftCardCode"] {
   border-color: #000;
   font-size: 14px;
   line-height: 22px;
@@ -650,7 +650,7 @@ main .cart__actions-bottom button.cart__btn-clear:hover::before {
 }
 
 .commerce-cart-container .cart__coupons input#coupon::placeholder,
-.commerce-cart-container .cart__gift-cards input#giftCardCode::placeholder {
+.commerce-cart-container .cart__gift-cards input[id="giftCardCode"]::placeholder {
   color: #000;
 }
 
