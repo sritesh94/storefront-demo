@@ -3,3 +3,13 @@
 .commerce-order-status {
     margin-bottom: var(--spacing-small);
 }
+
+
+body.columns main>.commerce-account-sidebar-container+.commerce-order-status-container>div {
+    max-width: 700px;
+}
+
+.commerce-order-status-container .dropin-header-container .dropin-header-container__divider--medium {
+    border-color: #B0B0B0;
+    border-width: 1px;
+}

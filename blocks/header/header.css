@@ -368,6 +368,7 @@ header nav .nav-tools button.nav-cart-button {
   background-repeat: no-repeat;
   background-position: center;
   position: relative;
+  display: inline-block !important;
 }
 
 header nav .nav-tools button.nav-compare-button {

@@ -1,1 +1,161 @@
-/* stylelint-disable no-empty-source */
+.commerce-customer-information {
+    margin-bottom: 40px !important;
+}
+
+/* Account Information Grid Layout */
+.dropin-customer-information__cards {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    margin-top: 16px;
+}
+
+@media (min-width: 768px) {
+    .dropin-customer-information__cards {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* Card overrides to match Figma flat layout */
+.dropin-customer-information__card,
+.commerce-customer-information-dropin .dropin-card,
+.commerce-customer-information-dropin .dropin-card--secondary {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+.dropin-card__content {
+    padding: 0 !important;
+}
+
+.dropin-customer-information__section-header {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #1d1d1b !important;
+    border-bottom: 1px solid #e8e8e8 !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 16px !important;
+}
+
+.dropin-customer-information__section-content {
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    color: #1d1d1b !important;
+    margin-bottom: 16px !important;
+}
+
+/* Bold the name line */
+.dropin-customer-information__section-content p:first-of-type {
+    font-weight: 700 !important;
+}
+
+/* Edit / Action Buttons styling */
+.dropin-customer-information__actions {
+    display: flex !important;
+    gap: 20px !important;
+    margin-top: 12px !important;
+}
+
+.commerce-customer-information-dropin .dropin-button {
+    background: transparent !important;
+    border: none !important;
+    color: #FA1792 !important;
+    padding: 0 !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    min-height: unset !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+}
+
+.commerce-customer-information-dropin .dropin-button:hover {
+    text-decoration: underline !important;
+    background: transparent !important;
+}
+
+/* Injecting Pencil Icon for Edit buttons */
+.dropin-customer-information__actions .dropin-button:first-child::before {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23e0007a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20h9'%3E%3C/path%3E%3Cpath d='M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+/* Injecting Key/Lock Icon for Change Password buttons */
+.dropin-customer-information__actions .dropin-button:nth-child(2)::before {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23e0007a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='7.5' cy='15.5' r='5.5'%3E%3C/circle%3E%3Cpath d='M21 2l-9.6 9.6'%3E%3C/path%3E%3Cpath d='M15.5 7.5L17.5 9.5'%3E%3C/path%3E%3Cpath d='M18.5 4.5L20.5 6.5'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.account-actions-address.account-actions-address--viewall {
+    height: auto;
+    max-width: fit-content;
+    padding: 10px 16px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 0;
+}
+
+.account-actions-address--viewall .account-actions-address__title {
+    color: #fff;
+}
+
+.account-actions-address.account-actions-address--viewall svg {
+    color: #fff;
+    width: 24px;
+    height: 24px;
+}
+
+.commerce-returns-list-wrapper {
+    display: none;
+}
+
+.dropin-header-container.account-orders-list-header {
+    display: none;
+}
+
+.account-orders-list-action.account-orders-list-action--minifiedView {
+    display: none;
+}
+
+.account-address-card .account-address-card__labels {
+    margin-bottom: 20px;
+}
+
+.account-orders-list .account-orders-list-card {
+    border: 1px solid #B0B0B0 !important;
+    padding: 0 20px !important;
+    max-width: 443px;
+}
+
+.account-edit-customer-information__actions,
+.account-change-password .account-change-password__actions {
+    justify-content: flex-start !important;
+}
+
+.account-edit-customer-information .account-edit-customer-information__actions button,
+.account-change-password .account-change-password__actions button {
+    min-width: fit-content;
+}
+
+.account-edit-customer-information-form.account-form>.dropin-field:nth-child(1),
+.account-edit-customer-information-form.account-form>.dropin-field:nth-child(2) {
+    grid-column: span 2;
+}

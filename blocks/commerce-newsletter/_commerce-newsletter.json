@@ -1,0 +1,17 @@
+{
+  "definitions": [{
+    "title": "Commerce Newsletter",
+    "id": "commerce-newsletter",
+    "model": "commerce-newsletter",
+    "plugins": {
+      "da": {
+        "type": "key-value-block"
+      }
+    }
+  }],
+  "models": [{
+    "id": "commerce-newsletter",
+    "fields": []
+  }],
+  "filters": []
+}

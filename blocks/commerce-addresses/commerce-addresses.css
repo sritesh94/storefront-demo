@@ -1,1 +1,194 @@
-/* stylelint-disable no-empty-source */
+.commerce-addresses {
+    margin-bottom: 40px !important;
+}
+
+/* Address Book Grid Layout */
+.dropin-addresses__cards,
+.commerce-addresses-dropin .dropin-addresses__cards,
+.commerce-addresses-dropin .dropin-address-card__cards {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    margin-top: 16px;
+}
+
+@media (min-width: 768px) {
+    .dropin-addresses__cards,
+    .commerce-addresses-dropin .dropin-addresses__cards,
+    .commerce-addresses-dropin .dropin-address-card__cards {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* Card overrides to match Figma flat layout */
+.dropin-addresses__card,
+.commerce-addresses-dropin .dropin-addresses__card,
+.commerce-addresses-dropin .dropin-address-card,
+.commerce-addresses-dropin .dropin-card,
+.commerce-addresses-dropin .dropin-card--secondary {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+.dropin-addresses__section-header,
+.dropin-address-card__section-header {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #1d1d1b !important;
+    border-bottom: 1px solid #e8e8e8 !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 16px !important;
+}
+
+.dropin-addresses__section-content,
+.dropin-address-card__section-content,
+.dropin-address-card__content {
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    color: #1d1d1b !important;
+    margin-bottom: 16px !important;
+}
+
+/* Bold the name line */
+.dropin-address-card__content p:first-of-type,
+.dropin-addresses__section-content p:first-of-type {
+    font-weight: 700 !important;
+}
+
+/* Phone number styling with pink phone icon */
+.dropin-address-card__phone,
+.dropin-addresses__phone,
+.dropin-address-card__content p:last-of-type {
+    display: flex !important;
+    align-items: center !important;
+    font-weight: 500 !important;
+}
+
+.dropin-address-card__phone::before,
+.dropin-addresses__phone::before,
+.dropin-address-card__content p:last-of-type::before {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 6px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23e0007a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+/* Edit Address link styling */
+.commerce-addresses-dropin .dropin-button,
+.commerce-addresses-dropin .dropin-address-card__actions button {
+    background: transparent !important;
+    border: none !important;
+    color: #e0007a !important;
+    padding: 0 !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    min-height: unset !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    margin-top: 12px !important;
+}
+
+.commerce-addresses-dropin .dropin-button:hover,
+.commerce-addresses-dropin .dropin-address-card__actions button:hover {
+    text-decoration: underline !important;
+    background: transparent !important;
+}
+
+/* Injecting Pencil Icon for Edit Address button */
+.commerce-addresses-dropin .dropin-button::before,
+.commerce-addresses-dropin .dropin-address-card__actions button::before {
+    content: '';
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23e0007a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20h9'%3E%3C/path%3E%3Cpath d='M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.account-actions-address.account-actions-address--address {
+    height: auto;
+    max-width: fit-content;
+    padding: 10px 16px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 0;
+}
+
+.account-actions-address.account-actions-address--address .account-actions-address__title {
+    color: #fff;
+}
+
+.account-actions-address.account-actions-address--address svg {
+    color: #fff;
+    width: 24px;
+    height: 24px;
+}
+
+.dropin-header-container .dropin-header-container__divider--medium {
+    border-color: #B0B0B0;
+    border-width: 1px;
+}
+
+.dropin-modal__body--medium>.dropin-modal__content,
+.dropin-modal__body--full>.dropin-modal__content {
+    margin: 0 !important;
+}
+
+.commerce-addresses-wrapper .commerce-addresses-dropin.dropin-design {
+    max-width: 100%;
+}
+
+.commerce-addresses-wrapper .dropin-card--secondary.account-address-card {
+    max-width: 443px;
+}
+
+.commerce-addresses-wrapper .account-form.account-address-form {
+    max-width: 700px;
+    grid-template-columns: 1fr;
+}
+
+.commerce-addresses-wrapper .account-form>.dropin-field:nth-child(1),
+.commerce-addresses-wrapper .account-form>.dropin-field:nth-child(2),
+.commerce-addresses-wrapper .account-form>.dropin-field:nth-child(6),
+.commerce-addresses-wrapper .account-form>.dropin-field:nth-child(7),
+.commerce-addresses-wrapper .account-form>.dropin-field:nth-child(8),
+.commerce-addresses-wrapper .account-form>.dropin-field:nth-child(9) {
+    grid-column: span 2;
+}
+
+.commerce-addresses-wrapper .dropin-input--floating,
+.commerce-addresses-wrapper .dropin-picker select {
+    border-color: #B0B0B0;
+    color: #000;
+    font-size: 16px;
+    line-height: 24px;
+    padding: 13px 16px;
+}
+
+.commerce-addresses-wrapper .dropin-input--floating::placeholder {
+    color: #616161;
+}
+
+.commerce-addresses-wrapper .dropin-input__label--floating--error,
+.commerce-addresses-wrapper .dropin-field__hint--error {
+    color: #FF4242;
+}
+
+.account-address-form-wrapper__buttons {
+    justify-content: flex-start;
+    gap: 0;
+}

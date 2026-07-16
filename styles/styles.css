@@ -11,7 +11,8 @@
  */
 
 /* stylelint-disable no-empty-source */
-:root, .dropin-design {
+:root,
+.dropin-design {
   /* Adobe Commerce Dropin design tokens */
   --color-brand-300: #6d6d6d;
   --color-brand-500: #454545;
@@ -139,7 +140,8 @@
   src: local("Helvetica");
 }
 
-html, body {
+html,
+body {
   min-height: 100%;
 }
 
@@ -263,7 +265,7 @@ main pre {
   white-space: pre;
 }
 
-main > div {
+main>div {
   margin: var(--spacing-xbig) var(--spacing-small);
 }
 
@@ -335,9 +337,9 @@ button.button:focus {
 main a.button:any-link:hover,
 main a.button:any-link:focus,
 button.button:hover {
-    background-color: #000;
-    color: #fff;
-  }
+  background-color: #000;
+  color: #fff;
+}
 
 a.button[aria-disabled="true"],
 button.button:disabled {
@@ -470,7 +472,7 @@ main img {
 }
 
 /* sections */
-main > .section {
+main>.section {
   margin: var(--spacing-xbig) 0;
 }
 
@@ -478,18 +480,18 @@ main > .section {
   display: none;
 }
 
-main > .section > div {
+main>.section>div {
   max-width: var(--container-max-width);
   margin: auto;
   padding: 0 var(--container-padding);
 }
 
-main > .section:first-of-type {
+main>.section:first-of-type {
   margin-top: 0;
 }
 
 @media (min-width: 900px) {
-  main > .section > div {
+  main>.section>div {
     padding: 0 var(--container-padding);
   }
 }
@@ -503,80 +505,80 @@ main .section.highlight {
 }
 
 main .section[data-padding="default"] {
-    padding: var(--spacing-xxsmall) 0;
+  padding: var(--spacing-xxsmall) 0;
 }
 
 main .section[data-padding="small"] {
-    padding: var(--spacing-xsmall) 0;
+  padding: var(--spacing-xsmall) 0;
 }
 
 main .section[data-padding="medium"] {
-    padding: var(--spacing-small) 0;
+  padding: var(--spacing-small) 0;
 }
 
 main .section[data-padding="large"] {
-    padding: var(--spacing-medium) 0;
+  padding: var(--spacing-medium) 0;
 }
 
 main .section[data-padding="big"] {
-    padding: var(--spacing-big) 0;
+  padding: var(--spacing-big) 0;
 }
 
 main .section[data-padding="xbig"] {
-    padding: var(--spacing-xbig) 0;
+  padding: var(--spacing-xbig) 0;
 }
 
 main .section[data-padding="xxbig"] {
-    padding: var(--spacing-xxbig) 0;
+  padding: var(--spacing-xxbig) 0;
 }
 
 main .section[data-padding="huge"] {
-    padding: var(--spacing-huge) 0;
+  padding: var(--spacing-huge) 0;
 }
 
 main .section[data-padding="xhuge"] {
-    padding: var(--spacing-xhuge) 0;
+  padding: var(--spacing-xhuge) 0;
 }
 
 main .section[data-padding="xxhuge"] {
-    padding: var(--spacing-xxhuge) 0;
+  padding: var(--spacing-xxhuge) 0;
 }
 
 
 main .section[data-margin="small"] {
-    margin: var(--spacing-xsmall) 0;
+  margin: var(--spacing-xsmall) 0;
 }
 
 main .section[data-margin="medium"] {
-    margin: var(--spacing-small) 0;
+  margin: var(--spacing-small) 0;
 }
 
 main .section[data-margin="large"] {
-    margin: var(--spacing-medium) 0;
+  margin: var(--spacing-medium) 0;
 }
 
 main .section[data-margin="big"] {
-    margin: var(--spacing-big) 0;
+  margin: var(--spacing-big) 0;
 }
 
 main .section[data-margin="xbig"] {
-    margin: var(--spacing-xbig) 0;
+  margin: var(--spacing-xbig) 0;
 }
 
 main .section[data-margin="xxbig"] {
-    margin: var(--spacing-xxbig) 0;
+  margin: var(--spacing-xxbig) 0;
 }
 
 main .section[data-margin="huge"] {
-    margin: var(--spacing-huge) 0;
+  margin: var(--spacing-huge) 0;
 }
 
 main .section[data-margin="xhuge"] {
-    margin: var(--spacing-xhuge) 0;
+  margin: var(--spacing-xhuge) 0;
 }
 
 main .section[data-margin="xxhuge"] {
-    margin: var(--spacing-xxhuge) 0;
+  margin: var(--spacing-xxhuge) 0;
 }
 
 /* section metadata - styles - end */
@@ -601,7 +603,7 @@ body.columns main {
   box-sizing: border-box;
 }
 
-body.columns main > .section {
+body.columns main>.section {
   flex: 1;
   flex-basis: 100%;
   max-width: unset;
@@ -610,26 +612,28 @@ body.columns main > .section {
   box-sizing: border-box;
 }
 
-body.columns main > .section:first-child {
+body.columns main>.section:first-child {
   padding-inline-start: 0;
   padding-block-start: 0;
 }
 
-body.columns main > .section:last-child {
+body.columns main>.section:last-child {
   padding-inline-end: 0;
   padding-block-end: 0;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
-body.columns main > .section > div {
+body.columns main>.section>div {
   max-width: unset;
   padding: unset;
 }
 
-body.columns main > .section > div:not(:last-child) {
+body.columns main>.section>div:not(:last-child) {
   margin-bottom: var(--gap, unset);
 }
 
-body.columns main > .section:empty {
+body.columns main>.section:empty {
   display: none;
 }
 
@@ -648,7 +652,7 @@ body.columns main > .section:empty {
     flex-flow: row wrap;
   }
 
-  body.columns main > .section {
+  body.columns main>.section {
     flex: 1;
     flex-basis: var(--column-width, auto);
   }
@@ -660,4 +664,59 @@ body.columns main > .section:empty {
 */
 main[hidden] {
   display: none !important;
+}
+
+
+body.columns main>.section:last-child>.commerce-account-header-wrapper {
+  order: 1 !important;
+}
+
+body.columns main>.section:last-child>.commerce-customer-information-wrapper {
+  order: 2 !important;
+}
+
+body.columns main>.section:last-child>.commerce-addresses-wrapper {
+  order: 3 !important;
+}
+
+body.columns main>.section:last-child>.commerce-orders-list-wrapper {
+  order: 4 !important;
+}
+
+body.columns main>.section:last-child>.commerce-returns-list-wrapper {
+  order: 5 !important;
+}
+
+.commerce-account-section-link {
+  color: #FA1792 !important;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.commerce-account-section-link:hover {
+  text-decoration: underline !important;
+}
+
+.commerce-account-section-link svg.pink-svg {
+  color: #FA1792 !important;
+  stroke: #FA1792 !important;
+  fill: none;
+}
+
+/* Global card overrides for flat layout on account pages */
+.commerce-customer-information-dropin .dropin-card,
+.commerce-customer-information-dropin .dropin-card--secondary,
+.commerce-addresses-dropin .dropin-card,
+.commerce-addresses-dropin .dropin-card--secondary,
+.commerce-orders-list-dropin .dropin-card,
+.commerce-orders-list-dropin .dropin-card--secondary {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  background: transparent !important;
 }

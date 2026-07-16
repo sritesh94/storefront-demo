@@ -1,5 +1,98 @@
-main .commerce-login-container {
+main>.section.commerce-login-container {
     max-width: 700px;
     margin: 40px auto;
     width: 100%;
+}
+
+.commerce-login-container .auth-sign-in-form__title {
+    margin-bottom: 20px;
+}
+
+.commerce-login-container .auth-sign-in-form__title .dropin-header-container__title {
+    font-size: 20px;
+    line-height: 30px;
+    color: #000;
+    letter-spacing: 0;
+}
+
+.commerce-login-container .commerce-login__footer {
+    padding: 0 var(--spacing-xxbig) var(--spacing-xxbig) var(--spacing-xxbig);
+}
+
+.commerce-login__footer .commerce-login__create-account-link {
+    background-color: #000;
+    color: #fff;
+    padding: 8px 24px;
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.commerce-login__divider {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.commerce-login__divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 1px;
+    background-color: #B0B0B0;
+    transform: translate(-50%, -50%);
+}
+
+.commerce-login__divider__text {
+    background-color: #fff;
+    padding: 0 20px;
+    z-index: 2;
+}
+
+.auth-sign-in-form input.dropin-input {
+    border-color: #B0B0B0;
+    font-size: 16px;
+    line-height: 24px;
+    color: #000;
+    font-weight: 400;
+    padding: 13px 16px;
+    border-radius: 0;
+}
+
+.auth-sign-in-form input.dropin-input--icon-left {
+    padding-left: 48px;
+}
+
+.auth-sign-in-form input.dropin-input::placeholder {
+    color: #616161;
+}
+
+.auth-sign-in-form .dropin-input-container--primary .dropin-input--error {
+    border-color: #FF4242;
+    color: #FF4242;
+}
+
+.auth-sign-in-form .dropin-input__label--floating--error {
+    color: #FF4242;
+}
+
+.auth-sign-in-form .dropin-field__hint--error {
+    color: #FF4242;
+    font-weight: 500;
+    letter-spacing: .5px;
+}
+
+.auth-sign-in-form .dropin-button.dropin-button--primary.auth-button {
+    background-color: #000;
+    border-radius: 0;
+}
+
+.auth-sign-in-form .auth-sign-in-form__button--forgot {
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: #000;
+    text-decoration: underline;
+    text-underline-offset: 4px;
 }

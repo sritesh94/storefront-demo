@@ -1,5 +1,79 @@
-main .commerce-create-account-container {
+main>.section.commerce-create-account-container {
     max-width: 700px;
     margin: 40px auto;
     width: 100%;
+}
+
+.commerce-create-account-container .auth-sign-up-form__title {
+    margin-bottom: 20px;
+}
+
+.commerce-create-account-container .auth-sign-up-form__title .dropin-header-container__title {
+    font-size: 20px;
+    line-height: 30px;
+    color: #000;
+    letter-spacing: 0;
+}
+
+.auth-sign-in-form input.dropin-input,
+.auth-sign-up-form__form input.dropin-input {
+    border-color: #B0B0B0;
+    font-size: 16px;
+    line-height: 24px;
+    color: #000;
+    font-weight: 400;
+    padding: 13px 16px;
+    border-radius: 0;
+}
+
+.auth-sign-up-form__form input.dropin-input--icon-left {
+    padding-left: 48px;
+}
+
+.auth-sign-up-form__form input.dropin-input::placeholder {
+    color: #616161;
+}
+
+.auth-sign-up-form__form .dropin-input-container--primary .dropin-input--error {
+    border-color: #FF4242;
+    color: #FF4242;
+}
+
+.auth-sign-up-form__form .dropin-input__label--floating--error {
+    color: #FF4242;
+}
+
+.auth-sign-up-form__form .dropin-field__hint--error {
+    color: #FF4242;
+    font-weight: 500;
+    letter-spacing: .5px;
+}
+
+.auth-sign-up-form__form .dropin-checkbox__label,
+.auth-sign-up-form__form .dropin-password-status-indicator__item--pending {
+    color: #000;
+}
+
+.auth-sign-up-form__form div[data-testid="privacyPolicyConsent"] span {
+    color: #000 !important;
+}
+
+.auth-sign-up-form__form div[data-testid="privacyPolicyConsent"] a {
+    color: #000;
+    font-weight: 600;
+    font-size: 13px !important;
+    line-height: 20px !important;
+}
+
+.auth-sign-up-form__form .dropin-button.dropin-button--primary.auth-button {
+    background-color: #000;
+    border-radius: 0;
+}
+
+.auth-sign-up-form__form .auth-sign-up-form-buttons--signin .auth-button__text {
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: #000;
+    text-decoration: underline;
+    text-underline-offset: 4px;
 }

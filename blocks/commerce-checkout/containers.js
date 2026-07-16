@@ -43,6 +43,15 @@ import { PaymentMethodCode } from '@dropins/storefront-payment-services/api.js';
 import CreditCard from '@dropins/storefront-payment-services/containers/CreditCard.js';
 import { render as PaymentServices } from '@dropins/storefront-payment-services/render.js';
 
+// Order Dropin
+import CustomerDetails from '@dropins/storefront-order/containers/CustomerDetails.js';
+import OrderCostSummary from '@dropins/storefront-order/containers/OrderCostSummary.js';
+import OrderHeader from '@dropins/storefront-order/containers/OrderHeader.js';
+import OrderProductList from '@dropins/storefront-order/containers/OrderProductList.js';
+import OrderStatus from '@dropins/storefront-order/containers/OrderStatus.js';
+import ShippingStatus from '@dropins/storefront-order/containers/ShippingStatus.js';
+import { render as OrderProvider } from '@dropins/storefront-order/render.js';
+
 // Tools
 import {
   Header,
@@ -485,8 +494,9 @@ export const renderCartSummaryList = async (container) => renderContainer(
   async () => {
     const placeholders = await fetchPlaceholders('placeholders/checkout.json');
 
-    return CartProvider.render(CartSummaryList, {
+    const renderPromise = CartProvider.render(CartSummaryList, {
       variant: 'secondary',
+      accordion: true,
       slots: {
         Heading: (headingCtx) => {
           const title = placeholders?.Checkout?.Summary?.heading;
@@ -535,6 +545,30 @@ export const renderCartSummaryList = async (container) => renderContainer(
         Footer: renderCartGiftOptions,
       },
     })(container);
+
+    const updateTitleText = (count) => {
+      const accordionTitle = container.querySelector('.dropin-accordion-section__title');
+      if (accordionTitle) {
+        const text = `${count} Item${count !== 1 ? 's' : ''} In Cart`;
+        if (accordionTitle.textContent !== text) {
+          accordionTitle.textContent = text;
+        }
+      }
+    };
+
+    const observer = new MutationObserver(() => {
+      const cartData = cartApi.getCartDataFromCache();
+      updateTitleText(cartData?.totalQuantity || 0);
+    });
+    observer.observe(container, { childList: true, subtree: true });
+
+    events.on('cart/data', (data) => {
+      if (data) {
+        updateTitleText(data.totalQuantity || 0);
+      }
+    }, { eager: true });
+
+    return renderPromise;
   },
 );
 
@@ -722,7 +756,7 @@ export const renderAddressForm = async (container, formRef, data, addressType) =
       }
 
       let isFirstRender = true;
-      const hasCartAddress = Boolean(isShipping ? data.shippingAddresses?.[0] : data.billingAddress);
+      const hasCartAddress = Boolean(isShipping ? data?.shippingAddresses?.[0] : data?.billingAddress);
 
       // Create address setter with appropriate API
       const setAddressOnCartFn = setAddressOnCart({
@@ -800,4 +834,150 @@ export const renderGiftOptions = async (container) => renderContainer(
       SwatchImage: swatchImageSlot,
     },
   })(container),
+);
+
+// =============================================================================
+// MULTI-STEP CHECKOUT CONVENIENCE WRAPPERS
+// =============================================================================
+
+/**
+ * Renders the shipping address form for guest users in the multi-step flow.
+ * @param {HTMLElement} container
+ * @param {Object} formRef
+ * @param {Object} [data]
+ * @returns {Promise<Object>}
+ */
+export const renderShippingAddressForm = async (container, formRef, data) => renderAddressForm(
+  container,
+  formRef,
+  data,
+  'shipping',
+);
+
+/**
+ * Renders the billing address form for guest users in the multi-step flow.
+ * @param {HTMLElement} container
+ * @param {Object} formRef
+ * @param {Object} [data]
+ * @returns {Promise<Object>}
+ */
+export const renderBillingAddressForm = async (container, formRef, data) => renderAddressForm(
+  container,
+  formRef,
+  data,
+  'billing',
+);
+
+/**
+ * Updates the PlaceOrder component's disabled state via its registry API.
+ * @param {boolean} disabled
+ */
+export const updatePlaceOrder = (options) => {
+  const placeOrder = registry.get(CONTAINERS.PLACE_ORDER_BUTTON);
+  if (placeOrder && placeOrder.setProps) {
+    if (typeof options === 'boolean') {
+      placeOrder.setProps((prev) => ({ ...prev, disabled: options }));
+    } else {
+      placeOrder.setProps((prev) => ({ ...prev, ...options }));
+    }
+  }
+};
+
+/**
+ * Renders a simple empty-cart notice.
+ * @param {HTMLElement} container
+ * @param {string} [cartUrl]
+ */
+export const renderEmptyCart = (container, cartUrl = '/cart') => {
+  if (!container) return;
+  // eslint-disable-next-line no-param-reassign
+  container.innerHTML = `
+    <div class="checkout__empty-cart-message">
+      <p>Your cart is empty. <a href="${cartUrl}">Return to cart</a>.</p>
+    </div>
+  `;
+};
+
+/**
+ * Clears the empty-cart notice.
+ * @param {HTMLElement} container
+ */
+export const unmountEmptyCart = (container) => {
+  if (!container) return;
+  // eslint-disable-next-line no-param-reassign
+  container.innerHTML = '';
+};
+
+// =============================================================================
+// ORDER CONFIRMATION CONTAINERS
+// =============================================================================
+
+const ORDER_CONFIRMATION_CONTAINERS = Object.freeze({
+  ORDER_HEADER: 'orderHeader',
+  ORDER_STATUS: 'orderStatus',
+  SHIPPING_STATUS: 'shippingStatus',
+  CUSTOMER_DETAILS: 'customerDetails',
+  ORDER_COST_SUMMARY: 'orderCostSummary',
+  ORDER_PRODUCT_LIST: 'orderProductList',
+});
+
+/**
+ * Renders the order confirmation header.
+ * @param {HTMLElement} container
+ * @param {Object} options - Options including orderData.
+ * @returns {Promise<Object>}
+ */
+export const renderOrderHeader = async (container, options = {}) => renderContainer(
+  ORDER_CONFIRMATION_CONTAINERS.ORDER_HEADER,
+  async () => OrderProvider.render(OrderHeader, { orderData: options.orderData })(container),
+);
+
+/**
+ * Renders the order status container.
+ * @param {HTMLElement} container
+ * @returns {Promise<Object>}
+ */
+export const renderOrderStatus = async (container) => renderContainer(
+  ORDER_CONFIRMATION_CONTAINERS.ORDER_STATUS,
+  async () => OrderProvider.render(OrderStatus)(container),
+);
+
+/**
+ * Renders the shipping status container.
+ * @param {HTMLElement} container
+ * @returns {Promise<Object>}
+ */
+export const renderShippingStatus = async (container) => renderContainer(
+  ORDER_CONFIRMATION_CONTAINERS.SHIPPING_STATUS,
+  async () => OrderProvider.render(ShippingStatus)(container),
+);
+
+/**
+ * Renders customer details for the order confirmation page.
+ * @param {HTMLElement} container
+ * @returns {Promise<Object>}
+ */
+export const renderCustomerDetails = async (container) => renderContainer(
+  ORDER_CONFIRMATION_CONTAINERS.CUSTOMER_DETAILS,
+  async () => OrderProvider.render(CustomerDetails)(container),
+);
+
+/**
+ * Renders the order cost summary for the order confirmation page.
+ * @param {HTMLElement} container
+ * @returns {Promise<Object>}
+ */
+export const renderOrderCostSummary = async (container) => renderContainer(
+  ORDER_CONFIRMATION_CONTAINERS.ORDER_COST_SUMMARY,
+  async () => OrderProvider.render(OrderCostSummary)(container),
+);
+
+/**
+ * Renders the list of ordered products for the order confirmation page.
+ * @param {HTMLElement} container
+ * @returns {Promise<Object>}
+ */
+export const renderOrderProductList = async (container) => renderContainer(
+  ORDER_CONFIRMATION_CONTAINERS.ORDER_PRODUCT_LIST,
+  async () => OrderProvider.render(OrderProductList)(container),
 );

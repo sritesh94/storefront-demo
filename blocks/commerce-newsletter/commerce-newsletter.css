@@ -1,0 +1,90 @@
+/* Newsletter Subscriptions block */
+
+.commerce-newsletter {
+    margin-bottom: 40px;
+}
+
+/* Content container */
+.commerce-newsletter-content {
+    margin-top: 16px;
+}
+
+/* Status messages */
+.commerce-newsletter-status {
+    font-size: 14px;
+    line-height: 20px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+}
+
+.commerce-newsletter-status--success {
+    background-color: #f0faf0;
+    color: #1a6b2a;
+    border: 1px solid #a3d9a5;
+}
+
+.commerce-newsletter-status--error {
+    background-color: #fff0f0;
+    color: #a8000d;
+    border: 1px solid #ffb3b3;
+}
+
+/* Form layout */
+.commerce-newsletter-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+}
+
+/* Checkbox + label row */
+.commerce-newsletter-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Checkbox */
+.commerce-newsletter-checkbox {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: #000;
+    margin: 0;
+}
+
+/* Label */
+.commerce-newsletter-label {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+    color: #000;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Save button — black, uppercase, matches Figma */
+.commerce-newsletter-save-btn {
+    background-color: #000;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: none;
+    padding: 12px 28px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    min-width: 100px;
+}
+
+.commerce-newsletter-save-btn:hover {
+    background-color: #333;
+}
+
+.commerce-newsletter-save-btn:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+    opacity: 0.7;
+}

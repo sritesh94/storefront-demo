@@ -13,6 +13,19 @@ export default async function decorate(block) {
   if (!checkIsAuthenticated()) {
     window.location.href = rootLink(CUSTOMER_LOGIN_PATH);
   } else {
-    await accountRenderer.render(CustomerInformation, {})(block);
+    block.innerHTML = '';
+
+    // Create the section heading to match Figma design
+    const headingEl = document.createElement('h2');
+    headingEl.classList.add('commerce-account-section-heading');
+    headingEl.innerText = 'Account Information';
+    block.appendChild(headingEl);
+
+    // Create container for the customer information Dropin
+    const dropinContainer = document.createElement('div');
+    dropinContainer.classList.add('commerce-customer-information-dropin');
+    block.appendChild(dropinContainer);
+
+    await accountRenderer.render(CustomerInformation, {})(dropinContainer);
   }
 }
