@@ -34,6 +34,11 @@
     margin-block-end: var(--spacing-small);
 }
 
+.dropin-pagination .dropin-pagination_list-item--active button {
+    color: #fff;
+    pointer-events: none;
+}
+
 .block.product-list-page .search__view-facets button {
     justify-content: start;
     width: 100%;
@@ -272,9 +277,4 @@
 
 .dropin-pagination .dropin-pagination_list-item--active {
     background-color: #000;
-}
-
-.dropin-pagination .dropin-pagination_list-item--active button {
-    color: #fff;
-    pointer-events: none;
 }
