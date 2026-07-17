@@ -442,3 +442,31 @@ main>.section-product-sustainability {
   font-size: 16px;
   line-height: 26px;
 }
+
+/* Product Gallery Thumbnails Scaling */
+.product-details .pdp-carousel__thumbnail__container {
+  max-width: 150px;
+  width: 100%;
+  height: auto;
+}
+
+.product-details .pdp-carousel__thumbnail__span {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.product-details .pdp-carousel__thumbnail__span img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.product-details .pdp-carousel__controls__container--thumbnailsRow {
+  height: auto;
+}
+
+.pdp-carousel__controls__wrapper--thumbnailsRow {
+  flex: 1;
+}

@@ -135,14 +135,14 @@ export default async function decorate(block) {
         </div>
         <a href="/fragments/pdp-info">/fragments/pdp-info</a>
         <div class="product-details__accordion-container">
-          <details class="product-details__accordion" open>
+          <details class="product-details__accordion">
             <summary class="product-details__accordion-summary">
               ${descriptionLabel}
               <span class="product-details__accordion-icon"></span>
             </summary>
             <div class="product-details__description"></div>
           </details>
-          <details class="product-details__accordion" open>
+          <details class="product-details__accordion">
             <summary class="product-details__accordion-summary">
               ${detailsLabel}
               <span class="product-details__accordion-icon"></span>

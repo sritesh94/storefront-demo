@@ -264,3 +264,17 @@
 .block.product-list-page .product-discovery-facet.is-open .dropin-button {
     display: inline-flex;
 }
+
+.dropin-pagination .dropin-pagination_list-item {
+    width: 26px;
+    height: 26px;
+}
+
+.dropin-pagination .dropin-pagination_list-item--active {
+    background-color: #000;
+}
+
+.dropin-pagination .dropin-pagination_list-item--active button {
+    color: #fff;
+    pointer-events: none;
+}
