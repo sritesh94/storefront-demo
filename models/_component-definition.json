@@ -40,7 +40,6 @@
         {
           "...": "../blocks/enrichment/_*.json#/definitions"
         },
-
         {
           "...": "../blocks/fragment/_*.json#/definitions"
         },
@@ -61,6 +60,9 @@
         },
         {
           "...": "../blocks/tabs-*/_*.json#/definitions"
+        },
+        {
+          "...": "../blocks/commerce-video-*/_*.json#/definitions"
         }
       ]
     },

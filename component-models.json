@@ -351,6 +351,10 @@
     ]
   },
   {
+    "id": "commerce-newsletter",
+    "fields": []
+  },
+  {
     "id": "commerce-orders-list",
     "fields": [
       {
