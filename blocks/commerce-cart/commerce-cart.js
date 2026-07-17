@@ -28,7 +28,9 @@ import '../../scripts/initializers/cart.js';
 import '../../scripts/initializers/wishlist.js';
 
 import { readBlockConfig } from '../../scripts/aem.js';
-import { fetchPlaceholders, rootLink, getProductLink } from '../../scripts/commerce.js';
+import {
+  fetchPlaceholders, rootLink, getProductLink, checkIsAuthenticated, CUSTOMER_LOGIN_PATH,
+} from '../../scripts/commerce.js';
 
 export default async function decorate(block) {
   // Configuration
@@ -182,6 +184,16 @@ export default async function decorate(block) {
             removeProdFromCart: Cart.updateProductsFromCart,
             iconToWishlist: new URL(`${window.hlx.codeBasePath}/icons/wishlist.svg`, window.location.origin).href,
             iconWishlisted: new URL(`${window.hlx.codeBasePath}/icons/wishlist-filled.svg`, window.location.origin).href,
+            ...(!checkIsAuthenticated() && {
+              onClick: (e) => {
+                e?.preventDefault();
+                e?.stopPropagation();
+                const redirectUrl = encodeURIComponent(
+                  window.location.pathname + window.location.search,
+                );
+                window.location.href = `${rootLink(CUSTOMER_LOGIN_PATH)}?redirect=${redirectUrl}`;
+              },
+            }),
           })($wishlistToggle);
 
           ctx.appendChild($wishlistToggle);

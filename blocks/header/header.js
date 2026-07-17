@@ -350,7 +350,7 @@ export default async function decorate(block) {
   const wishlistButton = navTools.querySelector('.nav-wishlist-button');
 
   const wishlistMeta = getMetadata('wishlist');
-  const wishlistPath = wishlistMeta ? new URL(wishlistMeta, window.location).pathname : '/wishlist';
+  const wishlistPath = wishlistMeta ? new URL(wishlistMeta, window.location).pathname : '/customer/wishlist';
 
   wishlistButton.addEventListener('click', () => {
     window.location.href = rootLink(wishlistPath);

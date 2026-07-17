@@ -20,7 +20,9 @@ import { render as wishlistRender } from '@dropins/storefront-wishlist/render.js
 
 // Block-level
 import { readBlockConfig } from '../../scripts/aem.js';
-import { fetchPlaceholders, getProductLink } from '../../scripts/commerce.js';
+import {
+  fetchPlaceholders, getProductLink, rootLink, checkIsAuthenticated, CUSTOMER_LOGIN_PATH,
+} from '../../scripts/commerce.js';
 
 // Initializers
 import '../../scripts/initializers/recommendations.js';
@@ -248,6 +250,16 @@ export default async function decorate(block) {
               // Render Icon
               wishlistRender.render(WishlistToggle, {
                 product: ctx.item,
+                ...(!checkIsAuthenticated() && {
+                  onClick: (e) => {
+                    e?.preventDefault();
+                    e?.stopPropagation();
+                    const redirectUrl = encodeURIComponent(
+                      window.location.pathname + window.location.search,
+                    );
+                    window.location.href = `${rootLink(CUSTOMER_LOGIN_PATH)}?redirect=${redirectUrl}`;
+                  },
+                }),
               })($wishlistToggle);
 
               // Append to Cart Item

@@ -37,14 +37,14 @@ async function updateSubscriptionStatus(isSubscribed) {
   try {
     const result = await CORE_FETCH_GRAPHQL.fetchGraphQl(`
       mutation UpdateCustomerSubscription($isSubscribed: Boolean!) {
-        updateCustomer(input: { is_subscribed: $isSubscribed }) {
+        updateCustomerV2(input: { is_subscribed: $isSubscribed }) {
           customer {
             is_subscribed
           }
         }
       }
     `, { variables: { isSubscribed } });
-    return result?.data?.updateCustomer?.customer?.is_subscribed ?? null;
+    return result?.data?.updateCustomerV2?.customer?.is_subscribed ?? null;
   } catch (err) {
     console.error('Failed to update newsletter subscription:', err);
     return null;

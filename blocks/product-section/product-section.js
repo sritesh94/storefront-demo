@@ -13,7 +13,9 @@ import { render as wishlistRender } from '@dropins/storefront-wishlist/render.js
 
 // Block-level
 import { readBlockConfig } from '../../scripts/aem.js';
-import { getProductLink, CS_FETCH_GRAPHQL } from '../../scripts/commerce.js';
+import {
+  getProductLink, CS_FETCH_GRAPHQL, rootLink, checkIsAuthenticated, CUSTOMER_LOGIN_PATH,
+} from '../../scripts/commerce.js';
 import {
   addCompareProduct,
   removeCompareProduct,
@@ -370,6 +372,14 @@ function renderProductCard(product, container) {
   wishlistRender.render(WishlistToggle, {
     product: wishlistProduct,
     variant: 'tertiary',
+    ...(!checkIsAuthenticated() && {
+      onClick: (e) => {
+        e?.preventDefault();
+        e?.stopPropagation();
+        const redirectUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `${rootLink(CUSTOMER_LOGIN_PATH)}?redirect=${redirectUrl}`;
+      },
+    }),
   })(wishlistContainer);
 
   container.appendChild(card);

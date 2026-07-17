@@ -16,9 +16,10 @@ export default async function decorate(block) {
     { title: 'My Account', link: '/customer/account', iconName: 'user' },
     { title: 'My orders', link: '/customer/orders', iconName: 'order' },
     {
-      title: 'My Wishlist', link: '/wishlist', iconName: 'heart', badge: 0,
+      title: 'My Wishlist', link: '/customer/wishlist', iconName: 'heart', badge: 0,
     },
     { title: 'Address Book', link: '/customer/address', iconName: 'address-book' },
+    { title: 'Account Information', link: '/customer/account/edit', iconName: 'user' },
     { title: 'Newsletter Subscriptions', link: '/customer/newsletter', iconName: 'newsletter' },
     { title: 'Sign out', link: '#', iconName: 'sign-out' },
   ];
@@ -46,7 +47,15 @@ export default async function decorate(block) {
     menuItemEl.href = item.link === '#' ? '#' : rootLink(item.link);
 
     // Active item detection
-    const isItemActive = item.link !== '#' && window.location.pathname.includes(item.link);
+    let isItemActive = false;
+    if (item.link !== '#') {
+      if (item.link === '/customer/account') {
+        isItemActive = window.location.pathname === rootLink(item.link)
+          || window.location.pathname === item.link;
+      } else {
+        isItemActive = window.location.pathname.includes(item.link);
+      }
+    }
     if (isItemActive) {
       menuItemEl.classList.add('commerce-account-sidebar-item-active');
     }
@@ -97,7 +106,7 @@ export default async function decorate(block) {
     const count = wishlistData?.items_count ?? wishlistData?.items?.length ?? 0;
 
     // 1. Update Wishlist Badge
-    const badgeEl = navContainer.querySelector('[href*="/wishlist"] .commerce-account-sidebar-item-badge');
+    const badgeEl = navContainer.querySelector('[href*="/customer/wishlist"] .commerce-account-sidebar-item-badge');
     if (badgeEl) {
       badgeEl.innerText = count.toString();
       badgeEl.style.display = count > 0 ? 'inline-block' : 'none';
@@ -118,7 +127,7 @@ export default async function decorate(block) {
       wishlistTitle.style.cursor = 'pointer';
       wishlistTitle.innerHTML = `My Wishlists <span class="commerce-account-sidebar-wishlist-count">(${count} items)</span>`;
       wishlistTitle.addEventListener('click', () => {
-        window.location.href = rootLink('/wishlist');
+        window.location.href = rootLink('/customer/wishlist');
       });
       wishlistSection.appendChild(wishlistTitle);
 

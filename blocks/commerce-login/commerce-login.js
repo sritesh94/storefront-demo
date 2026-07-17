@@ -17,7 +17,14 @@ export default async function decorate(block) {
   } else {
     await authRenderer.render(SignIn, {
       routeForgotPassword: () => rootLink(CUSTOMER_FORGOTPASSWORD_PATH),
-      routeRedirectOnSignIn: () => rootLink(CUSTOMER_ACCOUNT_PATH),
+      routeRedirectOnSignIn: () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirect = urlParams.get('redirect');
+        if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
+          return redirect;
+        }
+        return rootLink(CUSTOMER_ACCOUNT_PATH);
+      },
     })(block);
 
     if (!block.querySelector('.commerce-login__footer')) {

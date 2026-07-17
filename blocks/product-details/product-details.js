@@ -31,6 +31,8 @@ import {
   setJsonLd,
   fetchPlaceholders,
   getProductLink,
+  checkIsAuthenticated,
+  CUSTOMER_LOGIN_PATH,
 } from '../../scripts/commerce.js';
 
 // Compare
@@ -288,6 +290,14 @@ export default async function decorate(block) {
       product,
       labelToWishlist: labels.Wishlist?.AddToWishlist || 'Add to Wishlist',
       labelWishlisted: labels.Wishlist?.Added || 'Added to Wishlist',
+      ...(!checkIsAuthenticated() && {
+        onClick: (e) => {
+          e?.preventDefault();
+          e?.stopPropagation();
+          const redirectUrl = encodeURIComponent(window.location.pathname + window.location.search);
+          window.location.href = `${rootLink(CUSTOMER_LOGIN_PATH)}?redirect=${redirectUrl}`;
+        },
+      }),
     })($wishlistToggleBtn),
   ]);
 

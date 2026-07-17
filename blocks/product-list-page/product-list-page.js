@@ -16,7 +16,9 @@ import { tryRenderAemAssetsImage } from '@dropins/tools/lib/aem/assets.js';
 import { events } from '@dropins/tools/event-bus.js';
 // AEM
 import { readBlockConfig } from '../../scripts/aem.js';
-import { fetchPlaceholders, getProductLink } from '../../scripts/commerce.js';
+import {
+  fetchPlaceholders, getProductLink, rootLink, checkIsAuthenticated, CUSTOMER_LOGIN_PATH,
+} from '../../scripts/commerce.js';
 import { getSearchStateFromUrl, applySearchStateToUrl } from './search-url.js';
 import {
   addCompareProduct,
@@ -180,6 +182,16 @@ export default async function decorate(block) {
           wishlistRender.render(WishlistToggle, {
             product: ctx.product,
             variant: 'tertiary',
+            ...(!checkIsAuthenticated() && {
+              onClick: (e) => {
+                e?.preventDefault();
+                e?.stopPropagation();
+                const redirectUrl = encodeURIComponent(
+                  window.location.pathname + window.location.search,
+                );
+                window.location.href = `${rootLink(CUSTOMER_LOGIN_PATH)}?redirect=${redirectUrl}`;
+              },
+            }),
           })($wishlistToggle);
           // Compare Button
           const compareBtn = document.createElement('button');
