@@ -216,6 +216,10 @@
   }
 }
 
+.dropin-content-grid.recommendations-product-list__content {
+  overflow-x: auto !important;
+}
+
 .product-recommendations .recommendations-product-list__heading {
   text-align: center;
   font-size: 36px;
