@@ -26,6 +26,7 @@ import {
 } from './commerce.js';
 import { initHomepagePromoCountdown } from './homepage-countdown.js';
 import initHomepageVideoCarousel from './homepage-video-carousel.js';
+import initHomepageCommerceVideoCarousel from './homepage-commerce-video-carousel.js';
 
 /**
  * Builds hero block and prepends to main in a new section.
@@ -154,6 +155,37 @@ function decorateButtons(main) {
 }
 
 /**
+ * Converts custom block tables to blocks before standard table conversion.
+ * @param {Element} root The container element
+ */
+function convertCustomTablesToBlocks(root) {
+  const CUSTOM_BLOCKS = new Set(['commerce-video', 'commerce-newsletter']);
+  Array.from(root.querySelectorAll('table')).reverse().forEach((table) => {
+    const rows = Array.from(table.querySelectorAll('tr'));
+    if (rows.length === 0) return;
+    const firstCell = rows[0].querySelector('td, th');
+    if (!firstCell) return;
+    const blockName = firstCell.textContent
+      .trim()
+      .toLowerCase()
+      .replace(/[^0-9a-z]/gi, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+    if (CUSTOM_BLOCKS.has(blockName)) {
+      const content = [];
+      for (let i = 1; i < rows.length; i += 1) {
+        const cols = Array.from(rows[i].querySelectorAll('td, th'));
+        const colHtml = cols.map((c) => c.innerHTML || '');
+        content.push(colHtml);
+      }
+      const blockEl = buildBlock(blockName, content);
+      blockEl.dataset.blockPlaceholder = 'true';
+      table.replaceWith(blockEl);
+    }
+  });
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
@@ -161,6 +193,7 @@ export function decorateMain(main) {
   decorateLinks(main);
   decorateIcons(main);
   buildAutoBlocks(main);
+  convertCustomTablesToBlocks(main);
   convertTablesToBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
@@ -192,6 +225,7 @@ async function loadEager(doc) {
     await loadSection(main.querySelector('.section'), waitForFirstImage);
     initHomepagePromoCountdown(main);
     initHomepageVideoCarousel(main);
+    initHomepageCommerceVideoCarousel(main);
   }
 
   try {

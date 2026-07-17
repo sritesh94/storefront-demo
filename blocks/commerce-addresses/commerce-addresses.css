@@ -325,3 +325,64 @@
 .custom-add-new-address-btn:hover {
     background: #333 !important;
 }
+
+/* Table layout styles for additional address entries */
+.custom-additional-addresses-table-wrapper {
+    width: 100% !important;
+    overflow-x: auto !important;
+    margin-top: 16px !important;
+}
+
+.custom-additional-addresses-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    text-align: left !important;
+    font-size: 14px !important;
+}
+
+.custom-additional-addresses-table th {
+    font-weight: 700 !important;
+    color: #1d1d1b !important;
+    padding: 12px 10px !important;
+    border-bottom: 1px solid #ccc !important;
+    white-space: nowrap !important;
+}
+
+.custom-additional-addresses-table td {
+    padding: 12px 10px !important;
+    border-bottom: 1px solid #e8e8e8 !important;
+    color: #1d1d1b !important;
+    vertical-align: top !important;
+}
+
+.custom-additional-addresses-table tr:hover td {
+    background-color: #f9f9f9 !important;
+}
+
+.custom-additional-addresses-table .action {
+    background: none !important;
+    border: none !important;
+    color: #FA1792 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    display: inline !important;
+}
+
+.custom-additional-addresses-table .action:hover {
+    color: #d1127b !important;
+    text-decoration: underline !important;
+}
+
+.custom-additional-addresses-table .action-separator {
+    margin: 0 6px !important;
+    color: #ccc !important;
+    font-size: 14px !important;
+}
+
+.custom-additional-addresses-table .actions-cell {
+    white-space: nowrap !important;
+}

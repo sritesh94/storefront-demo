@@ -1,12 +1,34 @@
-body:not(.columns) main div.commerce-order-header-wrapper {
-    margin-top: var(--spacing-large);
+/* ============================================================
+   commerce-order-header — Magento 2-style order header
+   ============================================================ */
+
+/* ── Back to all orders link ── */
+.commerce-order-header .orders-list-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  color: #333;
+  text-decoration: none;
+  margin-bottom: 14px;
 }
 
-body.columns main > .section > div.commerce-order-header-wrapper {
-    margin-bottom: 0;
+.commerce-order-header .orders-list-link:hover {
+  color: var(--color-brand-600, #e0007a);
 }
 
-.orders-list-link {
-    display: inline-block;
-    margin-bottom: var(--spacing-medium);
+/* ── Order number heading ── */
+.commerce-order-header .dropin-header-container {
+  margin-bottom: 0;
+}
+
+.commerce-order-header .dropin-header-container__title {
+  font-size: 26px;
+  font-weight: 300;
+  color: #333;
+  line-height: 1.2;
+}
+
+.commerce-order-header .dropin-divider {
+  border-color: #e0e0e0;
+  margin: 10px 0 0;
 }

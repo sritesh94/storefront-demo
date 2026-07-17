@@ -1,10 +1,188 @@
-/* .commerce-customer-details {
-} */
+/* ============================================================
+   commerce-order-product-list — Magento 2-style Items Ordered table
+   Uses JS-built <table> from the dropin's rendered product cards.
+   ============================================================ */
 
-.commerce-order-product-list {
-    margin-bottom: var(--spacing-small);
+/* ── Hide the dropin's own card wrapper (data source) ── */
+.commerce-order-product-list .order-order-product-list {
+  display: none !important;
 }
 
-.commerce-order-product-list .dropin-cart-item a:hover {
-    text-decoration: none;
+/* ── Section heading ── */
+.commerce-order-product-list .order-details-items-heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 28px 0 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #c7c7c7;
+}
+
+/* ── Native HTML table ── */
+.order-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  color: #333;
+  table-layout: auto;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* ── Table head ── */
+.order-items-table thead tr {
+  border-bottom: 1px solid #c7c7c7;
+}
+
+.order-items-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 14px;
+  color: #333;
+  padding: 10px 16px 10px 0;
+  white-space: nowrap;
+  background: transparent;
+}
+
+.order-items-table th:first-child {
+  padding-left: 0;
+}
+
+.order-items-table th.col-price,
+.order-items-table th.col-qty,
+.order-items-table th.col-subtotal {
+  text-align: right;
+}
+
+/* ── Table body ── */
+.order-items-table tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.order-items-table td {
+  padding: 14px 16px 14px 0;
+  vertical-align: top;
+  font-size: 14px;
+  color: #333;
+}
+
+/* ── Column: Product Name ── */
+.order-items-table .col-name a {
+  color: #1a1a1a;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.order-items-table .col-name a:hover {
+  color: var(--color-brand-600, #e0007a);
+}
+
+/* ── Column: SKU ── */
+.order-items-table .col-sku {
+  color: #555;
+  white-space: nowrap;
+}
+
+/* ── Column: Price, Qty, Subtotal ── */
+.order-items-table .col-price,
+.order-items-table .col-qty,
+.order-items-table .col-subtotal {
+  text-align: right;
+  white-space: nowrap;
+  font-weight: 400;
+}
+
+.order-items-table .col-subtotal {
+  font-weight: 600;
+}
+
+.order-items-table .col-qty .qty-ordered::before {
+  content: 'Ordered: ';
+  color: #666;
+  font-weight: 400;
+}
+
+/* ── Order Totals (right-aligned, below the table) ── */
+.order-totals-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-top: 0;
+  border-top: 1px solid #e0e0e0;
+}
+
+.order-totals-table td {
+  padding: 8px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.order-items-table td:first-child {
+  padding-left: 0;
+}
+
+.order-totals-table .totals-label {
+  text-align: right;
+  padding-right: 16px;
+  color: #555;
+  width: 85%;
+}
+
+.order-totals-table .totals-value {
+  text-align: right;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.order-totals-table .totals-grand-total .totals-label,
+.order-totals-table .totals-grand-total .totals-value {
+  font-weight: 700;
+  font-size: 15px;
+  color: #1a1a1a;
+  padding-top: 10px;
+  border-top: 1px solid #c7c7c7;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .order-items-table,
+  .order-items-table thead,
+  .order-items-table tbody,
+  .order-items-table th,
+  .order-items-table td,
+  .order-items-table tr {
+    display: block;
+  }
+
+  .order-items-table thead {
+    display: none;
+  }
+
+  .order-items-table tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 12px 0;
+  }
+
+  .order-items-table td {
+    padding: 4px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .order-items-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    min-width: 90px;
+    font-size: 13px;
+    color: #666;
+    flex-shrink: 0;
+  }
+
+  .order-items-table td.col-price,
+  .order-items-table td.col-qty,
+  .order-items-table td.col-subtotal {
+    text-align: left;
+  }
 }

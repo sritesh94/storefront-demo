@@ -84,7 +84,8 @@
     "id": "columns-cell",
     "components": [
       "text",
-      "image"
+      "image",
+      "commerce-video"
     ]
   },
   {

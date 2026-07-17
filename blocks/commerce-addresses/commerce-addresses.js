@@ -65,18 +65,22 @@ export default async function decorate(block) {
 
   const isMinified = minifiedViewConfig === 'true';
 
-  if (!checkIsAuthenticated()) {
+  // Normalise the current path (remove trailing slash) and build the edit path (locale‑aware)
+  const currentPath = window.location.pathname.replace(/\/$/, '');
+  const editPath = rootLink(`${CUSTOMER_ADDRESS_PATH}/edit`).replace(/\/$/, '');
+
+  // Detect edit page – works with or without a trailing slash
+  const isEditPage = currentPath === editPath;
+
+  block.innerHTML = '';
+
+  // Only redirect to login when we are NOT on the edit page
+  if (!checkIsAuthenticated() && !isEditPage) {
     window.location.href = rootLink(CUSTOMER_LOGIN_PATH);
     return;
   }
 
-  // Robust route detection that supports localized prefix URLs
-  const CUSTOMER_ADDRESS_EDIT_PATH = `${CUSTOMER_ADDRESS_PATH}/edit`;
-  const editPath = rootLink(CUSTOMER_ADDRESS_EDIT_PATH);
-  const isEditPage = window.location.pathname === editPath || window.location.pathname === `${editPath}/`;
-
-  block.innerHTML = '';
-
+  // Render the Edit/Add Address form when on the edit route
   if (isEditPage) {
     // Render Edit/Add Address Page
     const headerContainer = document.createElement('div');
@@ -108,6 +112,7 @@ export default async function decorate(block) {
     await accountRenderer.render(AddressForm, {
       inputsDefaultValueSet: addressData,
       hideActionFormButtons: false,
+      isOpen: true,
       onSuccess: () => {
         window.location.href = rootLink(CUSTOMER_ADDRESS_PATH);
       },
@@ -293,36 +298,49 @@ export default async function decorate(block) {
         customListContainer.appendChild(additionalHeading);
 
         const additionalWrapper = document.createElement('div');
-        additionalWrapper.classList.add('custom-additional-addresses-container');
+        additionalWrapper.classList.add('custom-additional-addresses-table-wrapper');
 
+        let tableRowsHtml = '';
         additionalAddresses.forEach((addr) => {
-          const addrCard = document.createElement('div');
-          addrCard.classList.add('custom-address-card', 'custom-additional-address-card');
-          addrCard.innerHTML = `
-            <h4 class="custom-address-card-title">Additional Address</h4>
-            <div class="custom-address-card-content">
-              <p class="custom-address-name">${addr.firstname} ${addr.lastname}</p>
-              <p class="custom-address-street">${addr.street.join('<br>')}</p>
-              <p class="custom-address-region">${addr.city}, ${addr.region?.region || addr.region?.region_code || ''} ${addr.postcode}</p>
-              <p class="custom-address-country">${getCountryName(addr.country_code)}</p>
-              <p class="custom-address-phone">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="#FA1792" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                ${addr.telephone}
-              </p>
-              <div class="custom-address-card-actions">
-                <a href="${rootLink(`${CUSTOMER_ADDRESS_PATH}/edit`)}?id=${addr.id}" class="custom-address-action-btn">
-                  <svg viewBox="0 0 24 24" width="14" height="14" stroke="#FA1792" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                  Edit Address
-                </a>
-                <button type="button" class="custom-address-action-btn delete-btn" data-id="${addr.id}" style="margin-left: 24px;">
-                  <svg viewBox="0 0 24 24" width="14" height="14" stroke="#FA1792" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                  Delete Address
-                </button>
-              </div>
-            </div>
+          tableRowsHtml += `
+            <tr>
+              <td>${addr.firstname || ''}</td>
+              <td>${addr.lastname || ''}</td>
+              <td>${(addr.street || []).join('<br>')}</td>
+              <td>${addr.city || ''}</td>
+              <td>${getCountryName(addr.country_code) || ''}</td>
+              <td>${addr.region?.region || addr.region?.region_code || ''}</td>
+              <td>${addr.postcode || ''}</td>
+              <td>${addr.telephone || ''}</td>
+              <td class="actions-cell">
+                <a href="${rootLink(`${CUSTOMER_ADDRESS_PATH}/edit`)}?id=${addr.id}" class="action edit">Edit</a>
+                <span class="action-separator">|</span>
+                <button type="button" class="action delete delete-btn" data-id="${addr.id}">Delete</button>
+              </td>
+            </tr>
           `;
-          additionalWrapper.appendChild(addrCard);
         });
+
+        additionalWrapper.innerHTML = `
+          <table class="custom-additional-addresses-table">
+            <thead>
+              <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Street Address</th>
+                <th>City</th>
+                <th>Country</th>
+                <th>State</th>
+                <th>Zip/Postal Code</th>
+                <th>Phone</th>
+                <th class="actions-col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRowsHtml}
+            </tbody>
+          </table>
+        `;
         customListContainer.appendChild(additionalWrapper);
       }
 
