@@ -127,6 +127,93 @@ export default async function decorate(block) {
     return button;
   };
 
+  const mediaQuery = window.matchMedia('(max-width: 899px)');
+
+  const renderFilterButton = (target) => {
+    UI.render(Button, {
+      children: labels.Global?.Filters,
+      icon: Icon({ source: new URL(`${window.hlx.codeBasePath}/icons/filter.svg`, window.location.origin).href }),
+      variant: 'secondary',
+      onClick: () => {
+        $facets.classList.toggle('search__facets--visible');
+      },
+    })(target);
+  };
+
+  const setupMobileToggles = () => {
+    $viewFacets.innerHTML = '';
+
+    const $filterBtnContainer = document.createElement('div');
+    $filterBtnContainer.className = 'search__filter-btn-container';
+    $viewFacets.appendChild($filterBtnContainer);
+
+    const $toggleContainer = document.createElement('div');
+    $toggleContainer.className = 'search__layout-toggles';
+    $viewFacets.appendChild($toggleContainer);
+
+    $toggleContainer.innerHTML = `
+      <button type="button" class="search__layout-toggle search__layout-toggle--grid" aria-label="Grid View">
+        <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M0 2.08333C0 0.93274 0.93274 0 2.08333 0H6.25C7.40059 0 8.33333 0.93274 8.33333 2.08333V6.25C8.33333 7.40059 7.40059 8.33333 6.25 8.33333H2.08333C0.93274 8.33333 0 7.40059 0 6.25V2.08333ZM2.08333 1.66667C1.85321 1.66667 1.66667 1.85321 1.66667 2.08333V6.25C1.66667 6.48012 1.85321 6.66667 2.08333 6.66667H6.25C6.48012 6.66667 6.66667 6.48012 6.66667 6.25V2.08333C6.66667 1.85321 6.48012 1.66667 6.25 1.66667H2.08333Z" fill="currentColor"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M0 12.0833C0 10.9327 0.93274 10 2.08333 10H6.25C7.40059 10 8.33333 10.9327 8.33333 12.0833V16.25C8.33333 17.4006 7.40059 18.3333 6.25 18.3333H2.08333C0.93274 18.3333 0 17.4006 0 16.25V12.0833ZM2.08333 11.6667C1.85321 11.6667 1.66667 11.8532 1.66667 12.0833V16.25C1.66667 16.4801 1.85321 16.6667 2.08333 16.6667H6.25C6.48012 16.6667 6.66667 16.4801 6.66667 16.25V12.0833C6.66667 11.8532 6.48012 11.6667 6.25 11.6667H2.08333Z" fill="currentColor"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M10 2.08333C10 0.93274 10.9327 0 12.0833 0H16.25C17.4006 0 18.3333 0.93274 18.3333 2.08333V6.25C18.3333 7.40059 17.4006 8.33333 16.25 8.33333H12.0833C10.9327 8.33333 10 7.40059 10 6.25V2.08333ZM12.0833 1.66667C11.8532 1.66667 11.6667 1.85321 11.6667 2.08333V6.25C11.6667 6.48012 11.8532 6.66667 12.0833 6.66667H16.25C16.4801 6.66667 16.6667 6.48012 16.6667 6.25V2.08333C16.6667 1.85321 16.4801 1.66667 16.25 1.66667H12.0833Z" fill="currentColor"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M10 12.0833C10 10.9327 10.9327 10 12.0833 10H16.25C17.4006 10 18.3333 10.9327 18.3333 12.0833V16.25C18.3333 17.4006 17.4006 18.3333 16.25 18.3333H12.0833C10.9327 18.3333 10 17.4006 10 16.25V12.0833ZM12.0833 11.6667C11.8532 11.6667 11.6667 11.8532 11.6667 12.0833V16.25C11.6667 16.4801 11.8532 16.6667 12.0833 16.6667H16.25C16.4801 16.6667 16.6667 16.4801 16.6667 16.25V12.0833C16.6667 11.8532 16.4801 11.6667 16.25 11.6667H12.0833Z" fill="currentColor"/>
+        </svg>
+      </button>
+      <button type="button" class="search__layout-toggle search__layout-toggle--list" aria-label="List View">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M17.5 2.5H2.5V17.5H17.5V2.5ZM1 1V19H19V1H1Z" fill="currentColor"/>
+        </svg>
+      </button>
+    `;
+
+    renderFilterButton($filterBtnContainer);
+
+    const setViewMode = (view) => {
+      localStorage.setItem('plp-view-mode', view);
+      const gridBtn = $toggleContainer.querySelector('.search__layout-toggle--grid');
+      const listBtn = $toggleContainer.querySelector('.search__layout-toggle--list');
+
+      if (view === 'list') {
+        block.classList.add('list-view');
+        gridBtn?.classList.remove('active');
+        listBtn?.classList.add('active');
+      } else {
+        block.classList.remove('list-view');
+        gridBtn?.classList.add('active');
+        listBtn?.classList.remove('active');
+      }
+    };
+
+    const savedView = localStorage.getItem('plp-view-mode') || 'grid';
+    setViewMode(savedView);
+
+    $toggleContainer.querySelector('.search__layout-toggle--grid').addEventListener('click', () => setViewMode('grid'));
+    $toggleContainer.querySelector('.search__layout-toggle--list').addEventListener('click', () => setViewMode('list'));
+  };
+
+  const removeMobileToggles = () => {
+    $viewFacets.innerHTML = '';
+    block.classList.remove('list-view');
+    renderFilterButton($viewFacets);
+  };
+
+  const handleMediaChange = (e) => {
+    if (e.matches) {
+      setupMobileToggles();
+    } else {
+      removeMobileToggles();
+    }
+  };
+
+  mediaQuery.addEventListener('change', handleMediaChange);
+
+  if (mediaQuery.matches) {
+    setupMobileToggles();
+  } else {
+    renderFilterButton($viewFacets);
+  }
+
   await Promise.all([
     // Sort By
     provider.render(SortBy, {})($productSort),
@@ -138,16 +225,6 @@ export default async function decorate(block) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       },
     })($pagination),
-
-    // View Facets Button
-    UI.render(Button, {
-      children: labels.Global?.Filters,
-      icon: Icon({ source: 'Burger' }),
-      variant: 'secondary',
-      onClick: () => {
-        $facets.classList.toggle('search__facets--visible');
-      },
-    })($viewFacets),
 
     // Facets
     provider.render(Facets, {})($facets),

@@ -84,3 +84,9 @@
     display: inline-flex;
     align-items: center;
 }
+
+@media screen and (max-width: 899px) {
+    .section.breadcrumb-container {
+        display: none;
+    }
+}

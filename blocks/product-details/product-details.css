@@ -470,3 +470,15 @@ main>.section-product-sustainability {
 .pdp-carousel__controls__wrapper--thumbnailsRow {
   flex: 1;
 }
+
+@media (max-width: 899px) {
+  .product-details .pdp-carousel__button {
+    display: none !important;
+  }
+
+  .product-details .pdp-carousel--arrows {
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+  }
+}
