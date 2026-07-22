@@ -124,6 +124,7 @@
   line-height: 20px;
   font-weight: 700;
   padding: 0;
+  margin: 0;
 }
 
 .homepage-banner-section table p a {
@@ -148,7 +149,7 @@
 }
 
 .homepage-banner-section .carousel .carousel-slides {
-  height: 31.3vw;
+  height: 500px;
 }
 
 .homepage-summer-section .columns-2-cols {
@@ -228,6 +229,7 @@ main>.homepage-product-section {
   display: flex;
   padding: 80px 0;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .homepage-promo-section table p {
@@ -245,6 +247,7 @@ main>.homepage-product-section {
   font-weight: 500;
   margin: 0 0 60px;
   color: #000;
+  letter-spacing: 0;
 }
 
 .homepage-product-section h2+p {
@@ -284,6 +287,7 @@ main>.homepage-product-section {
   align-items: center;
   gap: 5px;
   margin: 0 0 13px;
+  flex-wrap: wrap;
 }
 
 .homepage-promo-section .columns>div>div>p:first-of-type {
@@ -314,6 +318,7 @@ main>.homepage-product-section {
   font-weight: 500;
   text-align: center;
   margin: 0 0 8px;
+  letter-spacing: 0;
 }
 
 .homepage-spotlight-section h2 {
@@ -400,13 +405,21 @@ main>.homepage-tabs-section {
 }
 
 .homepage-tabs-section table {
-  display: block;
+  display: flex;
+  justify-content: center;
 }
 
 .homepage-tabs-section tbody {
   display: flex;
-  justify-content: center;
   gap: 37px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.homepage-tabs-section tbody::-webkit-scrollbar {
+  display: none;
 }
 
 .homepage-tabs-section td {
@@ -425,6 +438,7 @@ main>.homepage-tabs-section {
 
 .homepage-tabs-section tr {
   max-width: 174px;
+  min-width: 130px;
   width: 100%;
   display: block;
 }
@@ -443,6 +457,7 @@ main>.homepage-spotlight-section {
 .homepage-spotlight-section .columns-2-cols {
   display: flex;
   gap: 30px;
+  flex-wrap: wrap;
 }
 
 .homepage-spotlight-section .columns>div>.columns-img-col {
@@ -646,6 +661,52 @@ main>.homepage-blog-sec {
   cursor: default;
 }
 
+.homepage-commerce-video .video-carousel-dots {
+  display: none;
+}
+
+div.homepage-commerce-video .video-carousel-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+  outline: 0;
+}
+
+.homepage-commerce-video .video-carousel-dot::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  background-color: transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.homepage-commerce-video .video-carousel-dot.active,
+.homepage-commerce-video .video-carousel-dot:hover,
+.homepage-commerce-video .video-carousel-dot:focus-visible {
+  border-color: #fff;
+  background-color: transparent;
+}
+
+.homepage-commerce-video .video-carousel-dot.active::before,
+.homepage-commerce-video .video-carousel-dot:hover::before,
+.homepage-commerce-video .video-carousel-dot:focus-visible::before {
+  background-color: #fff;
+  border-color: #fff;
+}
+
 .homepage-commerce-video .default-content-wrapper {
   padding: 0;
 }
@@ -675,14 +736,530 @@ main>.homepage-blog-sec {
   aspect-ratio: 4 / 5;
 }
 
+
+@media (min-width: 900px) {
+  .homepage-banner-section .carousel .carousel-slides {
+    height: 40vw;
+  }
+}
+
+@media (min-width: 1025px) {
+  .homepage-banner-section .carousel .carousel-slides {
+    height: 31.3vw;
+  }
+}
+
 @media (max-width: 1023px) {
   .homepage-commerce-video .video-slide {
     flex: 0 0 50%;
+  }
+
+  .homepage-summer-section .columns-2-cols>div>div:not(.columns-img-col) {
+    text-align: center;
+  }
+
+  .homepage-summer-section .columns-2-cols>div>div:not(.columns-img-col) h2+p {
+    max-width: 100%;
+    margin-bottom: 14px;
+  }
+
+  .homepage-summer-section .columns-2-cols>div>div:not(.columns-img-col) .button-wrapper {
+    margin: 0 auto;
+  }
+
+  .homepage-summer-section .columns-2-cols>div>div:not(.columns-img-col) .button-wrapper .button {
+    background-color: #000;
+    color: #fff;
+  }
+
+  .homepage-summer-section .columns-2-cols>div>div:not(.columns-img-col) img {
+    max-width: 125px;
+  }
+
+  .homepage-summer-section .columns-2-cols>div>div:not(.columns-img-col) .button-wrapper+p {
+    top: unset;
+    bottom: -70px;
+    transform: translateX(-50%);
+    letter-spacing: 0;
+  }
+
+  .homepage-summer-section .columns-2-cols>div>div:not(.columns-img-col) h2 {
+    font-size: 26px;
+    line-height: 32px;
+    letter-spacing: 0;
+    margin-bottom: 10px;
+  }
+
+  .homepage-summer-section .columns-2-cols {
+    padding: 20px;
   }
 }
 
 @media (max-width: 767px) {
   .homepage-commerce-video .video-slide {
     flex: 0 0 100%;
+  }
+}
+
+@media screen and (min-width: 1024px) and (max-width: 1680px) {
+  .homepage-summer-section .columns-2-cols>div>div:not(.columns-img-col) .button-wrapper+p {
+    left: unset;
+    right: 50px;
+  }
+}
+
+@media screen and (min-width: 900px) and (max-width: 1200px) {
+  main .homepage-product-section>.columns-wrapper {
+    padding-left: 20px;
+    width: 35%;
+  }
+}
+
+@media (max-width: 899px) {
+  /* 1. Base & Tabs paragraph styles & Product Slider Nav */
+  .homepage-tabs-section p {
+    color: #A0A0A0;
+    font-size: 18px;
+    line-height: 28px;
+  }
+
+  .homepage-original-sec p {
+    font-size: 16px;
+    line-height: 24px;
+    margin-bottom: 12px;
+  }
+
+  main>.homepage-product-slider .tabs-wrapper {
+    padding: 0 20px;
+  }
+
+  .homepage-product-slider .tabs-wrapper .tabs-nav {
+    margin-bottom: 40px;
+    overflow-x: auto;
+    justify-content: flex-start;
+    scrollbar-width: none;
+  }
+
+  .homepage-product-slider .tabs-nav button {
+    min-width: fit-content;
+  }
+
+  .homepage-product-slider .tabs-nav button:first-child {
+    margin-left: auto;
+  }
+
+  .homepage-product-slider .tabs-nav button:last-child {
+    margin-right: auto;
+  }
+
+  .homepage-product-slider .tabs-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 2. Banner Section */
+  .homepage-banner-section .carousel .carousel-slide-indicators {
+    right: 10px;
+  }
+
+  .homepage-banner-section table h1 {
+    margin: 10px 0 30px;
+    letter-spacing: 0;
+  }
+
+  .homepage-banner-section table {
+    color: #fff;
+    text-align: center;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .homepage-banner-section table p {
+    text-align: center;
+  }
+
+  .homepage-banner-section table p a.button {
+    border-color: #fff !important;
+    color: #000;
+    background-color: #fff;
+  }
+
+  .homepage-banner-section .carousel .carousel-slide-indicator button {
+    border-color: #fff;
+  }
+
+  .homepage-banner-section .carousel .carousel-slide-indicator:has(button:disabled) {
+    border-color: #fff;
+  }
+
+  .homepage-banner-section .carousel .carousel-slide-indicator button:disabled,
+  .homepage-banner-section .carousel .carousel-slide-indicator button:hover {
+    background-color: #fff;
+    border-color: #fff;
+  }
+
+  main>.homepage-banner-section {
+    margin-bottom: 20px;
+  }
+
+  /* 4. Tabs Section */
+  main>.homepage-tabs-section {
+    margin: 0;
+  }
+
+  main > .homepage-tabs-section .tabs-wrapper {
+    padding-right: 0;
+  }
+
+  .homepage-tabs-section h2 {
+    font-size: 24px;
+    line-height: 44px;
+  }
+
+  main>.section>div {
+    padding: 0 20px;
+  }
+
+  .homepage-tabs-section tbody {
+    gap: 12px;
+  }
+
+  /* 5. Spotlight Section */
+  .homepage-spotlight-section .spotlight-carousel-viewport {
+    overflow: hidden;
+    width: 100%;
+    outline: none;
+  }
+
+  .homepage-spotlight-section .columns-2-cols {
+    gap: 0;
+  }
+
+  .homepage-spotlight-section .spotlight-carousel-track {
+    display: flex;
+    flex-wrap: nowrap !important;
+    transition: transform 0.3s ease-out;
+    width: 100%;
+  }
+
+  .homepage-spotlight-section .spotlight-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .homepage-spotlight-section .columns-2-cols > div {
+    width: 100%;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .homepage-spotlight-section .columns-img-col {
+    width: 100%;
+    order: -1;
+  }
+
+  .homepage-spotlight-section .columns-img-col img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .homepage-spotlight-section h2 {
+    font-size: 24px;
+    line-height: 30px;
+    margin-bottom: 20px;
+    letter-spacing: 0;
+  }
+
+  .homepage-spotlight-section h3 {
+    font-size: 20px;
+    letter-spacing: 4px;
+  }
+
+  .homepage-spotlight-section h5 + p {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+    letter-spacing: 0;
+    margin-bottom: 28px;
+  }
+
+  .homepage-spotlight-section a {
+    font-weight: 700;
+    color: #121212;
+    text-transform: uppercase;
+    text-decoration: underline;
+    letter-spacing: 1px;
+  }
+
+  .homepage-spotlight-section .spotlight-carousel-indicators {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+    margin-bottom: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  main>.homepage-spotlight-section {
+    margin-bottom: 40px;
+    margin-top: 40px;
+  }
+
+  .homepage-spotlight-section .spotlight-carousel-indicators .spotlight-indicator {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+  }
+
+  .homepage-spotlight-section .columns-wrapper ul.spotlight-carousel-indicators .spotlight-indicator button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    outline: none;
+  }
+
+  .homepage-spotlight-section .spotlight-carousel-indicators .spotlight-indicator button .spotlight-indicator-dot {
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: 1px solid #1d1d1d;
+    background-color: transparent;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .homepage-spotlight-section .columns-wrapper ul.spotlight-carousel-indicators .spotlight-indicator.active button {
+    border-color: #1d1d1d;
+  }
+
+  .homepage-spotlight-section .columns-wrapper ul.spotlight-carousel-indicators .spotlight-indicator.active button .spotlight-indicator-dot {
+    background-color: #1d1d1d;
+    border-color: #1d1d1d;
+  }
+
+  /* 6. Original Section Column Rules */
+  .homepage-original-sec .columns-2-cols>div {
+    min-height: unset;
+  }
+
+  /* 7. Promo Section */
+  .homepage-promo-section .columns>div {
+    gap: 0;
+  }
+
+  .homepage-original-sec .columns>div>div {
+    width: 100%;
+  }
+
+  .homepage-promo-section .columns > div > div {
+    min-height: 380px;
+    text-align: center;
+    padding: 30px 20px;
+  }
+
+  .homepage-promo-section .columns>div>div:nth-child(2) {
+    align-items: center;
+  }
+
+  .homepage-promo-section h2 {
+    font-size: 24px;
+    line-height: 30px;
+    letter-spacing: 0;
+    margin-bottom: 20px;
+  }
+
+  .homepage-promo-section .button-wrapper a.button.secondary {
+    background-color: #000;
+    color: #fff;
+    font-size: 14px;
+    line-height: 24px;
+  }
+
+  .homepage-promo-section table {
+    justify-content: center;
+  }
+
+  .homepage-promo-section table p {
+    margin-bottom: 10px;
+  }
+
+  main>.homepage-promo-section {
+    margin-bottom: 40px;
+  }
+
+  /* 8. Product Section */
+  main .homepage-product-section>.columns-wrapper {
+    width: 100%;
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  .homepage-product-section>.product-section-wrapper {
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  .product-section-inner .product-section-next {
+    right: -10px;
+  }
+
+  .product-section-inner .product-section-prev {
+    left: -10px;
+  }
+
+  main>.homepage-product-section {
+    padding: 30px 0;
+  }
+
+  .homepage-product-section h2 {
+    font-size: 26px;
+    line-height: 32px;
+    margin-bottom: 18px;
+    letter-spacing: 0;
+  }
+
+  .homepage-product-section h2+p {
+    margin-bottom: 28px;
+  }
+
+  .homepage-product-section h2+p a {
+    background-color: #000;
+    color: #fff;
+  }
+
+  .homepage-product-section .button-wrapper {
+    margin-bottom: 28px;
+  }
+
+  /* 9. Commerce Video Section */
+  .homepage-commerce-video {
+    padding: 30px 20px;
+  }
+
+  .homepage-commerce-video h3 + p {
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 0;
+    text-align: center;
+    margin: 0;
+  }
+
+  .homepage-commerce-video h2,
+  .homepage-video-sec h2 {
+    font-size: 24px;
+    line-height: 30px;
+    margin-bottom: 20px;
+    letter-spacing: 0;
+    text-align: center;
+  }
+
+  .homepage-commerce-video h3,
+  .homepage-video-sec h3 {
+    font-size: 24px;
+    line-height: 30px;
+    letter-spacing: 0;
+    text-align: center;
+    margin: 30px 0 10px;
+  }
+
+  .homepage-commerce-video .video-carousel-controls {
+    position: static;
+    top: auto;
+    right: auto;
+    margin-top: 24px;
+    justify-content: center;
+  }
+
+  .homepage-commerce-video .video-prev,
+  .homepage-commerce-video .video-next,
+  .homepage-commerce-video .video-pagination {
+    display: none !important;
+  }
+
+  .homepage-commerce-video .video-carousel-dots {
+    display: flex !important;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 10. Original Section Rest */
+  .homepage-original-sec .columns-2-cols>div>div:not(.columns-img-col) {
+    order: -1;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .homepage-original-sec h2 {
+    font-size: 24px;
+    line-height: 30px;
+    margin-bottom: 20px;
+    letter-spacing: 0;
+  }
+
+  .homepage-original-sec h2+p {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+    letter-spacing: 0;
+    margin-bottom: 24px;
+  }
+
+  .homepage-original-sec p:nth-child(5) {
+    margin-bottom: 24px;
+  }
+
+  .homepage-original-sec .button-wrapper {
+    margin-top: 0;
+  }
+
+  .homepage-original-sec .button-wrapper .button.secondary {
+    background-color: #000;
+    color: #fff;
+  }
+
+  /* 11. Blog Section */
+  .homepage-blog-sec .cards ul {
+    grid-template-columns: 1fr;
+  }
+
+  main>.homepage-blog-sec {
+    margin-top: 40px;
+  }
+
+  .homepage-blog-sec h2 {
+    text-align: center;
+    margin-bottom: 0;
+    font-size: 24px;
+    line-height: 30px;
+  }
+
+  .homepage-blog-sec .cards-container .cards-wrapper {
+    margin-top: 30px;
+  }
+
+  .homepage-blog-sec .cards .cards-card-body {
+    padding: 20px;
+  }
+
+  .homepage-blog-sec h4 {
+    font-size: 16px;
+    line-height: 24px;
+    color: #EF6031;
+    font-weight: 500;
   }
 }

@@ -32,6 +32,7 @@ export default function initHomepageCommerceVideoCarousel(root = document) {
       <span class="current">1</span>/<span class="total">1</span>
     </span>
     <button class="video-next" aria-label="Next">&#10095;</button>
+    <div class="video-carousel-dots" role="tablist" aria-label="Slides"></div>
   `;
 
   viewport.after(controls);
@@ -40,9 +41,18 @@ export default function initHomepageCommerceVideoCarousel(root = document) {
   const nextBtn = controls.querySelector('.video-next');
   const currentEl = controls.querySelector('.current');
   const totalEl = controls.querySelector('.total');
+  const dotsContainer = controls.querySelector('.video-carousel-dots');
 
   let slidesPerView = getSlidesPerView();
   let currentIndex = 0;
+
+  dotsContainer.addEventListener('click', (e) => {
+    const dot = e.target.closest('.video-carousel-dot');
+    if (dot && dot.dataset.index !== undefined) {
+      currentIndex = Number(dot.dataset.index);
+      update();
+    }
+  });
 
   function getSlidesPerView() {
     if (window.innerWidth < 768) return 1;
@@ -70,6 +80,18 @@ export default function initHomepageCommerceVideoCarousel(root = document) {
 
     prevBtn.disabled = currentIndex === 0;
     nextBtn.disabled = currentIndex >= maxIndex();
+
+    // Render pagination dots
+    const totalDots = maxIndex() + 1;
+    dotsContainer.innerHTML = '';
+    for (let i = 0; i < totalDots; i += 1) {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = `video-carousel-dot${i === currentIndex ? ' active' : ''}`;
+      dot.dataset.index = i;
+      dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+      dotsContainer.appendChild(dot);
+    }
 
     section.querySelectorAll('video').forEach((video) => {
       video.pause();

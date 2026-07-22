@@ -14,7 +14,7 @@ import { getProductLink, rootLink } from '../../scripts/commerce.js';
  * @returns {object} Extracted item data
  */
 function extractItemData(item) {
-  const nameEl = item.querySelector('.dropin-cart-item__title a, .cart-summary-item__title a');
+  const nameEl = item.querySelector('.dropin-cart-item__title, .cart-summary-item__title');
   const name = nameEl ? nameEl.textContent.trim() : '';
   const nameHref = nameEl ? nameEl.getAttribute('href') : '#';
 
@@ -42,6 +42,10 @@ function extractItemData(item) {
     const rawText = priceContainer ? priceContainer.textContent.trim() : '';
     const qtyMatch2 = rawText.match(/^(\d+)\s*x/i);
     if (qtyMatch2) [, qty] = qtyMatch2;
+  }
+  // Default to 1 if no quantity is found (e.g. for single item orders)
+  if (!qty) {
+    qty = '1';
   }
 
   // Row total (subtotal for the row)
@@ -78,7 +82,7 @@ function extractCostData(costEl) {
 /**
  * Builds the Magento-style Items Ordered table.
  */
-function buildItemsTable(dropinEl) {
+function buildItemsTable(dropinEl, costBlock) {
   // Find all product items
   const items = dropinEl.querySelectorAll('.dropin-cart-item');
   if (!items.length) return null;
@@ -91,6 +95,10 @@ function buildItemsTable(dropinEl) {
   heading.classList.add('order-details-items-heading');
   heading.textContent = 'Items Ordered';
   wrapper.appendChild(heading);
+
+  // ── Inner container wrapping both tables ──
+  const tablesInner = document.createElement('div');
+  tablesInner.classList.add('order-tables-inner');
 
   // Build <table>
   const table = document.createElement('table');
@@ -127,10 +135,10 @@ function buildItemsTable(dropinEl) {
     tbody.appendChild(tr);
   });
   table.appendChild(tbody);
-  wrapper.appendChild(table);
+  tablesInner.appendChild(table);
 
   // ── Order Totals ──
-  const costWrapper = dropinEl.querySelector('.order-cost-summary-content__wrapper');
+  const costWrapper = costBlock ? costBlock.querySelector('.order-cost-summary-content__wrapper') : null;
   if (costWrapper) {
     const {
       subtotal, shipping, tax, grandTotal,
@@ -158,8 +166,10 @@ function buildItemsTable(dropinEl) {
         </tr>
       </tbody>
     `;
-    wrapper.appendChild(totalsTable);
+    tablesInner.appendChild(totalsTable);
   }
+
+  wrapper.appendChild(tablesInner);
 
   return wrapper;
 }
@@ -238,25 +248,46 @@ export default async function decorate(block) {
 
   /**
    * Rebuilds the visible table from the dropin's rendered items.
+   * Guard flag prevents re-entrant calls triggered by the observer
+   * seeing its own DOM writes to tableContainer.
    */
+  let isRebuilding = false;
+  let debounceTimer = null;
+
   const rebuildTable = () => {
+    if (isRebuilding) return;
     const items = dropinContainer.querySelectorAll('.dropin-cart-item');
     if (!items.length) return;
 
-    const tableWrapper = buildItemsTable(dropinContainer);
-    tableContainer.innerHTML = '';
-    if (tableWrapper) {
-      tableContainer.appendChild(tableWrapper);
+    // Fetch the cost summary block from the document
+    const costBlock = document.querySelector('.commerce-order-cost-summary');
+
+    isRebuilding = true;
+    try {
+      const tableWrapper = buildItemsTable(dropinContainer, costBlock);
+      tableContainer.innerHTML = '';
+      if (tableWrapper) {
+        tableContainer.appendChild(tableWrapper);
+      }
+    } finally {
+      isRebuilding = false;
     }
   };
 
-  // Observe the hidden dropin for changes
-  let debounceTimer = null;
+  // Observe ONLY the hidden dropin source container for changes.
+  // Do NOT observe block.parentElement — that scope includes tableContainer,
+  // causing the observer to fire on its own DOM writes (infinite loop).
   const observer = new MutationObserver(() => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(rebuildTable, 80);
   });
+
   observer.observe(dropinContainer, { childList: true, subtree: true });
+
+  // One-time fallback: rebuild after 800ms to pick up any late-rendering
+  // sibling blocks (e.g. commerce-order-cost-summary) that may not have
+  // been in the DOM at initial render time.
+  setTimeout(rebuildTable, 800);
 
   // Attempt immediate rebuild
   rebuildTable();

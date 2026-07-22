@@ -99,7 +99,14 @@ export default async function decorate(block) {
     // eslint-disable-next-line no-alert
     if (window.confirm('Are you sure you want to clear your shopping cart?')) {
       try {
-        await Cart.resetCart();
+        const cartData = await Cart.getCartData();
+        if (cartData && cartData.items && cartData.items.length > 0) {
+          const itemsToClear = cartData.items.map((item) => ({
+            uid: item.uid,
+            quantity: 0,
+          }));
+          await Cart.updateProductsFromCart(itemsToClear);
+        }
       } catch (error) {
         console.error('Error clearing cart:', error);
       }

@@ -10,12 +10,12 @@
 
 /* ── Section heading ── */
 .commerce-order-product-list .order-details-items-heading {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  margin: 28px 0 0;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #c7c7c7;
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+  padding-bottom: 0;
 }
 
 /* ── Native HTML table ── */
@@ -95,12 +95,6 @@
 
 .order-items-table .col-subtotal {
   font-weight: 600;
-}
-
-.order-items-table .col-qty .qty-ordered::before {
-  content: 'Ordered: ';
-  color: #666;
-  font-weight: 400;
 }
 
 /* ── Order Totals (right-aligned, below the table) ── */
@@ -184,5 +178,29 @@
   .order-items-table td.col-qty,
   .order-items-table td.col-subtotal {
     text-align: left;
+  }
+}
+
+@media screen and (min-width: 601px) {
+  .order-tables-inner {
+    border: 1px solid #B0B0B0;
+    padding: 40px;
+    margin-top: -1px;
+  }
+
+  .order-items-table-wrapper .order-details-items-heading {
+    background: #fff;
+    border: 1px solid #B0B0B0;
+    border-bottom: 0;
+    display: block;
+    margin-bottom: -1px;
+    padding: 13px 20px 2px;
+    max-width: fit-content;
+    z-index: 2;
+    position: relative;
+  }
+
+  .order-totals-table {
+    background-color: #F5F5F5;
   }
 }

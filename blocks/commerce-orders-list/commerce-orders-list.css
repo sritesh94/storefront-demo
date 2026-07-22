@@ -19,27 +19,35 @@
 .commerce-account-section-header-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #000;
 }
 
-.commerce-account-section-heading {
-  font-size: 26px;
-  font-weight: 300;
-  color: #333;
+.commerce-orders-list--minified .commerce-account-section-header-container {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.body.orders .commerce-account-section-header-container .commerce-account-section-heading {
+  font-size: 36px;
+  line-height: 44px;
+  font-weight: 500;
+  color: #121212;
   margin: 0;
-  line-height: 1.2;
 }
 
 .commerce-account-section-link {
   display: inline-flex;
   align-items: center;
   font-size: 14px;
-  color: var(--color-brand-600, #e0007a);
+  color: #000 !important;
   text-decoration: none;
-  font-weight: 400;
+  font-weight: 400 !important;
+}
+
+.commerce-account-section-link svg {
+  color: #FA1792 !important;
 }
 
 .commerce-account-section-link:hover {
@@ -47,10 +55,65 @@
 }
 
 /* ============================================================
+   SEARCH FILTER
+   ============================================================ */
+.commerce-orders-list .orders-search-container {
+  margin-bottom: 20px;
+}
+
+.commerce-orders-list .orders-search-box {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  max-width: 340px;
+}
+
+.commerce-orders-list .orders-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 14px;
+  padding: 8px 36px 8px 12px;
+  border: 1px solid #c7c7c7;
+  border-radius: 0;
+  background: #fff;
+  color: #333;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.commerce-orders-list .orders-search-input::placeholder {
+  color: #757575;
+  font-size: 14px;
+}
+
+.commerce-orders-list .orders-search-input:focus {
+  border-color: #333;
+}
+
+.commerce-orders-list .orders-search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: #333;
+}
+
+.commerce-orders-list .orders-search-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentcolor;
+}
+
+/* ============================================================
    DATE FILTER (moved above the table)
    ============================================================ */
 .orders-filter-container {
   margin-bottom: 16px;
+  display: none;
 }
 
 .orders-filter-container .account-orders-list__date-select {
@@ -77,6 +140,8 @@
    ============================================================ */
 .orders-table-container {
   width: 100%;
+  border-top: 2px solid #B0B0B0;
+  margin-top: 20px;
 }
 
 /* ============================================================
@@ -98,8 +163,9 @@
 .orders-table th {
   text-align: left;
   font-weight: 700;
-  font-size: 14px;
-  color: #333;
+  font-size: 16px;
+  line-height: 24px;
+  color: #000;
   padding: 10px 16px 10px 0;
   white-space: nowrap;
   background: transparent;
@@ -164,10 +230,11 @@
 /* Action links and separator inside the actions cell */
 .orders-table__actions .orders-action-link {
   display: inline;
-  color: var(--color-brand-600, #e0007a);
+  color: #FA1792;
   font-size: 14px;
   font-weight: 400;
   text-decoration: none;
+  text-decoration: underline;
 }
 
 .orders-table__actions .orders-action-link:hover {
@@ -226,12 +293,18 @@
 /* ============================================================
    RESPONSIVE
    ============================================================ */
-@media (max-width: 900px) {
+@media (max-width: 899px) {
   /* Hide Date column on tablet */
   .orders-table th:nth-child(2),
   .orders-table td:nth-child(2) {
     display: none;
   }
+
+  .commerce-account-section-header-container .commerce-account-section-heading {
+    font-size: 28px;
+    line-height: 32px;
+  }
+
 }
 
 @media (max-width: 600px) {
@@ -268,5 +341,12 @@
     font-size: 13px;
     color: #666;
     flex-shrink: 0;
+  }
+}
+
+@media screen and (min-width: 900px) {
+  body.orders .commerce-account-section-heading {
+    font-size: 36px;
+    line-height: 44px;
   }
 }

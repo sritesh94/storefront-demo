@@ -90,6 +90,11 @@
     gap: var(--spacing-xxsmall);
 }
 
+.product-discovery-product-actions .dropin-button--with-icon {
+    background-color: #000 !important;
+    border-radius: 0;
+}
+
 .product-discovery-product-actions__compare-toggle {
     background: none;
     border: none;

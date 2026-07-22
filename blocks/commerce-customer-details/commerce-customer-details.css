@@ -1,6 +1,106 @@
-/* .commerce-customer-details {
-} */
+/* ============================================================
+   commerce-customer-details — Magento 2-style Order Information section
+   ============================================================ */
 
 .commerce-customer-details {
-    margin-bottom: var(--spacing-small);
+  margin-top: 32px;
+  margin-bottom: 32px;
+  font-family: var(--type-base-font-family);
+}
+
+/* Remove default card styles from the dropin */
+.commerce-customer-details .dropin-card,
+.commerce-customer-details .dropin-card--secondary {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.commerce-customer-details .dropin-card__content {
+  padding: 0 !important;
+}
+
+/* Re-style block title to look like 'Order Information' */
+.commerce-customer-details .dropin-header-container {
+  margin-bottom: 20px !important;
+}
+
+.commerce-customer-details .dropin-header-container__title {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: #333 !important;
+}
+
+/* Hide dropin dividers */
+.commerce-customer-details .dropin-divider,
+.commerce-customer-details .dropin-header-container__divider {
+  display: none !important;
+}
+
+/* Hide Contact details email box */
+.commerce-customer-details .order-customer-details-content__container-email {
+  display: none !important;
+}
+
+/* 4 Column Box Grid */
+.commerce-customer-details .order-customer-details-content__container {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px !important;
+  margin-top: 15px !important;
+}
+
+/* Individual box wrapper styling */
+.commerce-customer-details .order-customer-details-content__container-shipping_address,
+.commerce-customer-details .order-customer-details-content__container-shipping_methods,
+.commerce-customer-details .order-customer-details-content__container-billing_address,
+.commerce-customer-details .order-customer-details-content__container-payment_methods {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  padding: 18px 16px;
+  min-height: 180px;
+  font-size: 14px;
+  color: #333;
+  grid-area: auto !important;
+}
+
+/* Title within each column */
+.commerce-customer-details .order-customer-details-content__container-title {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #2b2b2b !important;
+  margin-bottom: 12px !important;
+  padding-bottom: 8px !important;
+  border-bottom: 1px solid #c7c7c7 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Content paragraphs */
+.commerce-customer-details p,
+.commerce-customer-details div,
+.commerce-customer-details span {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.commerce-customer-details p {
+  margin-bottom: 4px;
+}
+
+/* Responsive grid layout */
+@media (max-width: 900px) {
+  .commerce-customer-details .order-customer-details-content__container {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .commerce-customer-details .order-customer-details-content__container {
+    grid-template-columns: 1fr !important;
+  }
 }

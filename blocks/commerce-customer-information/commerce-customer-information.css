@@ -163,11 +163,12 @@
 /* Edit Account Page Design Overrides (Figma Parity) */
 .commerce-account-edit-page .commerce-account-section-heading {
     font-size: 28px !important;
-    font-weight: 400 !important;
-    color: #1d1d1b !important;
+    line-height: 32px;
+    font-weight: 500 !important;
+    color: #121212 !important;
     margin: 0 0 24px !important;
     padding-bottom: 12px !important;
-    border-bottom: 1px solid #e8e8e8 !important;
+    border-bottom: 1px solid #000 !important;
 }
 
 .commerce-account-edit-page .account-customer-information-card {
@@ -195,7 +196,6 @@
     display: flex !important;
     flex-direction: column !important;
     gap: 20px !important;
-    max-width: 600px !important;
 }
 
 /* Position Labels statically above inputs */
@@ -210,11 +210,14 @@
     position: static !important;
     transform: none !important;
     pointer-events: auto !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    color: #1d1d1b !important;
-    margin-bottom: 8px !important;
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    color: #000 !important;
+    margin-bottom: 10px !important;
     display: block !important;
+    line-height: 24px;
+    padding-left: 0;
+    letter-spacing: 0 !important;
 }
 
 .commerce-account-edit-page .dropin-input,
@@ -227,6 +230,8 @@
     width: 100% !important;
     box-sizing: border-box !important;
     background-color: #fff !important;
+    color: #000;
+    font-weight: 400;
 }
 
 .commerce-account-edit-page .dropin-input:focus,
@@ -329,9 +334,18 @@
 
 /* Error hints styling */
 .commerce-account-edit-page .dropin-field__hint {
-    color: #f00 !important;
+    color: #FF4242 !important;
     font-size: 12px !important;
-    margin-top: 4px !important;
+    letter-spacing: 0;
+    font-weight: 500;
+}
+
+.account-edit-customer-information-form__field .dropin-input__field-icon--error {
+    top: 51px;
+}
+
+.customer-information .commerce-customer-information-dropin {
+    max-width: 100%;
 }
 
 /* Hide inline forms on the main account page */
@@ -353,11 +367,29 @@
     margin-top: 24px !important;
 }
 
+.commerce-orders-list-wrapper+.commerce-addresses-wrapper {
+    max-width: 936px !important;
+}
+
+.commerce-orders-list-wrapper+.commerce-addresses-wrapper .commerce-account-section-header-container {
+    border-bottom: 0;
+    justify-content: flex-start;
+}
+
+.commerce-orders-list-wrapper+.commerce-addresses-wrapper .commerce-account-section-header-container .commerce-account-section-link {
+    color: #000 !important;
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 300;
+    gap: 1px;
+}
+
 @media (min-width: 768px) {
     .commerce-customer-information:not(.commerce-account-edit-page) .custom-dashboard-columns {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
-        gap: 40px !important;
+        gap: 50px !important;
+        max-width: 936px;
     }
 }
 
@@ -423,4 +455,55 @@
 .commerce-customer-information:not(.commerce-account-edit-page) .custom-dashboard-action-btn svg {
     margin-right: 6px !important;
     flex-shrink: 0 !important;
+}
+
+@media screen and (min-width: 900px) {
+    .commerce-account-edit-page .commerce-account-section-heading {
+        font-size: 36px !important;
+        line-height: 44px;
+    }
+}
+
+/* Layout for Edit Account Page (Two Columns on Desktop >900px, Stacked on Mobile <=900px) */
+.commerce-account-edit-page .account-edit-two-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+@media screen and (min-width: 900px) {
+    .commerce-account-edit-page .account-edit-two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        align-items: start;
+    }
+}
+
+.commerce-account-edit-page .account-edit-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.commerce-account-edit-page .account-edit-right-section {
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.commerce-account-edit-page .show-right-section .account-edit-right-section {
+    display: flex !important;
+}
+
+.commerce-account-edit-page .account-edit-section-heading {
+    font-size: 20px !important;
+    line-height: 28px !important;
+    font-weight: 500 !important;
+    color: #121212 !important;
+    margin: 0 0 4px !important;
+    padding-bottom: 8px !important;
+    border-bottom: 1px solid #000 !important;
 }

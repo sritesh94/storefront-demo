@@ -1,9 +1,10 @@
-main > .section .carousel-wrapper {
+main>.section .carousel-wrapper {
     max-width: unset;
     padding: 0;
 }
 
-.carousel-container h2, .carousel-container p {
+.carousel-container h2,
+.carousel-container p {
     padding: 0 var(--spacing-xxlarge);
     text-align: center;
 }
@@ -56,7 +57,7 @@ main > .section .carousel-wrapper {
     inset: 0;
 }
 
-.carousel .carousel-slide .carousel-slide-image picture > img {
+.carousel .carousel-slide .carousel-slide-image picture>img {
     height: 100%;
     width: 100%;
     object-fit: cover;
@@ -93,7 +94,7 @@ main > .section .carousel-wrapper {
 }
 
 .carousel .carousel-slide-indicator {
-    margin: 0 var(--spacing-xsmall) 0 var(--spacing-xxsmall);
+    margin: 0;
     border: 1px solid transparent;
     width: 20px;
     height: 20px;

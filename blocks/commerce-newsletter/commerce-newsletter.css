@@ -4,6 +4,31 @@
     margin-bottom: 40px;
 }
 
+.commerce-newsletter-wrapper .commerce-account-section-heading {
+    font-size: 36px;
+    line-height: 44px;
+    color: #121212;
+    font-weight: 500;
+    border-bottom: 1px solid #121212;
+    padding-bottom: 12px;
+    width: 100%;
+}
+
+@media screen and (max-width: 899px) {
+    .commerce-newsletter-wrapper .commerce-account-section-heading {
+        font-size: 28px;
+        line-height: 32px;
+    }
+
+    .commerce-newsletter {
+        margin-bottom: 0;
+    }
+}
+
+.commerce-newsletter-wrapper .commerce-account-section-header-container {
+    margin-bottom: 20px;
+}
+
 /* Content container */
 .commerce-newsletter-content {
     margin-top: 16px;

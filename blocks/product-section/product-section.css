@@ -120,7 +120,7 @@
   pointer-events: none;
 }
 
-.product-section-actions > * {
+.product-section-actions>* {
   pointer-events: auto;
 }
 
@@ -199,24 +199,22 @@
 
 .product-section-price .special-price,
 .product-section-price .price {
-  font-size: 1rem;
+  font-size: 14px;
 }
 
 .product-section-add-to-cart {
-  background: var(--color-brand-700, #1976d2);
+  background: var(--color-brand-700, #000);
   color: white;
   border: none;
   padding: 0.85rem 1rem;
-  border-radius: 999px;
-  font-size: 0.95rem;
+  border-radius: 0;
+  font-size: 16px;
+  line-height: 20px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.3s ease, box-shadow 0.3s ease;
   width: 100%;
-}
-
-.product-section-add-to-cart:hover {
-  background: var(--color-brand-800, #1565c0);
+  text-transform: uppercase;
 }
 
 .product-section-add-to-cart:disabled {

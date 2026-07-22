@@ -34,8 +34,48 @@ export default async function decorate(block) {
     'sign-out': '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>',
   };
 
+  // 1. Detect active item for the mobile header title
+  let activeItemTitle = 'My Account';
+  menuItems.forEach((item) => {
+    let isItemActive = false;
+    if (item.link !== '#') {
+      if (item.link === '/customer/account') {
+        isItemActive = window.location.pathname === rootLink(item.link)
+          || window.location.pathname === item.link;
+      } else {
+        isItemActive = window.location.pathname.includes(item.link);
+      }
+    }
+    if (isItemActive) {
+      activeItemTitle = item.title;
+    }
+  });
+
   const navContainer = document.createElement('nav');
   navContainer.classList.add('commerce-account-sidebar-nav');
+
+  // Add mobile accordion toggle header
+  const mobileHeader = document.createElement('div');
+  mobileHeader.classList.add('commerce-account-sidebar-mobile-header');
+  mobileHeader.innerHTML = `
+    <span class="commerce-account-sidebar-mobile-header-title">${activeItemTitle}</span>
+    <span class="commerce-account-sidebar-mobile-header-arrow">
+      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </span>
+  `;
+  navContainer.appendChild(mobileHeader);
+
+  // Add links wrapper for smooth expand/collapse transition
+  const linksWrapper = document.createElement('div');
+  linksWrapper.classList.add('commerce-account-sidebar-nav-links');
+  navContainer.appendChild(linksWrapper);
+
+  mobileHeader.addEventListener('click', () => {
+    const isOpen = navContainer.classList.toggle('is-open');
+    mobileHeader.classList.toggle('is-open', isOpen);
+  });
 
   // Fetch initial wishlist data to show the correct badge count immediately
   const initialWishlistData = wishlistApi.getPersistedWishlistData();
@@ -95,7 +135,7 @@ export default async function decorate(block) {
       });
     }
 
-    navContainer.appendChild(menuItemEl);
+    linksWrapper.appendChild(menuItemEl);
   });
 
   block.innerHTML = '';
@@ -196,6 +236,9 @@ export default async function decorate(block) {
                       { sku: product.sku, quantity: 1 },
                     ]);
                     events.emit('cart/updated', response);
+                    if (wishlistApi && wishlistApi.removeProductsFromWishlist) {
+                      await wishlistApi.removeProductsFromWishlist([item]);
+                    }
                     // eslint-disable-next-line no-alert
                     alert(`${product.name} added to cart!`);
                   }

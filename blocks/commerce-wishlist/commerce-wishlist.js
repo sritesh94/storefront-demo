@@ -21,6 +21,8 @@ function CustomWishlist({ startShoppingURL }) {
   const [quantities, setQuantities] = useState({});
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState(null);
+  const [perPage, setPerPage] = useState(12);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     let isMounted = true;
@@ -133,6 +135,7 @@ function CustomWishlist({ startShoppingURL }) {
     try {
       setLoading(true);
       await cartApi.addProductsToCart(itemsToAdd);
+      await wishlistApi.removeProductsFromWishlist(wishlist.items);
       setAlert({ type: 'success', message: 'All items added to cart!' });
     } catch (err) {
       console.error(err);
@@ -152,6 +155,7 @@ function CustomWishlist({ startShoppingURL }) {
         optionsUIDs: item.selectedOptions?.map((opt) => opt.uid) || [],
         enteredOptions: item.enteredOptions || [],
       }]);
+      await wishlistApi.removeProductsFromWishlist([item]);
       setAlert({ type: 'success', message: 'Product added to cart!' });
     } catch (err) {
       console.error(err);
@@ -189,16 +193,22 @@ function CustomWishlist({ startShoppingURL }) {
     return h('div', { className: 'wishlist-loading' }, 'Loading Wishlist...');
   }
 
-  const items = wishlist?.items || [];
+  const allItems = wishlist?.items || [];
 
-  if (items.length === 0) {
+  if (allItems.length === 0) {
     return h('div', { className: 'wishlist-empty' }, [
       h('p', {}, 'Your wishlist is empty.'),
       startShoppingURL && h('a', { href: startShoppingURL, className: 'button primary' }, 'Start Shopping'),
     ]);
   }
 
-  const countLabel = items.length === 1 ? '1 Item' : `${items.length} Items`;
+  // ── Pagination logic ──
+  const totalPages = Math.ceil(allItems.length / perPage);
+  const safePage = Math.min(currentPage, totalPages);
+  const startIdx = (safePage - 1) * perPage;
+  const pagedItems = allItems.slice(startIdx, startIdx + perPage);
+
+  const countLabel = allItems.length === 1 ? '1 Item' : `${allItems.length} Items`;
 
   return h('div', { className: 'custom-wishlist-container' }, [
     alert && h('div', { className: `wishlist-alert-banner alert-${alert.type}` }, [
@@ -210,7 +220,7 @@ function CustomWishlist({ startShoppingURL }) {
       h('h2', { className: 'wishlist-heading-count' }, countLabel),
     ]),
 
-    h('div', { className: 'wishlist-grid' }, items.map((item) => {
+    h('div', { className: 'wishlist-grid' }, pagedItems.map((item) => {
       const prod = products[item.product.sku] || item.product;
       const qty = quantities[item.id] ?? item.quantity;
       const imageUrl = prod.images?.[0]?.url || 'https://placehold.co/288x288';
@@ -250,7 +260,7 @@ function CustomWishlist({ startShoppingURL }) {
           h('a', { href: pdpLink, className: 'wishlist-card-action-btn edit-action' }, [
             h('span', { className: 'action-icon edit-icon' }, [
               h('svg', {
-                viewBox: '0 0 24 24', width: '14', height: '14', stroke: 'currentColor', 'stroke-width': '2', fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+                viewBox: '0 0 24 24', width: '24', height: '24', stroke: 'currentColor', 'stroke-width': '2', fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round',
               }, [
                 h('path', { d: 'M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7' }),
                 h('path', { d: 'M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z' }),
@@ -264,15 +274,29 @@ function CustomWishlist({ startShoppingURL }) {
           }, [
             h('span', { className: 'action-icon delete-icon' }, [
               h('svg', {
-                viewBox: '0 0 24 24', width: '14', height: '14', stroke: 'currentColor', 'stroke-width': '2', fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+                width: '24', height: '24', viewBox: '0 0 24 24', fill: 'none', xmlns: 'http://www.w3.org/2000/svg',
               }, [
-                h('polyline', { points: '3 6 5 6 21 6' }),
-                h('path', { d: 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2' }),
+                h('path', {
+                  'fill-rule': 'evenodd', 'clip-rule': 'evenodd', d: 'M3 7.00004C3 6.44775 3.44772 6.00004 4 6.00004H20C20.5523 6.00004 21 6.44775 21 7.00004C21 7.55232 20.5523 8.00004 20 8.00004H4C3.44772 8.00004 3 7.55232 3 7.00004Z', fill: '#FA1792',
+                }),
+                h('path', {
+                  'fill-rule': 'evenodd', 'clip-rule': 'evenodd', d: 'M10 9.99996C10.5523 9.99996 11 10.4477 11 11V17C11 17.5522 10.5523 18 10 18C9.44772 18 9 17.5522 9 17V11C9 10.4477 9.44772 9.99996 10 9.99996Z', fill: '#FA1792',
+                }),
+                h('path', {
+                  'fill-rule': 'evenodd', 'clip-rule': 'evenodd', d: 'M14 9.99996C14.5523 9.99996 15 10.4477 15 11V17C15 17.5522 14.5523 18 14 18C13.4478 18 13 17.5522 13 17V11C13 10.4477 13.4478 9.99996 14 9.99996Z', fill: '#FA1792',
+                }),
+                h('path', {
+                  'fill-rule': 'evenodd', 'clip-rule': 'evenodd', d: 'M4.91699 6.00349C5.46737 5.95763 5.95072 6.36661 5.99658 6.91699L6.99658 18.917C6.99888 18.9446 7.00004 18.9723 7.00004 19C7.00004 19.2653 7.10539 19.5196 7.29293 19.7071C7.48047 19.8947 7.73482 20 8.00004 20H16C16.2653 20 16.5196 19.8947 16.7071 19.7071C16.8947 19.5196 17 19.2653 17 19C17 18.9723 17.0012 18.9446 17.0035 18.917L18.0035 6.91699C18.0494 6.36661 18.5327 5.95763 19.0831 6.00349C19.6335 6.04936 20.0424 6.53271 19.9966 7.08308L18.9997 19.0458C18.9878 19.8249 18.6732 20.5695 18.1214 21.1214C17.5587 21.684 16.7957 22 16 22H8.00004C7.20439 22 6.44132 21.684 5.87872 21.1214C5.32691 20.5695 5.01226 19.8249 5.00039 19.0458L4.00349 7.08308C3.95763 6.53271 4.36661 6.04936 4.91699 6.00349Z', fill: '#FA1792',
+                }),
+                h('path', {
+                  'fill-rule': 'evenodd', 'clip-rule': 'evenodd', d: 'M8.5858 2.58579C8.96088 2.21071 9.46959 2 10 2H14C14.5305 2 15.0392 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V7C16 7.55229 15.5523 8 15 8C14.4477 8 14 7.55229 14 7V4H10L10 7C10 7.55229 9.5523 8 9.00002 8C8.44773 8 8.00002 7.55229 8.00002 7V4C8.00002 3.46957 8.21073 2.96086 8.5858 2.58579Z', fill: '#FA1792',
+                }),
               ]),
             ]),
             'Delete',
           ]),
         ]),
+
       ]);
     })),
 
@@ -284,8 +308,17 @@ function CustomWishlist({ startShoppingURL }) {
       ]),
       h('div', { className: 'wishlist-footer-per-page' }, [
         h('span', {}, 'Show '),
-        h('select', { className: 'per-page-select' }, [
+        h('select', {
+          className: 'per-page-select',
+          value: perPage,
+          onChange: (e) => {
+            setPerPage(Number(e.target.value));
+            setCurrentPage(1);
+          },
+        }, [
           h('option', { value: '12' }, '12'),
+          h('option', { value: '24' }, '24'),
+          h('option', { value: '36' }, '36'),
         ]),
         h('span', {}, ' Product Per Page'),
       ]),
@@ -304,7 +337,24 @@ export default async function decorate(block) {
     'start-shopping-url': startShoppingURL = '',
   } = readBlockConfig(block);
 
+  // Prepend a header container inside the block
+  const headerContainer = document.createElement('div');
+  headerContainer.classList.add('commerce-account-section-header-container');
+
+  const headingEl = document.createElement('h2');
+  headingEl.classList.add('commerce-account-section-heading');
+  headingEl.innerText = 'My Wishlist';
+  headerContainer.appendChild(headingEl);
+
+  block.innerHTML = '';
+  block.appendChild(headerContainer);
+
+  // Create a separate div for the wishlist renderer to mount into
+  const wishlistContainer = document.createElement('div');
+  wishlistContainer.classList.add('wishlist-container-el');
+  block.appendChild(wishlistContainer);
+
   await wishlistRenderer.render(CustomWishlist, {
     startShoppingURL: startShoppingURL ? rootLink(startShoppingURL) : undefined,
-  })(block);
+  })(wishlistContainer);
 }

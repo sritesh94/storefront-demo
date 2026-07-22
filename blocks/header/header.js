@@ -21,6 +21,284 @@ import renderSellerAssistedBuyingBanner from './renderSellerAssistedBuyingBanner
 
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+let currentActiveTabIdentifier = null;
+
+const SELECTORS = {
+  TOP_TABS: '.default-content-wrapper > ul > li',
+  LEVEL2: '.submenu-wrapper li.nav-drop',
+  SUBMENU: '.submenu-wrapper',
+  CHILD_LIST: ':scope > ul',
+};
+
+const CLASSES = {
+  ACTIVE: 'active',
+  NAV_DROP: 'nav-drop',
+};
+
+function normalizePath(path) {
+  return path.replace(/\/index$/, '').replace(/\/+$/, '');
+}
+
+function getTabLabel(topTab) {
+  if (!topTab) return '';
+  const link = topTab.querySelector(':scope > a');
+  return link ? link.textContent.trim() : topTab.textContent.trim();
+}
+
+function isRouteMatch(currentPath, tabPath) {
+  const normCurrent = normalizePath(currentPath);
+  const normTab = normalizePath(tabPath);
+  if (!normTab || normTab === '') return false;
+  return normCurrent === normTab || normCurrent.startsWith(`${normTab}/`);
+}
+
+function setActive(element, active) {
+  if (!element) return;
+  element.classList.toggle(CLASSES.ACTIVE, active);
+  element.setAttribute('aria-expanded', active ? 'true' : 'false');
+}
+
+function setExpanded(element, expanded) {
+  if (!element) return;
+  element.style.maxHeight = expanded ? `${element.scrollHeight}px` : '0px';
+}
+
+function resetPanelScroll(panel) {
+  if (panel) panel.scrollTop = 0;
+}
+
+function expandPanel(element, panel) {
+  if (!element) return;
+  setActive(element, true);
+  if (panel) setExpanded(panel, true);
+}
+
+function collapsePanel(element, panel) {
+  if (!element) return;
+  setActive(element, false);
+  if (panel) setExpanded(panel, false);
+}
+
+function collapseNestedAccordions(tab) {
+  if (!tab) return;
+  tab.querySelectorAll(SELECTORS.LEVEL2).forEach((item) => {
+    const childUl = item.querySelector(SELECTORS.CHILD_LIST);
+    collapsePanel(item, childUl);
+  });
+}
+
+function resetInlineStyles(navSections) {
+  if (!navSections) return;
+  navSections.querySelectorAll(`${SELECTORS.SUBMENU}, ${SELECTORS.CHILD_LIST}`).forEach((el) => {
+    el.removeAttribute('style');
+  });
+}
+
+function cleanupMobileState(navSections) {
+  if (!navSections) return;
+  navSections
+    .querySelectorAll(`${SELECTORS.TOP_TABS}.${CLASSES.ACTIVE}, ${SELECTORS.LEVEL2}.${CLASSES.ACTIVE}`)
+    .forEach((item) => {
+      const panel = item.querySelector(`${SELECTORS.SUBMENU}, ${SELECTORS.CHILD_LIST}`);
+      collapsePanel(item, panel);
+    });
+  resetInlineStyles(navSections);
+}
+
+function scrollActiveTab(topTab, navSections) {
+  const tabBar = navSections.querySelector(':scope .default-content-wrapper > ul');
+  if (tabBar && topTab) {
+    const scrollTarget = topTab.offsetLeft - (tabBar.clientWidth / 2) + (topTab.clientWidth / 2);
+    tabBar.scrollTo({
+      left: Math.max(0, scrollTarget),
+      behavior: prefersReducedMotion.matches ? 'auto' : 'smooth',
+    });
+  }
+}
+
+function handleAccordionClick(level2Item, isKeyboard, event) {
+  const childUl = level2Item.querySelector(SELECTORS.CHILD_LIST);
+
+  if (childUl) {
+    event.preventDefault();
+    const siblings = Array.from(level2Item.parentElement.children);
+    const isCurrentlyActive = level2Item.classList.contains(CLASSES.ACTIVE);
+
+    siblings.forEach((sibling) => {
+      if (sibling !== level2Item && sibling.classList.contains(CLASSES.NAV_DROP)) {
+        const sibUl = sibling.querySelector(SELECTORS.CHILD_LIST);
+        collapsePanel(sibling, sibUl);
+      }
+    });
+
+    if (isCurrentlyActive) {
+      collapsePanel(level2Item, childUl);
+    } else {
+      expandPanel(level2Item, childUl);
+    }
+  }
+}
+
+function handleTopTabClick(topTab, topTabsCache, navSections, event) {
+  const submenuWrapper = topTab.querySelector('.submenu-wrapper');
+
+  if (submenuWrapper) {
+    event.preventDefault();
+    currentActiveTabIdentifier = getTabLabel(topTab);
+    const isActive = topTab.classList.contains(CLASSES.ACTIVE);
+
+    if (!isActive) {
+      topTabsCache.forEach((t) => {
+        if (t !== topTab) {
+          collapseNestedAccordions(t);
+          const sub = t.querySelector('.submenu-wrapper');
+          collapsePanel(t, sub);
+        }
+      });
+
+      expandPanel(topTab, submenuWrapper);
+      resetPanelScroll(submenuWrapper);
+      scrollActiveTab(topTab, navSections);
+    }
+  }
+}
+
+function activateTabFromRoute(navSections) {
+  if (isDesktop.matches || !navSections) return;
+  const topTabs = Array.from(navSections.querySelectorAll(SELECTORS.TOP_TABS))
+    .filter((tab) => tab.querySelector(SELECTORS.SUBMENU));
+  if (!topTabs.length) return;
+
+  let targetTab = null;
+  if (currentActiveTabIdentifier) {
+    targetTab = topTabs.find((t) => getTabLabel(t) === currentActiveTabIdentifier);
+  }
+
+  if (targetTab) {
+    topTabs.forEach((tab) => {
+      const submenu = tab.querySelector(SELECTORS.SUBMENU);
+      if (tab === targetTab) {
+        expandPanel(tab, submenu);
+      } else {
+        collapsePanel(tab, submenu);
+      }
+    });
+    return;
+  }
+
+  const currentPath = normalizePath(window.location.pathname.toLowerCase());
+
+  let matchedTab = topTabs.find((tab) => {
+    const link = tab.querySelector(':scope > a');
+    if (!link) return false;
+    const tabPath = new URL(link.href, window.location.origin).pathname.toLowerCase();
+    return isRouteMatch(currentPath, tabPath);
+  });
+
+  if (!matchedTab) [matchedTab] = topTabs;
+
+  currentActiveTabIdentifier = getTabLabel(matchedTab);
+
+  topTabs.forEach((tab) => {
+    const submenu = tab.querySelector(SELECTORS.SUBMENU);
+    if (tab === matchedTab) {
+      expandPanel(tab, submenu);
+    } else {
+      collapsePanel(tab, submenu);
+    }
+  });
+}
+
+function syncMobileNavigationState(navSections) {
+  if (isDesktop.matches || !navSections) return;
+  activateTabFromRoute(navSections);
+}
+
+function initMobileNavigation(navSections) {
+  if (!navSections || navSections.dataset.mobileNavInitialized === 'true') return;
+  navSections.dataset.mobileNavInitialized = 'true';
+
+  let topTabsCache = Array.from(navSections.querySelectorAll(SELECTORS.TOP_TABS));
+
+  const refreshCacheIfNeeded = () => {
+    const current = Array.from(navSections.querySelectorAll(SELECTORS.TOP_TABS));
+    const changed = current.length !== topTabsCache.length
+      || current.some((node, i) => node !== topTabsCache[i]);
+    if (changed) {
+      topTabsCache = current;
+    }
+  };
+
+  const processUserInteraction = (event, isKeyboard) => {
+    if (isDesktop.matches) return;
+    refreshCacheIfNeeded();
+
+    const insideSubmenu = event.target.closest(SELECTORS.SUBMENU);
+    if (insideSubmenu) {
+      const level2Item = event.target.closest(SELECTORS.LEVEL2);
+      if (level2Item && navSections.contains(level2Item)) {
+        handleAccordionClick(level2Item, isKeyboard, event);
+      }
+      return;
+    }
+
+    const topTab = event.target.closest(SELECTORS.TOP_TABS);
+    if (topTab && navSections.contains(topTab)) {
+      handleTopTabClick(topTab, topTabsCache, navSections, event);
+    }
+  };
+
+  const handleCaptureClick = (event) => {
+    if (isDesktop.matches) return;
+
+    const insideSubmenu = event.target.closest(SELECTORS.SUBMENU);
+    if (insideSubmenu) {
+      return;
+    }
+
+    const topTab = event.target.closest(SELECTORS.TOP_TABS);
+    if (topTab && navSections.contains(topTab)) {
+      const hasSubmenu = topTab.querySelector(SELECTORS.SUBMENU);
+      if (hasSubmenu) {
+        event.preventDefault();
+      }
+    }
+  };
+
+  const handleClick = (event) => processUserInteraction(event, false);
+  const handleKeydown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      processUserInteraction(event, true);
+    }
+  };
+
+  navSections.mobileNavHandler = handleClick;
+  navSections.mobileKeyHandler = handleKeydown;
+  navSections.mobileCaptureHandler = handleCaptureClick;
+
+  navSections.addEventListener('click', handleCaptureClick, true);
+  navSections.addEventListener('click', handleClick);
+  navSections.addEventListener('keydown', handleKeydown);
+
+  syncMobileNavigationState(navSections);
+}
+
+export function destroyMobileNavigation(navSections) {
+  if (!navSections || !navSections.mobileNavHandler) return;
+  cleanupMobileState(navSections);
+  navSections.removeEventListener('click', navSections.mobileNavHandler);
+  navSections.removeEventListener('keydown', navSections.mobileKeyHandler);
+  if (navSections.mobileCaptureHandler) {
+    navSections.removeEventListener('click', navSections.mobileCaptureHandler, true);
+  }
+  delete navSections.mobileNavHandler;
+  delete navSections.mobileKeyHandler;
+  delete navSections.mobileCaptureHandler;
+  delete navSections.dataset.mobileNavInitialized;
+}
 
 const labels = await fetchPlaceholders();
 
@@ -140,6 +418,7 @@ function closeOnEscape(e) {
 }
 
 function closeOnFocusLost(e) {
+  if (!isDesktop.matches) return;
   const nav = e.currentTarget;
   if (!nav.contains(e.relatedTarget)) {
     const navSections = nav.querySelector('.nav-sections');
@@ -148,8 +427,6 @@ function closeOnFocusLost(e) {
     if (navSectionExpanded && isDesktop.matches) {
       toggleAllNavSections(navSections, false);
       overlay.classList.remove('show');
-    } else if (!isDesktop.matches) {
-      toggleMenu(nav, navSections, true);
     }
   }
 }
@@ -174,7 +451,7 @@ function focusNavSection() {
  * @param {Boolean} expanded Whether the element should be expanded or collapsed
  */
 function toggleAllNavSections(sections, expanded = false) {
-  if (!sections) return;
+  if (!sections || !isDesktop.matches) return;
   sections
     .querySelectorAll('.nav-sections .default-content-wrapper > ul > li')
     .forEach((section) => {
@@ -195,6 +472,14 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
   toggleAllNavSections(navSections, expanded || isDesktop.matches ? 'false' : 'true');
   button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
+  if (!expanded && navSections) {
+    currentActiveTabIdentifier = null;
+    cleanupMobileState(navSections);
+    syncMobileNavigationState(navSections);
+  } else if (expanded && navSections) {
+    currentActiveTabIdentifier = null;
+    cleanupMobileState(navSections);
+  }
   // enable nav dropdown keyboard accessibility
   if (navSections) {
     const navDrops = navSections.querySelectorAll('.nav-drop');
@@ -207,15 +492,14 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
       });
     } else {
       navDrops.forEach((drop) => {
-        drop.classList.remove('active');
         drop.removeAttribute('tabindex');
         drop.removeEventListener('focus', focusNavSection);
       });
     }
   }
 
-  // enable menu collapse on escape keypress
-  if (!expanded || isDesktop.matches) {
+  // enable menu collapse on escape keypress for desktop
+  if (isDesktop.matches && !expanded) {
     // collapse menu on escape press
     window.addEventListener('keydown', closeOnEscape);
     // collapse menu on focus lost
@@ -315,12 +599,6 @@ export default async function decorate(block) {
       .forEach((navSection) => {
         if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
         setupSubmenu(navSection);
-        navSection.addEventListener('click', (event) => {
-          if (event.target.tagName === 'A') return;
-          if (!isDesktop.matches) {
-            navSection.classList.toggle('active');
-          }
-        });
         navSection.addEventListener('mouseenter', () => {
           toggleAllNavSections(navSections);
           if (isDesktop.matches) {
@@ -333,6 +611,8 @@ export default async function decorate(block) {
           }
         });
       });
+
+    initMobileNavigation(navSections);
   }
 
   navTools = nav.querySelector('.nav-tools');
@@ -714,7 +994,14 @@ export default async function decorate(block) {
   nav.setAttribute('aria-expanded', 'false');
   // prevent mobile nav behavior on window resize
   toggleMenu(nav, navSections, isDesktop.matches);
-  isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
+  isDesktop.addEventListener('change', () => {
+    toggleMenu(nav, navSections, isDesktop.matches);
+    if (isDesktop.matches && navSections) {
+      cleanupMobileState(navSections);
+    } else if (navSections && nav.getAttribute('aria-expanded') === 'true') {
+      syncMobileNavigationState(navSections);
+    }
+  });
 
   renderAuthCombine(
     navSections,

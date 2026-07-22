@@ -22,16 +22,18 @@
         0 80px 80px -20px rgb(154 156 165 / 8%);
 }
 
-body.columns main>.section.commerce-account-sidebar-container {
-    max-width: 285px;
-}
+@media (min-width: 900px) {
+    body.columns main>.section.commerce-account-sidebar-container {
+        max-width: 285px;
+    }
 
-body.columns main>.commerce-account-sidebar-container+.section {
-    padding-left: 30px;
-}
+    body.columns main>.commerce-account-sidebar-container+.section {
+        padding-left: 30px;
+    }
 
-body.columns main>.commerce-account-sidebar-container+.section>div {
-    margin: 0;
+    body.columns main>.commerce-account-sidebar-container+.section>div {
+        margin: 0;
+    }
 }
 
 .commerce-account-sidebar-nav a.commerce-account-sidebar-item {
@@ -85,7 +87,6 @@ body.columns main>.commerce-account-sidebar-container+.section>div {
     color: #fff;
 }
 
-
 .commerce-account-sidebar-item-badge {
     background-color: #EF6031;
     color: #fff;
@@ -100,6 +101,131 @@ body.columns main>.commerce-account-sidebar-container+.section>div {
     align-items: center;
     font-size: 12px;
     line-height: 18px;
+}
+
+/* Mobile Accordion Styles */
+.commerce-account-sidebar-mobile-header {
+    display: none;
+}
+
+@media screen and (min-width: 769px) and (max-width: 899px) {
+    body:has(.commerce-account-sidebar-container) main {
+        padding-bottom: 0;
+        padding-top: 0;
+    }
+
+    body.columns main>.section.commerce-account-sidebar-container {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 899px) {
+    .commerce-account-sidebar-container+.section>div {
+        width: 100%;
+    }
+
+    .commerce-account-sidebar-wishlist-section {
+        display: none;
+    }
+
+    body .commerce-orders-list,
+    body.columns main>.section:last-child>.commerce-customer-information-wrapper,
+    body.columns main>.section:last-child>.commerce-addresses-wrapper,
+    body.columns main>.section:last-child>.commerce-orders-list-wrapper {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 767px) {
+    body:has(.commerce-account-sidebar-container) main {
+        padding: 0;
+    }
+
+    .commerce-account-sidebar-container+.section {
+        padding: 20px 20px 0 !important;
+    }
+
+    .commerce-account-sidebar-nav {
+        box-shadow: none !important;
+        padding: 0 !important;
+        background-color: transparent !important;
+    }
+
+    .commerce-account-sidebar-mobile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 20px;
+        background-color: #f9f9f9;
+        border-top: 1px solid #e0e0e0;
+        border-bottom: 1px solid #e0e0e0;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 700;
+        color: #1d1d1b;
+        letter-spacing: 0;
+    }
+
+    .commerce-account-sidebar-mobile-header-arrow svg {
+        transition: transform 0.3s ease;
+        display: block;
+    }
+
+    .commerce-account-sidebar-mobile-header.is-open .commerce-account-sidebar-mobile-header-arrow svg {
+        transform: rotate(180deg);
+    }
+
+    .commerce-account-sidebar-nav-links {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out;
+        background-color: #f9f9f9;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 0;
+    }
+
+    nav.commerce-account-sidebar-nav.is-open .commerce-account-sidebar-nav-links {
+        max-height: 600px;
+        opacity: 1;
+        padding: 8px 0;
+    }
+
+    .commerce-account-sidebar-item-icon {
+        display: none !important;
+    }
+
+    .commerce-account-sidebar-nav a.commerce-account-sidebar-item {
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 400;
+        color: #1d1d1b !important;
+        background: transparent;
+    }
+
+    .commerce-account-sidebar-nav a.commerce-account-sidebar-item:hover {
+        background-color: #f0f0f0;
+    }
+
+    .commerce-account-sidebar-nav a.commerce-account-sidebar-item-active {
+        background-color: #f0f0f0 !important;
+        color: #000 !important;
+        font-weight: 700 !important;
+        border-left: 3px solid #FA1792 !important;
+        padding-left: 17px !important;
+    }
+
+    .commerce-account-sidebar-nav a.commerce-account-sidebar-item-active .commerce-account-sidebar-item-title {
+        color: #000 !important;
+    }
+
+    /* Separators inside list */
+    .commerce-account-sidebar-nav-links a[href*="/customer/wishlist"],
+    .commerce-account-sidebar-nav-links a[href*="/customer/account/edit"] {
+        border-bottom: 1px solid #e0e0e0 !important;
+        margin-bottom: 8px !important;
+        padding-bottom: 16px !important;
+    }
 }
 
 /* Sidebar Wishlist section */

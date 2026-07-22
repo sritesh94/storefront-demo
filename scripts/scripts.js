@@ -24,9 +24,6 @@ import {
   checkAndRenderCategoryPage,
   checkAndRenderProductPage,
 } from './commerce.js';
-import { initHomepagePromoCountdown } from './homepage-countdown.js';
-import initHomepageVideoCarousel from './homepage-video-carousel.js';
-import initHomepageCommerceVideoCarousel from './homepage-commerce-video-carousel.js';
 
 /**
  * Builds hero block and prepends to main in a new section.
@@ -223,9 +220,6 @@ async function loadEager(doc) {
     }
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
-    initHomepagePromoCountdown(main);
-    initHomepageVideoCarousel(main);
-    initHomepageCommerceVideoCarousel(main);
   }
 
   try {
@@ -247,6 +241,30 @@ async function loadLazy(doc) {
 
   const main = doc.querySelector('main');
   await loadSections(main);
+
+  if (main.querySelector('.homepage-promo-section')) {
+    import('./homepage-countdown.js').then(({ initHomepagePromoCountdown }) => {
+      initHomepagePromoCountdown(main);
+    });
+  }
+
+  if (main.querySelector('.homepage-video-sec')) {
+    import('./homepage-video-carousel.js').then(({ default: initVideoCarousel }) => {
+      initVideoCarousel(main);
+    });
+  }
+
+  if (main.querySelector('.homepage-commerce-video')) {
+    import('./homepage-commerce-video-carousel.js').then(({ default: initCommerceVideoCarousel }) => {
+      initCommerceVideoCarousel(main);
+    });
+  }
+
+  if (main.querySelector('.homepage-spotlight-section')) {
+    import('./homepage-spotlight-carousel.js').then(({ default: initSpotlightCarousel }) => {
+      initSpotlightCarousel(main);
+    });
+  }
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;

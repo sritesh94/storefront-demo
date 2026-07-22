@@ -1,5 +1,6 @@
 import { render as accountRenderer } from '@dropins/storefront-account/render.js';
 import { OrdersList } from '@dropins/storefront-account/containers/OrdersList.js';
+import { getOrderHistoryList } from '@dropins/storefront-account/api.js';
 import { tryRenderAemAssetsImage } from '@dropins/tools/lib/aem/assets.js';
 import { readBlockConfig } from '../../scripts/aem.js';
 import {
@@ -15,6 +16,48 @@ import {
 
 // Initialize
 import '../../scripts/initializers/account.js';
+
+let orderItemsCache = null;
+let isFetchingOrderItems = false;
+
+/**
+ * Fetches order items (product names & SKUs) for all customer orders
+ * and returns a map keyed by order number.
+ * @returns {Promise<Map<string, Array<{productName: string, sku: string, topLevelSku: string}>>>}
+ */
+async function fetchOrderItemsMap() {
+  if (orderItemsCache) return orderItemsCache;
+  if (isFetchingOrderItems) return new Map();
+
+  isFetchingOrderItems = true;
+  try {
+    const data = await getOrderHistoryList(100, '{"viewAll":true}', 1);
+    const map = new Map();
+    if (data?.items) {
+      data.items.forEach((order) => {
+        const orderNum = String(order.number || order.id || '').trim().toLowerCase();
+        const items = (order.items || []).map((item) => ({
+          productName: (item.productName || '').toLowerCase(),
+          sku: (item.sku || '').toLowerCase(),
+          topLevelSku: (item.topLevelSku || '').toLowerCase(),
+        }));
+        if (orderNum) {
+          map.set(orderNum, items);
+          const unpadded = orderNum.replace(/^0+/, '');
+          if (unpadded && unpadded !== orderNum) {
+            map.set(unpadded, items);
+          }
+        }
+      });
+    }
+    orderItemsCache = map;
+  } catch (err) {
+    orderItemsCache = new Map();
+  } finally {
+    isFetchingOrderItems = false;
+  }
+  return orderItemsCache;
+}
 
 /**
  * Reads data from a dropin card element and returns a structured object.
@@ -178,6 +221,36 @@ export default async function decorate(block) {
 
     block.appendChild(headerContainer);
 
+    // Search input field (shown on full orders page)
+    let searchInput = null;
+    if (!isMinified) {
+      const searchContainer = document.createElement('div');
+      searchContainer.classList.add('orders-search-container');
+
+      const searchBox = document.createElement('div');
+      searchBox.classList.add('orders-search-box');
+
+      searchInput = document.createElement('input');
+      searchInput.type = 'text';
+      searchInput.classList.add('orders-search-input');
+      searchInput.placeholder = 'Search by SKU or Product Name';
+      searchInput.setAttribute('aria-label', 'Search by SKU or Product Name');
+
+      const searchIcon = document.createElement('span');
+      searchIcon.classList.add('orders-search-icon');
+      searchIcon.innerHTML = `
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      `;
+
+      searchBox.appendChild(searchInput);
+      searchBox.appendChild(searchIcon);
+      searchContainer.appendChild(searchBox);
+      block.appendChild(searchContainer);
+    }
+
     // Hidden dropin container — the dropin renders here; we read its output
     // and produce a proper <table> in the visible area.
     const dropinContainer = document.createElement('div');
@@ -229,6 +302,76 @@ export default async function decorate(block) {
     })(dropinContainer);
 
     /**
+     * Filters displayed orders based on search query matching Order ID, SKU, or Product Name.
+     */
+    const filterOrders = () => {
+      if (!searchInput) return;
+      const rawQuery = searchInput.value.trim().toLowerCase();
+      const table = tableContainer.querySelector('.orders-table');
+      if (!table) return;
+
+      const rows = table.querySelectorAll('tbody tr');
+      let visibleCount = 0;
+
+      rows.forEach((tr) => {
+        if (!rawQuery) {
+          tr.style.display = '';
+          visibleCount += 1;
+          return;
+        }
+
+        const orderNumEl = tr.querySelector('.orders-table__order-number');
+        const orderNum = orderNumEl ? orderNumEl.textContent.trim().toLowerCase() : '';
+        const unpaddedOrderNum = orderNum.replace(/^0+/, '');
+        const unpaddedQuery = rawQuery.replace(/^0+/, '');
+        const rowText = tr.textContent.toLowerCase();
+
+        // 1. Check Order ID & row text match
+        let matches = orderNum.includes(rawQuery)
+          || (unpaddedOrderNum && unpaddedQuery && unpaddedOrderNum.includes(unpaddedQuery))
+          || rowText.includes(rawQuery);
+
+        // 2. Check SKU & Product Name match from order items cache
+        if (!matches && orderItemsCache) {
+          const items = orderItemsCache.get(orderNum)
+            || (unpaddedOrderNum ? orderItemsCache.get(unpaddedOrderNum) : null);
+          if (items && items.length > 0) {
+            matches = items.some(
+              (item) => item.productName.includes(rawQuery)
+                || item.sku.includes(rawQuery)
+                || item.topLevelSku.includes(rawQuery),
+            );
+          }
+        }
+
+        if (matches) {
+          tr.style.display = '';
+          visibleCount += 1;
+        } else {
+          tr.style.display = 'none';
+        }
+      });
+
+      let emptyMsg = tableContainer.querySelector('.orders-search-empty');
+      if (visibleCount === 0 && rawQuery !== '') {
+        table.style.display = 'none';
+        if (!emptyMsg) {
+          emptyMsg = document.createElement('p');
+          emptyMsg.classList.add('orders-empty', 'orders-search-empty');
+          emptyMsg.textContent = 'No orders found matching your search.';
+          tableContainer.appendChild(emptyMsg);
+        } else {
+          emptyMsg.style.display = '';
+        }
+      } else {
+        table.style.display = '';
+        if (emptyMsg) {
+          emptyMsg.style.display = 'none';
+        }
+      }
+    };
+
+    /**
      * Moves the date filter from the dropin container to the visible filter area,
      * then rebuilds the HTML table from the dropin's rendered cards.
      */
@@ -273,7 +416,18 @@ export default async function decorate(block) {
         footerWrapper.appendChild(footerLink.cloneNode(true));
         tableContainer.appendChild(footerWrapper);
       }
+
+      if (searchInput) {
+        filterOrders();
+        fetchOrderItemsMap().then(() => {
+          filterOrders();
+        });
+      }
     };
+
+    if (searchInput) {
+      searchInput.addEventListener('input', filterOrders);
+    }
 
     // Observe dropin for initial render and any re-renders (filter change, pagination)
     let rebuildTimer = null;

@@ -268,12 +268,6 @@ const renderAuthCombine = (navSections, toggleMenu) => {
           authCombineNavElement.style.display = 'none';
           popupMenuContainer.innerHTML = '';
           popupElement.style.minWidth = '250px';
-          if (headerLoginButton) {
-            const spanElementText = headerLoginButton.querySelector('span');
-            spanElementText.textContent = `Hi, ${getCookie(
-              'auth_dropin_firstname',
-            )}`;
-          }
           popupMenuContainer.insertAdjacentHTML(
             'afterend',
             `<ul class="popupMenuUrlList">

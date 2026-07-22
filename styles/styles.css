@@ -185,6 +185,8 @@ footer .footer {
 header .header[data-block-status="loaded"],
 footer .footer[data-block-status="loaded"] {
   visibility: visible;
+  z-index: 10;
+  position: relative;
 }
 
 h1,
@@ -603,6 +605,12 @@ body.columns main {
   box-sizing: border-box;
 }
 
+@media (max-width: 899px) {
+  body.columns main {
+    padding-top: 120px;
+  }
+}
+
 body.columns main>.section {
   flex: 1;
   flex-basis: 100%;
@@ -639,7 +647,7 @@ body.columns main>.section:empty {
 
 @media (min-width: 600px) {
   body.columns main {
-    padding: var(--spacing-large) var(--spacing-big);
+    padding: 80px var(--spacing-big) 64px;
   }
 }
 
@@ -654,7 +662,7 @@ body.columns main>.section:empty {
 
   body.columns main>.section {
     flex: 1;
-    flex-basis: var(--column-width, auto);
+    width: calc(100% - 315px);
   }
 }
 

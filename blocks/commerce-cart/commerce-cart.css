@@ -18,8 +18,10 @@
 }
 
 .cart__wrapper[hidden],
-.cart__empty-cart[hidden] {
-  display: none;
+.cart__empty-cart[hidden],
+.cart__table-headers[hidden],
+.cart__actions-bottom[hidden] {
+  display: none !important;
 }
 
 .cart__gift-options {
