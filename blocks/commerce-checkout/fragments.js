@@ -207,9 +207,16 @@ export function createAddressSummary(address, onEdit = null) {
 
   if (!address) return el;
 
+  let streetLines = [];
+  if (Array.isArray(address.street)) {
+    streetLines = address.street;
+  } else if (typeof address.street === 'string') {
+    streetLines = [address.street];
+  }
+
   const parts = [
     [address.firstName, address.lastName].filter(Boolean).join(' '),
-    address.street?.filter(Boolean).join(', '),
+    streetLines.filter(Boolean).join(', '),
     [
       address.city,
       typeof address.region === 'object'

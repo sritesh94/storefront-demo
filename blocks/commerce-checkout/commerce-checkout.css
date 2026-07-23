@@ -1,16 +1,12 @@
 .checkout__content {
     display: flex;
-    gap: 100px;
+    gap: 50px;
     margin-top: 60px;
     flex-wrap: wrap;
 }
 
 .checkout__merged-cart-banner {
     width: 100%;
-}
-
-.checkout__aside {
-    width: 370px;
 }
 
 .checkout__shipping-address-form.checkout__block.dropin-design .dropin-divider--primary.dropin-header-container__divider {
@@ -32,8 +28,37 @@
     flex: 1;
 }
 
-.account-addresses-wrapper__footer-section {
+.checkout__main .account-addresses-wrapper__footer-section {
     margin-top: 50px;
+    width: 100%;
+}
+
+.checkout__main .account-addresses-wrapper .account-addresses-form__footer__wrapper {
+    padding: 0;
+    border: 0 !important;
+}
+
+.account-addresses-wrapper--select-view > .account-addresses-wrapper__label {
+    max-width: 394px;
+    width: 100%;
+}
+
+.account-addresses-wrapper--select-view > .account-addresses-wrapper__label:not(:last-of-type) {
+    margin-bottom: 20px;
+}
+
+.checkout__main .account-addresses-wrapper--select-view .account-addresses-wrapper__footer-section .account-addresses-wrapper__label {
+    max-width: 100%;
+}
+
+.checkout-place-order button.dropin-button.dropin-button--primary {
+    background-color: #000;
+    color: #fff;
+    border-radius: 0;
+}
+
+.checkout__main .checkout-login-form__heading {
+    gap: 10px;
 }
 
 .account-addresses-wrapper__label span.account-actions-address.account-actions-address--address.account-actions-address--selectable {
@@ -62,17 +87,9 @@
     letter-spacing: 0;
 }
 
-.account-addresses-wrapper--select-view .account-addresses-wrapper__label>.account-address-card {
-    border-color: #B0B0B0 !important;
+.account-addresses-wrapper--select-view .account-addresses-wrapper__label > .account-address-card {
+    border-color: #b0b0b0 !important;
     max-width: 394px;
-}
-
-.account-addresses-wrapper--select-view>.account-addresses-wrapper__label {
-    max-width: 394px;
-}
-
-.account-addresses-wrapper--select-view>.account-addresses-wrapper__label:not(:last-of-type) {
-    margin-bottom: 20px;
 }
 
 
@@ -178,6 +195,10 @@
 .checkout__bill-to-shipping:has(> :empty),
 .checkout__gift-options:has(.cart-gift-options-view--readonly:empty) {
     display: none;
+}
+
+.checkout__aside {
+    width: 100%;
 }
 
 /* Hide aside containers when there is a server error */
@@ -303,7 +324,16 @@
     display: none;
 }
 
-@media only screen and (min-width: 320px) and (max-width: 768px) {
+@media only screen and (min-width: 320px) and (max-width: 899px) {
+    div.checkout__billing-step .dropin-header-container__title {
+        margin-top: 0;
+    }
+
+    div.checkout-place-order {
+        background-color: transparent;
+        padding: 0;
+    }
+
     .checkout__main,
     .checkout__aside {
         display: contents;
@@ -313,16 +343,36 @@
         order: 3;
     }
 
+    .checkout-step {
+        width: 100%;
+    }
+
+    div.checkout-step__body .dropin-login-form__form,
+    div.checkout-step__body .account-form.account-address-form {
+        max-width: 100%;
+    }
+
     .checkout__heading {
         order: 1;
     }
 
-    .checkout__aside-summary-card {
+    div.checkout__aside-summary-card {
         order: 4;
+        width: 100%;
+        box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
     }
 
     .checkout__place-order {
         order: 5;
+    }
+
+    .checkout__main .checkout-login-form__heading-label {
+        margin-top: 0;
+    }
+
+    .checkout__main .checkout-login-form__heading-label p {
+        margin-top: 2px;
+        margin-bottom: 0;
     }
 }
 
@@ -368,6 +418,12 @@
 .checkout-step__body .dropin-login-form__form,
 .checkout-step__body .account-form.account-address-form {
     max-width: 615px;
+}
+
+.checkout-step__body .account-addresses-wrapper--select-view {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 20px;
 }
 
 /* Step summaries: hidden when step is active, shown when inactive */
@@ -469,6 +525,7 @@
     justify-content: space-between;
     align-items: center;
     margin: 0 auto 40px;
+    width: 100%;
 }
 
 .progress-bar__line {
@@ -1108,4 +1165,30 @@
 /* Remove extra margin on input container */
 .checkout__aside-summary-card .dropin-input-container.dropin-input-container--primary {
     margin-right: 0;
+}
+
+@media screen and (min-width: 900px) {
+    .checkout__aside {
+        width: 370px;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .checkout__content {
+        gap: 100px;
+    }
+}
+
+@media screen and (max-width: 899px) {
+    .checkout__content {
+        margin-top: 40px;
+    }
+
+    .checkout__progress-bar {
+        margin-bottom: 0;
+    }
+
+    .checkout__content .checkout__shipping-address-form {
+        margin-bottom: 40px;
+    }
 }

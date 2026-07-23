@@ -676,6 +676,11 @@ header .nav-search-input .search_autocomplete .popover-container {
     position: relative;
   }
 
+  header nav .nav-tools-panel {
+    right: 10px;
+    width: calc(100% - 20px) !important;
+  }
+
   header .nav-wrapper.active .header-top-section {
     display: none;
   }

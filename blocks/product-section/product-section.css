@@ -67,6 +67,17 @@
   transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
+.product-section-wishlist button,
+.product-section-compare {
+  padding: 0;
+}
+
+.product-section-card .product-section-wishlist button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .product-section-card:hover {
   box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
   transform: translateY(-2px);
@@ -137,11 +148,6 @@
   cursor: pointer;
   box-shadow: 0 4px 16px rgb(0 0 0 / 8%);
   transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.product-section-wishlist button,
-.product-section-compare {
-  padding: 0;
 }
 
 .product-section-wishlist button:hover,

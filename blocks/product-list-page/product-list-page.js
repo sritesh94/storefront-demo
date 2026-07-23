@@ -291,14 +291,9 @@ export default async function decorate(block) {
               compareBtn.classList.remove('active');
             } else {
               const result = addCompareProduct(ctx.product.sku);
-              if (!result.success) {
-                const error = document.createElement('div');
-                error.className = 'compare-error';
-                error.textContent = result.message;
-                actionsWrapper.append(error);
-                return;
+              if (result.success) {
+                compareBtn.classList.add('active');
               }
-              compareBtn.classList.add('active');
             }
           });
           actionsWrapper.appendChild(addToCartBtn);

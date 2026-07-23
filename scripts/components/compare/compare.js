@@ -1,3 +1,5 @@
+import { showToast } from '../../lib/toast.js';
+
 const STORAGE_KEY = 'compare-products';
 const MAX_PRODUCTS = 4;
 
@@ -31,9 +33,11 @@ export function addCompareProduct(sku) {
   }
 
   if (products.length >= MAX_PRODUCTS) {
+    const message = `Maximum ${MAX_PRODUCTS} products can be compared.`;
+    showToast(message, 'warning');
     return {
       success: false,
-      message: `Maximum ${MAX_PRODUCTS} products can be compared.`,
+      message,
     };
   }
 
@@ -49,6 +53,8 @@ export function addCompareProduct(sku) {
       detail: updated,
     }),
   );
+
+  showToast('Added to compare list', 'success');
 
   return {
     success: true,
@@ -72,6 +78,8 @@ export function removeCompareProduct(sku) {
     }),
   );
 
+  showToast('Removed from compare list', 'info');
+
   return updated;
 }
 
@@ -83,4 +91,6 @@ export function clearCompareProducts() {
       detail: [],
     }),
   );
+
+  showToast('Compare list cleared', 'info');
 }

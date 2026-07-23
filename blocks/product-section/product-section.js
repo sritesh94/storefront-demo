@@ -354,14 +354,9 @@ function renderProductCard(product, container) {
       compareBtn.classList.remove('active');
     } else {
       const result = addCompareProduct(product.sku);
-      if (!result.success) {
-        const error = document.createElement('div');
-        error.className = 'product-section-compare-error';
-        error.textContent = result.message;
-        card.appendChild(error);
-        return;
+      if (result.success) {
+        compareBtn.classList.add('active');
       }
-      compareBtn.classList.add('active');
     }
   });
 

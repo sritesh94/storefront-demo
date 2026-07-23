@@ -12,7 +12,6 @@ import { render as pdpRendered } from '@dropins/storefront-pdp/render.js';
 import { render as wishlistRender } from '@dropins/storefront-wishlist/render.js';
 
 import { WishlistToggle } from '@dropins/storefront-wishlist/containers/WishlistToggle.js';
-import { WishlistAlert } from '@dropins/storefront-wishlist/containers/WishlistAlert.js';
 
 // Containers
 import ProductHeader from '@dropins/storefront-pdp/containers/ProductHeader.js';
@@ -35,7 +34,6 @@ import {
   CUSTOMER_LOGIN_PATH,
 } from '../../scripts/commerce.js';
 
-// Compare
 import {
   addCompareProduct,
   removeCompareProduct,
@@ -204,7 +202,6 @@ export default async function decorate(block) {
 
   // Alert
   let inlineAlert = null;
-  const routeToWishlist = rootLink('/wishlist');
 
   const [
     _galleryMobile,
@@ -329,16 +326,10 @@ export default async function decorate(block) {
         btn.querySelector('span').textContent = labels.Compare?.AddToCompare || 'Compare';
       } else {
         const result = addCompareProduct(sku);
-        if (!result.success) {
-          const err = document.createElement('span');
-          err.className = 'product-details__compare-error';
-          err.textContent = result.message;
-          $compareBtn.appendChild(err);
-          setTimeout(() => err.remove(), 3000);
-          return;
+        if (result.success) {
+          btn.classList.add('active');
+          btn.querySelector('span').textContent = labels.Compare?.Compared || 'Compared';
         }
-        btn.classList.add('active');
-        btn.querySelector('span').textContent = labels.Compare?.Compared || 'Compared';
       }
     });
     $compareBtn.appendChild(btn);
@@ -469,25 +460,6 @@ export default async function decorate(block) {
       }));
     }
   }, { eager: true });
-
-  events.on('wishlist/alert', ({ action, item }) => {
-    wishlistRender.render(WishlistAlert, {
-      action,
-      item,
-      routeToWishlist,
-    })($alert);
-
-    setTimeout(() => {
-      $alert.innerHTML = '';
-    }, 5000);
-
-    setTimeout(() => {
-      $alert.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
-    }, 0);
-  });
 
   // --- Add new event listener for cart/data ---
   events.on(

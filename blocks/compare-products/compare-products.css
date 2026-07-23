@@ -1,22 +1,30 @@
 .compare-container {
   max-width: var(--container-max-width);
   margin: var(--spacing-medium) auto;
-  padding: 0 var(--container-padding);
+  padding: 0;
 }
 
 .compare-header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-medium);
-  border-bottom: 2px solid var(--color-neutral-200);
+  margin-bottom: 40px;
+  border-bottom: 2px solid #b0b0b0;
   padding-bottom: var(--spacing-small);
 }
 
 .compare-header-container h2 {
   margin: 0;
-  font: var(--type-headline-1-font);
-  color: var(--color-neutral-900);
+  font-size: 28px;
+  line-height: 32px;
+  color: #000;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.compare-add-cart.button.primary {
+  background-color: #000;
+  color: #fff;
 }
 
 .compare-action-btn {
@@ -64,7 +72,7 @@
   font-weight: 700;
   background-color: var(--color-neutral-100);
   position: sticky;
-  left: 0;
+  left: -1px;
   z-index: 2;
   border-right: 2px solid var(--color-neutral-300);
 }

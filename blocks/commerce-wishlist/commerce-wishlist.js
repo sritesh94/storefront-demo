@@ -12,6 +12,7 @@ import {
   CUSTOMER_LOGIN_PATH,
 } from '../../scripts/commerce.js';
 import { readBlockConfig } from '../../scripts/aem.js';
+import { showToast } from '../../scripts/lib/toast.js';
 
 import '../../scripts/initializers/wishlist.js';
 
@@ -20,7 +21,6 @@ function CustomWishlist({ startShoppingURL }) {
   const [products, setProducts] = useState({});
   const [quantities, setQuantities] = useState({});
   const [loading, setLoading] = useState(true);
-  const [alert, setAlert] = useState(null);
   const [perPage, setPerPage] = useState(12);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -104,17 +104,17 @@ function CustomWishlist({ startShoppingURL }) {
     });
 
     if (itemsToUpdate.length === 0) {
-      setAlert({ type: 'info', message: 'No changes to update.' });
+      showToast('No changes to update.', 'info');
       return;
     }
 
     try {
       setLoading(true);
       await wishlistApi.updateProductsInWishlist(itemsToUpdate);
-      setAlert({ type: 'success', message: 'Wishlist updated successfully!' });
+      showToast('Wishlist updated successfully!', 'success');
     } catch (err) {
       console.error(err);
-      setAlert({ type: 'error', message: 'Failed to update wishlist.' });
+      showToast('Failed to update wishlist.', 'error');
     } finally {
       setLoading(false);
     }
@@ -136,10 +136,10 @@ function CustomWishlist({ startShoppingURL }) {
       setLoading(true);
       await cartApi.addProductsToCart(itemsToAdd);
       await wishlistApi.removeProductsFromWishlist(wishlist.items);
-      setAlert({ type: 'success', message: 'All items added to cart!' });
+      showToast('All items added to cart!', 'success');
     } catch (err) {
       console.error(err);
-      setAlert({ type: 'error', message: 'Failed to add all items to cart.' });
+      showToast('Failed to add all items to cart.', 'error');
     } finally {
       setLoading(false);
     }
@@ -156,10 +156,10 @@ function CustomWishlist({ startShoppingURL }) {
         enteredOptions: item.enteredOptions || [],
       }]);
       await wishlistApi.removeProductsFromWishlist([item]);
-      setAlert({ type: 'success', message: 'Product added to cart!' });
+      showToast('Product added to cart!', 'success');
     } catch (err) {
       console.error(err);
-      setAlert({ type: 'error', message: 'Failed to add item to cart.' });
+      showToast('Failed to add item to cart.', 'error');
     } finally {
       setLoading(false);
     }
@@ -169,10 +169,10 @@ function CustomWishlist({ startShoppingURL }) {
     try {
       setLoading(true);
       await wishlistApi.removeProductsFromWishlist([item]);
-      setAlert({ type: 'success', message: 'Item removed from wishlist.' });
+      showToast('Item removed from wishlist.', 'success');
     } catch (err) {
       console.error(err);
-      setAlert({ type: 'error', message: 'Failed to remove item.' });
+      showToast('Failed to remove item.', 'error');
     } finally {
       setLoading(false);
     }
@@ -182,10 +182,10 @@ function CustomWishlist({ startShoppingURL }) {
     const shareUrl = window.location.href;
     navigator.clipboard.writeText(shareUrl)
       .then(() => {
-        setAlert({ type: 'success', message: 'Wishlist URL copied to clipboard!' });
+        showToast('Wishlist URL copied to clipboard!', 'success');
       })
       .catch(() => {
-        setAlert({ type: 'error', message: 'Could not copy link to clipboard.' });
+        showToast('Could not copy link to clipboard.', 'error');
       });
   };
 
@@ -211,11 +211,6 @@ function CustomWishlist({ startShoppingURL }) {
   const countLabel = allItems.length === 1 ? '1 Item' : `${allItems.length} Items`;
 
   return h('div', { className: 'custom-wishlist-container' }, [
-    alert && h('div', { className: `wishlist-alert-banner alert-${alert.type}` }, [
-      h('span', { className: 'alert-message' }, alert.message),
-      h('button', { className: 'alert-close', onClick: () => setAlert(null) }, '✕'),
-    ]),
-
     h('div', { className: 'wishlist-header-row' }, [
       h('h2', { className: 'wishlist-heading-count' }, countLabel),
     ]),

@@ -23,7 +23,9 @@ import {
   IS_DA,
   checkAndRenderCategoryPage,
   checkAndRenderProductPage,
+  fetchPlaceholders,
 } from './commerce.js';
+import { showToast } from './lib/toast.js';
 
 /**
  * Builds hero block and prepends to main in a new section.
@@ -276,6 +278,39 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
+
+  // Register a global wishlist toast notification for all pages using WishlistToggle
+  const wishlistLabels = await fetchPlaceholders('placeholders/wishlist.json');
+  const wishlistMessages = {
+    add: wishlistLabels['Wishlist.Alert.addProduct.heading'] || 'Added to wishlist',
+    remove: wishlistLabels['Wishlist.Alert.removeProduct.heading'] || 'Removed from wishlist',
+    move: wishlistLabels['Wishlist.Alert.moveToCart.heading'] || 'Moved to cart',
+    addError: wishlistLabels['Wishlist.Alert.addError.heading'] || 'Could not add to wishlist',
+    removeError: wishlistLabels['Wishlist.Alert.removeError.heading'] || 'Could not remove from wishlist',
+  };
+
+  // Dynamically import events to avoid loading the event bus before commerce is ready
+  const { events } = await import('@dropins/tools/event-bus.js');
+  events.on('wishlist/alert', ({ action, item }) => {
+    const productName = item?.product?.name || '';
+    const messageTemplate = wishlistLabels[`Wishlist.Alert.${action}Product.message`]
+      || wishlistLabels[`Wishlist.Alert.${action}.message`]
+      || '';
+    const message = (productName && messageTemplate)
+      ? messageTemplate.replace('{product}', productName)
+      : wishlistMessages[action] || 'Wishlist updated';
+    const type = (action === 'addError' || action === 'removeError') ? 'error' : 'success';
+    showToast(message, type);
+  });
+
+  // Register a global cart toast notification site-wide
+  events.on('cart/product/added', (items) => {
+    const itemArray = Array.isArray(items) ? items : [items];
+    const firstItem = itemArray[0];
+    const name = firstItem?.name || firstItem?.product?.name;
+    const message = name ? `Added "${name}" to cart` : 'Added product to cart';
+    showToast(message, 'success');
+  });
 }
 
 /**

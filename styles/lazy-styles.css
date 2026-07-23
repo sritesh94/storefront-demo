@@ -1,1 +1,93 @@
 /* add global styles that can be loaded post LCP here */
+
+/* =============================================================================
+   SITE TOAST NOTIFICATIONS
+   Used by scripts/lib/toast.js — renders transient popup messages site-wide.
+   ============================================================================= */
+
+#site-toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  max-width: min(360px, calc(100vw - 40px));
+}
+
+.site-toast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  font-family: var(--body-font-family, sans-serif);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 15%);
+  pointer-events: all;
+  opacity: 0;
+  transform: translateX(24px);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  will-change: opacity, transform;
+}
+
+.site-toast--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Variant: info (default) */
+.site-toast--info {
+  background: #1a1a1a;
+  color: #fff;
+  border-left: 4px solid #6978d9;
+}
+
+/* Variant: error */
+.site-toast--error {
+  background: #1a1a1a;
+  color: #fff;
+  border-left: 4px solid #c35050;
+}
+
+/* Variant: success */
+.site-toast--success {
+  background: #1a1a1a;
+  color: #fff;
+  border-left: 4px solid #53824c;
+}
+
+/* Variant: warning */
+.site-toast--warning {
+  background: #1a1a1a;
+  color: #fff;
+  border-left: 4px solid #cc7a2e;
+}
+
+.site-toast__close {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0;
+  opacity: 0.7;
+  flex-shrink: 0;
+  transition: opacity 0.15s ease;
+}
+
+.site-toast__close:hover {
+  opacity: 1;
+}
+
+@media (max-width: 600px) {
+  #site-toast-container {
+    inset: auto 12px 16px;
+    max-width: none;
+  }
+}
