@@ -96,3 +96,17 @@ main>.section.commerce-login-container {
     text-decoration: underline;
     text-underline-offset: 4px;
 }
+
+.commerce-login-alert {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    line-height: 20px;
+    border-radius: 4px;
+}
+
+.commerce-login-alert--success {
+    background-color: #e6f4ea;
+    color: #137333;
+    border: 1px solid #ceead6;
+}

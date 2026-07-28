@@ -1,3 +1,4 @@
+import { events } from '@dropins/tools/event-bus.js';
 import { render as orderRenderer } from '@dropins/storefront-order/render.js';
 import { OrderProductList } from '@dropins/storefront-order/containers/OrderProductList.js';
 import GiftOptions from '@dropins/storefront-cart/containers/GiftOptions.js';
@@ -80,93 +81,339 @@ function extractCostData(costEl) {
 }
 
 /**
- * Builds the Magento-style Items Ordered table.
+ * Determines which Magento-style tabs to display based on order data & DOM items.
  */
-function buildItemsTable(dropinEl, costBlock) {
-  // Find all product items
-  const items = dropinEl.querySelectorAll('.dropin-cart-item');
-  if (!items.length) return null;
+function getTabAvailability(orderData) {
+  const status = (orderData?.status || '').toUpperCase();
+  const items = orderData?.items || [];
+  const shipments = orderData?.shipments || [];
+  const returns = orderData?.returns || [];
+
+  const hasInvoicedQty = items.some((item) => (item.quantityInvoiced ?? 0) > 0);
+  const hasShippedQty = items.some((item) => (item.quantityShipped ?? 0) > 0);
+  const hasRefundedQty = items.some((item) => (item.quantityRefunded ?? 0) > 0);
+
+  const closedOrComplete = ['CLOSED', 'COMPLETE'].includes(status);
+  const processingOrShipped = ['PROCESSING', 'SHIPPED', 'INVOICED'].includes(status);
+
+  const hasInvoices = (orderData?.invoices?.length > 0)
+    || hasInvoicedQty
+    || closedOrComplete
+    || processingOrShipped;
+
+  const hasShipments = (shipments.length > 0)
+    || hasShippedQty
+    || ['SHIPPED', 'COMPLETE', 'CLOSED'].includes(status);
+
+  const hasRefunds = (returns.length > 0)
+    || hasRefundedQty
+    || ['CLOSED', 'REFUNDED', 'CREDIT MEMO'].includes(status);
+
+  return { hasInvoices, hasShipments, hasRefunds };
+}
+
+/**
+ * Extracts options (e.g. Size, Color) from order item.
+ */
+function extractItemOptions(item) {
+  const options = [];
+  if (Array.isArray(item.configurableOptions)) {
+    item.configurableOptions.forEach((opt) => {
+      if (opt.optionLabel && opt.valueLabel) {
+        options.push({ label: opt.optionLabel, value: opt.valueLabel });
+      }
+    });
+  } else if (Array.isArray(item.selectedOptions)) {
+    item.selectedOptions.forEach((opt) => {
+      if (opt.label && opt.value) {
+        options.push({ label: opt.label, value: opt.value });
+      }
+    });
+  }
+  return options;
+}
+
+/**
+ * Builds the Magento-style Items / Invoices / Shipments / Refunds tabbed section.
+ */
+function buildItemsTable(dropinEl, costBlock, currentTab, orderData, onTabChange) {
+  const domItems = dropinEl.querySelectorAll('.dropin-cart-item');
+  if (!domItems.length && !orderData?.items?.length) return null;
+
+  const { hasInvoices, hasShipments, hasRefunds } = getTabAvailability(orderData);
 
   const wrapper = document.createElement('div');
   wrapper.classList.add('order-items-table-wrapper');
 
-  // Section heading
-  const heading = document.createElement('h2');
-  heading.classList.add('order-details-items-heading');
-  heading.textContent = 'Items Ordered';
-  wrapper.appendChild(heading);
+  // Tab Header Bar
+  const tabHeader = document.createElement('div');
+  tabHeader.classList.add('order-details-tabs-header');
 
-  // ── Inner container wrapping both tables ──
+  const tabs = [
+    { id: 'items', label: 'Items Ordered', show: true },
+    { id: 'invoices', label: 'Invoices', show: hasInvoices },
+    { id: 'shipments', label: 'Order Shipments', show: hasShipments },
+    { id: 'refunds', label: 'Refunds', show: hasRefunds },
+  ];
+
+  tabs.forEach((tab) => {
+    if (!tab.show) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.classList.add('order-tab-btn');
+    if (tab.id === currentTab) btn.classList.add('active');
+    btn.textContent = tab.label;
+    btn.addEventListener('click', () => {
+      if (currentTab !== tab.id && onTabChange) {
+        onTabChange(tab.id);
+      }
+    });
+    tabHeader.appendChild(btn);
+  });
+  wrapper.appendChild(tabHeader);
+
+  // Inner container wrapping table and totals
   const tablesInner = document.createElement('div');
   tablesInner.classList.add('order-tables-inner');
+
+  // Extract reference numbers
+  const searchParams = new URLSearchParams(window.location.search);
+  const fallbackNum = searchParams.get('orderRef') || '000000015';
+  const orderNum = orderData?.number || orderData?.id || fallbackNum;
+  const invoiceNumber = orderData?.invoices?.[0]?.number || orderNum;
+  const shipmentNumber = orderData?.shipments?.[0]?.number
+    || orderData?.shipments?.[0]?.id
+    || orderNum;
+  const refundNumber = orderData?.returns?.[0]?.number
+    || orderData?.returns?.[0]?.id
+    || orderNum;
+
+  // Sub-header for specific tabs (Invoices, Shipments, Refunds)
+  let subHeader = null;
+  if (currentTab === 'invoices') {
+    subHeader = document.createElement('div');
+    subHeader.classList.add('order-sub-header');
+    subHeader.innerHTML = `
+      <div class="action-bar-top">
+        <a href="#" class="action print-link">Print All Invoices</a>
+      </div>
+      <div class="order-title-block">
+        <h3 class="order-sub-title">Invoice #${invoiceNumber}</h3>
+        <a href="#" class="action print-link-inline">Print Invoice</a>
+      </div>
+    `;
+  } else if (currentTab === 'shipments') {
+    subHeader = document.createElement('div');
+    subHeader.classList.add('order-sub-header');
+    subHeader.innerHTML = `
+      <div class="action-bar-top">
+        <a href="#" class="action print-link">Print All Shipments</a>
+      </div>
+      <div class="order-title-block">
+        <h3 class="order-sub-title">Shipment #${shipmentNumber}</h3>
+        <a href="#" class="action print-link-inline">Print Shipment</a>
+        <a href="#" class="action track-shipment-link">Track this shipment</a>
+      </div>
+    `;
+  } else if (currentTab === 'refunds') {
+    subHeader = document.createElement('div');
+    subHeader.classList.add('order-sub-header');
+    subHeader.innerHTML = `
+      <div class="action-bar-top">
+        <a href="#" class="action print-link">Print All Refunds</a>
+      </div>
+      <div class="order-title-block">
+        <h3 class="order-sub-title">Refund #${refundNumber}</h3>
+        <a href="#" class="action print-link-inline">Print Refund</a>
+      </div>
+    `;
+  }
+
+  if (subHeader) {
+    subHeader.querySelectorAll('.print-link, .print-link-inline').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.print();
+      });
+    });
+
+    const trackLink = subHeader.querySelector('.track-shipment-link');
+    if (trackLink) {
+      trackLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.print();
+      });
+    }
+
+    tablesInner.appendChild(subHeader);
+  }
+
+  // Items Data (from event payload or DOM fallback)
+  const itemsData = (orderData?.items && orderData.items.length > 0)
+    ? orderData.items.map((item) => {
+      const priceVal = item.price?.value !== undefined
+        ? item.price.value
+        : (item.productSalePrice?.value || 0);
+      const formattedPrice = `$${Number(priceVal).toFixed(2)}`;
+      const totalVal = item.total?.value !== undefined
+        ? item.total.value
+        : (priceVal * (item.quantityOrdered || 1));
+      const formattedSubtotal = `$${Number(totalVal).toFixed(2)}`;
+
+      return {
+        name: item.productName || item.product?.name || '',
+        nameHref: item.productUrlKey
+          ? getProductLink(item.productUrlKey, item.productSku || item.product?.sku)
+          : rootLink('#'),
+        sku: item.productSku || item.product?.sku || '',
+        price: formattedPrice,
+        qtyOrdered: item.quantityOrdered || 1,
+        qtyInvoiced: item.quantityInvoiced || item.quantityOrdered || 1,
+        qtyShipped: item.quantityShipped || item.quantityOrdered || 1,
+        qtyRefunded: item.quantityRefunded || item.quantityOrdered || 1,
+        subtotal: formattedSubtotal,
+        discount: '$0.00',
+        rowTotal: formattedSubtotal,
+        options: extractItemOptions(item),
+      };
+    })
+    : Array.from(domItems).map((el) => ({
+      ...extractItemData(el),
+      qtyOrdered: extractItemData(el).qty,
+      qtyInvoiced: extractItemData(el).qty,
+      qtyShipped: extractItemData(el).qty,
+      qtyRefunded: extractItemData(el).qty,
+      discount: '$0.00',
+      rowTotal: extractItemData(el).subtotal,
+      options: [],
+    }));
 
   // Build <table>
   const table = document.createElement('table');
   table.classList.add('order-items-table');
 
-  // <thead>
   const thead = document.createElement('thead');
-  thead.innerHTML = `
-    <tr>
-      <th scope="col" class="col-name">Product Name</th>
-      <th scope="col" class="col-sku">SKU</th>
-      <th scope="col" class="col-price">Price</th>
-      <th scope="col" class="col-qty">Qty</th>
-      <th scope="col" class="col-subtotal">Subtotal</th>
-    </tr>
-  `;
+  if (currentTab === 'items') {
+    thead.innerHTML = `
+      <tr>
+        <th scope="col" class="col-name">Product Name</th>
+        <th scope="col" class="col-sku">SKU</th>
+        <th scope="col" class="col-price">Price</th>
+        <th scope="col" class="col-qty">Qty</th>
+        <th scope="col" class="col-subtotal">Subtotal</th>
+      </tr>
+    `;
+  } else if (currentTab === 'invoices') {
+    thead.innerHTML = `
+      <tr>
+        <th scope="col" class="col-name">Product Name</th>
+        <th scope="col" class="col-sku">SKU</th>
+        <th scope="col" class="col-price">Price</th>
+        <th scope="col" class="col-qty">Qty Invoiced</th>
+        <th scope="col" class="col-subtotal">Subtotal</th>
+      </tr>
+    `;
+  } else if (currentTab === 'shipments') {
+    thead.innerHTML = `
+      <tr>
+        <th scope="col" class="col-name">Product Name</th>
+        <th scope="col" class="col-sku">SKU</th>
+        <th scope="col" class="col-qty">Qty Shipped</th>
+      </tr>
+    `;
+  } else if (currentTab === 'refunds') {
+    thead.innerHTML = `
+      <tr>
+        <th scope="col" class="col-name">Product Name</th>
+        <th scope="col" class="col-sku">SKU</th>
+        <th scope="col" class="col-price">Price</th>
+        <th scope="col" class="col-qty">Qty</th>
+        <th scope="col" class="col-subtotal">Subtotal</th>
+        <th scope="col" class="col-discount">Discount Amount</th>
+        <th scope="col" class="col-row-total">Row Total</th>
+      </tr>
+    `;
+  }
   table.appendChild(thead);
 
-  // <tbody>
   const tbody = document.createElement('tbody');
-  items.forEach((item) => {
-    const {
-      name, nameHref, sku, price, qty, subtotal,
-    } = extractItemData(item);
+  itemsData.forEach((item) => {
+    let optionsHtml = '';
+    if (item.options && item.options.length > 0) {
+      optionsHtml = `<div class="product-options"><dl class="item-options">${item.options.map((opt) => `<dt>${opt.label}</dt><dd>${opt.value}</dd>`).join('')}</dl></div>`;
+    }
 
     const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="col-name" data-label="Product Name"><a href="${nameHref}">${name}</a></td>
-      <td class="col-sku" data-label="SKU">${sku}</td>
-      <td class="col-price" data-label="Price">${price}</td>
-      <td class="col-qty" data-label="Qty"><span class="qty-ordered">${qty}</span></td>
-      <td class="col-subtotal" data-label="Subtotal">${subtotal}</td>
-    `;
+    if (currentTab === 'items') {
+      tr.innerHTML = `
+        <td class="col-name" data-label="Product Name"><a href="${item.nameHref}">${item.name}</a>${optionsHtml}</td>
+        <td class="col-sku" data-label="SKU">${item.sku}</td>
+        <td class="col-price" data-label="Price">${item.price}</td>
+        <td class="col-qty" data-label="Qty"><span class="qty-ordered">${item.qtyOrdered}</span></td>
+        <td class="col-subtotal" data-label="Subtotal">${item.subtotal}</td>
+      `;
+    } else if (currentTab === 'invoices') {
+      tr.innerHTML = `
+        <td class="col-name" data-label="Product Name"><a href="${item.nameHref}">${item.name}</a>${optionsHtml}</td>
+        <td class="col-sku" data-label="SKU">${item.sku}</td>
+        <td class="col-price" data-label="Price">${item.price}</td>
+        <td class="col-qty" data-label="Qty Invoiced"><span class="qty-invoiced">${item.qtyInvoiced}</span></td>
+        <td class="col-subtotal" data-label="Subtotal">${item.subtotal}</td>
+      `;
+    } else if (currentTab === 'shipments') {
+      tr.innerHTML = `
+        <td class="col-name" data-label="Product Name"><a href="${item.nameHref}">${item.name}</a>${optionsHtml}</td>
+        <td class="col-sku" data-label="SKU">${item.sku}</td>
+        <td class="col-qty" data-label="Qty Shipped"><span class="qty-shipped">${item.qtyShipped}</span></td>
+      `;
+    } else if (currentTab === 'refunds') {
+      tr.innerHTML = `
+        <td class="col-name" data-label="Product Name"><a href="${item.nameHref}">${item.name}</a>${optionsHtml}</td>
+        <td class="col-sku" data-label="SKU">${item.sku}</td>
+        <td class="col-price" data-label="Price">${item.price}</td>
+        <td class="col-qty" data-label="Qty"><span class="qty-refunded">${item.qtyRefunded}</span></td>
+        <td class="col-subtotal" data-label="Subtotal">${item.subtotal}</td>
+        <td class="col-discount" data-label="Discount Amount">${item.discount}</td>
+        <td class="col-row-total" data-label="Row Total">${item.rowTotal}</td>
+      `;
+    }
     tbody.appendChild(tr);
   });
   table.appendChild(tbody);
   tablesInner.appendChild(table);
 
-  // ── Order Totals ──
-  const costWrapper = costBlock ? costBlock.querySelector('.order-cost-summary-content__wrapper') : null;
-  if (costWrapper) {
-    const {
-      subtotal, shipping, tax, grandTotal,
-    } = extractCostData(costWrapper);
+  // Totals Table (for items, invoices, and refunds, NOT shipments)
+  if (currentTab !== 'shipments') {
+    const costWrapper = costBlock ? costBlock.querySelector('.order-cost-summary-content__wrapper') : null;
+    if (costWrapper) {
+      const {
+        subtotal, shipping, tax, grandTotal,
+      } = extractCostData(costWrapper);
 
-    const totalsTable = document.createElement('table');
-    totalsTable.classList.add('order-totals-table');
-    totalsTable.innerHTML = `
-      <tbody>
-        <tr class="totals-subtotal">
-          <td class="totals-label">Subtotal</td>
-          <td class="totals-value">${subtotal}</td>
-        </tr>
-        <tr class="totals-shipping">
-          <td class="totals-label">Shipping &amp; Handling</td>
-          <td class="totals-value">${shipping}</td>
-        </tr>
-        <tr class="totals-tax">
-          <td class="totals-label">Tax</td>
-          <td class="totals-value">${tax}</td>
-        </tr>
-        <tr class="totals-grand-total">
-          <td class="totals-label">Grand Total</td>
-          <td class="totals-value">${grandTotal}</td>
-        </tr>
-      </tbody>
-    `;
-    tablesInner.appendChild(totalsTable);
+      const totalsTable = document.createElement('table');
+      totalsTable.classList.add('order-totals-table');
+      totalsTable.innerHTML = `
+        <tbody>
+          <tr class="totals-subtotal">
+            <td class="totals-label">Subtotal</td>
+            <td class="totals-value">${subtotal}</td>
+          </tr>
+          <tr class="totals-shipping">
+            <td class="totals-label">Shipping &amp; Handling</td>
+            <td class="totals-value">${shipping}</td>
+          </tr>
+          <tr class="totals-tax">
+            <td class="totals-label">Tax</td>
+            <td class="totals-value">${tax}</td>
+          </tr>
+          <tr class="totals-grand-total">
+            <td class="totals-label">Grand Total</td>
+            <td class="totals-value">${grandTotal}</td>
+          </tr>
+        </tbody>
+      `;
+      tablesInner.appendChild(totalsTable);
+    }
   }
 
   wrapper.appendChild(tablesInner);
@@ -246,25 +493,31 @@ export default async function decorate(block) {
     routeProductDetails: createProductLink,
   })(dropinContainer);
 
-  /**
-   * Rebuilds the visible table from the dropin's rendered items.
-   * Guard flag prevents re-entrant calls triggered by the observer
-   * seeing its own DOM writes to tableContainer.
-   */
   let isRebuilding = false;
   let debounceTimer = null;
+  let cachedOrderData = events.lastPayload('order/data') || null;
+  let activeTab = 'items';
 
   const rebuildTable = () => {
     if (isRebuilding) return;
     const items = dropinContainer.querySelectorAll('.dropin-cart-item');
-    if (!items.length) return;
+    if (!items.length && !cachedOrderData?.items?.length) return;
 
     // Fetch the cost summary block from the document
     const costBlock = document.querySelector('.commerce-order-cost-summary');
 
     isRebuilding = true;
     try {
-      const tableWrapper = buildItemsTable(dropinContainer, costBlock);
+      const tableWrapper = buildItemsTable(
+        dropinContainer,
+        costBlock,
+        activeTab,
+        cachedOrderData,
+        (newTab) => {
+          activeTab = newTab;
+          rebuildTable();
+        },
+      );
       tableContainer.innerHTML = '';
       if (tableWrapper) {
         tableContainer.appendChild(tableWrapper);
@@ -274,9 +527,12 @@ export default async function decorate(block) {
     }
   };
 
+  events.on('order/data', (data) => {
+    cachedOrderData = data;
+    rebuildTable();
+  }, { eager: true });
+
   // Observe ONLY the hidden dropin source container for changes.
-  // Do NOT observe block.parentElement — that scope includes tableContainer,
-  // causing the observer to fire on its own DOM writes (infinite loop).
   const observer = new MutationObserver(() => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(rebuildTable, 80);
@@ -284,11 +540,6 @@ export default async function decorate(block) {
 
   observer.observe(dropinContainer, { childList: true, subtree: true });
 
-  // One-time fallback: rebuild after 800ms to pick up any late-rendering
-  // sibling blocks (e.g. commerce-order-cost-summary) that may not have
-  // been in the DOM at initial render time.
   setTimeout(rebuildTable, 800);
-
-  // Attempt immediate rebuild
   rebuildTable();
 }

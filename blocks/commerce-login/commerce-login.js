@@ -15,10 +15,17 @@ export default async function decorate(block) {
   if (checkIsAuthenticated()) {
     window.location.href = rootLink(CUSTOMER_ACCOUNT_PATH);
   } else {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('emailChanged') === 'true' && !block.querySelector('.commerce-login-alert')) {
+      const alertEl = document.createElement('div');
+      alertEl.className = 'commerce-login-alert commerce-login-alert--success';
+      alertEl.innerHTML = 'You have successfully updated your email. Please sign in with your new email address.';
+      block.prepend(alertEl);
+    }
+
     await authRenderer.render(SignIn, {
       routeForgotPassword: () => rootLink(CUSTOMER_FORGOTPASSWORD_PATH),
       routeRedirectOnSignIn: () => {
-        const urlParams = new URLSearchParams(window.location.search);
         const redirect = urlParams.get('redirect');
         if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
           return redirect;

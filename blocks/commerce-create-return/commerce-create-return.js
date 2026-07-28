@@ -32,13 +32,20 @@ export default async function decorate(block) {
 }
 function imageSlotConfig(ctx) {
   const { data, defaultImageProps } = ctx;
+  const sku = data?.product?.sku
+    || data?.orderItem?.product?.sku
+    || data?.orderItem?.productSku
+    || data?.productSku
+    || data?.sku
+    || '';
+
   return {
-    alias: data.product.sku,
+    alias: sku,
     imageProps: defaultImageProps,
 
     params: {
-      width: defaultImageProps.width,
-      height: defaultImageProps.height,
+      width: defaultImageProps?.width,
+      height: defaultImageProps?.height,
     },
   };
 }

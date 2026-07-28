@@ -88,6 +88,57 @@ function formatNumericAttributeValue(value) {
   return new Intl.NumberFormat(document.documentElement.lang).format(Number(trimmed));
 }
 
+/**
+ * Checks if an accordion content container has meaningful content to display.
+ */
+function hasAccordionContent(contentEl, labelToIgnore = '') {
+  if (!contentEl) return false;
+
+  if (contentEl.querySelector('img, video, iframe, svg, canvas')) {
+    return true;
+  }
+
+  const listItems = contentEl.querySelectorAll('li');
+  const hasNonEmptyLi = Array.from(listItems).some(
+    (li) => li.textContent.replace(/\u00a0/g, ' ').trim().length > 0,
+  );
+  if (hasNonEmptyLi) {
+    return true;
+  }
+
+  let text = contentEl.textContent.replace(/\u00a0/g, ' ').trim();
+  if (labelToIgnore) {
+    text = text.replace(new RegExp(labelToIgnore, 'gi'), '').trim();
+  }
+
+  if (contentEl.querySelector('ul, ol') && listItems.length === 0) {
+    return false;
+  }
+
+  return text.length > 0;
+}
+
+function updateAccordionVisibility(accordionEl, contentEl, labelToIgnore = '') {
+  if (!accordionEl || !contentEl) return;
+  const hasContent = hasAccordionContent(contentEl, labelToIgnore);
+  if (hasContent) {
+    accordionEl.removeAttribute('hidden');
+  } else {
+    accordionEl.setAttribute('hidden', '');
+  }
+}
+
+function updateAccordionContainerVisibility(containerEl) {
+  if (!containerEl) return;
+  const accordions = containerEl.querySelectorAll('.product-details__accordion');
+  const visibleAccordions = Array.from(accordions).filter((acc) => !acc.hasAttribute('hidden'));
+  if (visibleAccordions.length === 0) {
+    containerEl.setAttribute('hidden', '');
+  } else {
+    containerEl.removeAttribute('hidden');
+  }
+}
+
 export default async function decorate(block) {
   const eventProduct = events.lastPayload('pdp/data') ?? null;
   // bug: the pdp sends an object with event data even if product is not found.
@@ -166,6 +217,22 @@ export default async function decorate(block) {
   const $compareBtn = fragment.querySelector('.product-details__buttons__compare');
   const $description = fragment.querySelector('.product-details__description');
   const $attributes = fragment.querySelector('.product-details__attributes');
+  const $accordionContainer = fragment.querySelector('.product-details__accordion-container');
+  const $descriptionAccordion = $description?.closest('.product-details__accordion');
+  const $attributesAccordion = $attributes?.closest('.product-details__accordion');
+
+  const updateAllAccordions = () => {
+    updateAccordionVisibility($descriptionAccordion, $description);
+    updateAccordionVisibility($attributesAccordion, $attributes, detailsLabel);
+    updateAccordionContainerVisibility($accordionContainer);
+  };
+
+  const accordionObserver = new MutationObserver(() => {
+    updateAllAccordions();
+  });
+  const observerConfig = { childList: true, subtree: true, characterData: true };
+  if ($description) accordionObserver.observe($description, observerConfig);
+  if ($attributes) accordionObserver.observe($attributes, observerConfig);
 
   // Load fragments
   const fragmentElements = [...fragment.querySelectorAll('a[href*="/fragments/"]')];
@@ -297,6 +364,8 @@ export default async function decorate(block) {
       }),
     })($wishlistToggleBtn),
   ]);
+
+  updateAllAccordions();
 
   // Compare Button
   function renderCompareButton(sku) {
@@ -433,6 +502,7 @@ export default async function decorate(block) {
   events.on('pdp/data', (data) => {
     isOutOfStock = data?.inStock === false;
     addToCart.setProps((prev) => ({ ...prev, disabled: isOutOfStock }));
+    updateAllAccordions();
   }, { eager: true });
 
   events.on('pdp/valid', (valid) => {

@@ -356,24 +356,54 @@ function setupEditFormInjections(block) {
         saveButton.disabled = true;
         saveButton.innerHTML = '<span>Saving...</span>';
 
+        let emailChangedSuccessfully = false;
         try {
-          // 1. Password change
+          // 1. Password change (if requested)
           if (showPassword) {
             await updateCustomerPassword({ currentPassword, newPassword });
           }
 
-          // 2. Email change
-          if (showEmail) {
-            await updateCustomerEmail({ email, password: currentPassword });
-          }
-
-          // 3. Name change
+          // 2. Name change (must run BEFORE email update while token is still active)
           await updateCustomer({ firstName, lastName });
 
-          // Redirect to account dashboard on success
+          // 3. Email change (if requested)
+          if (showEmail) {
+            await updateCustomerEmail({ email, password: currentPassword });
+            emailChangedSuccessfully = true;
+
+            // Clear token and auth headers locally
+            try {
+              const { revokeCustomerToken } = await import('@dropins/storefront-auth/api.js');
+              await revokeCustomerToken();
+            } catch (revokeErr) {
+              // Ignore cleanup error since token is already revoked on server
+            }
+
+            document.cookie = 'auth_dropin_user_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+            document.cookie = 'auth_dropin_firstname=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+            document.cookie = 'auth_dropin_lastname=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+            document.cookie = 'auth_dropin_admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+
+            window.location.href = rootLink('/customer/login?emailChanged=true');
+            return;
+          }
+
+          // Redirect to account dashboard on success if email was not changed
           window.location.href = rootLink('/customer/account');
         } catch (err) {
           console.error(err);
+          // If email update succeeded or token was revoked, handle as successful email change
+          const isTokenRevoked = err?.message?.toLowerCase().includes('revoked');
+          if (emailChangedSuccessfully || (showEmail && isTokenRevoked)) {
+            document.cookie = 'auth_dropin_user_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+            document.cookie = 'auth_dropin_firstname=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+            document.cookie = 'auth_dropin_lastname=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+            document.cookie = 'auth_dropin_admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+
+            window.location.href = rootLink('/customer/login?emailChanged=true');
+            return;
+          }
+
           // Show error message (typically incorrect password)
           const errorMsg = err.message || 'An error occurred while saving.';
           form.querySelector('.custom-hint-current-password').textContent = errorMsg;
